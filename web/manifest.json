@@ -1,11 +1,11 @@
 {
-    "name": "otobix_crm",
-    "short_name": "otobix_crm",
+    "name": "Otobix CRM Dashboard",
+    "short_name": "Otobix CRM",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#ffffff",
+    "theme_color": "#2D6A4F",
+    "description": "Otobix CRM Dashboard – Manage car auctions, inspections, customers, and reports with ease. A modern web app for automotive businesses.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
