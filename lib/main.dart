@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:otobix_crm/homepage.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:otobix_crm/views/desktop_homepage.dart';
+import 'package:otobix_crm/utils/app_colors.dart';
+import 'package:otobix_crm/utils/responsive_layout.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,12 +13,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        brightness: Brightness.light,
+        // fontFamily: 'Poppins',
+        scaffoldBackgroundColor: AppColors.white,
+        canvasColor: AppColors.white,
+        // dialogTheme: const DialogTheme(backgroundColor: AppColors.white),
+        bottomSheetTheme: const BottomSheetThemeData(
+          backgroundColor: AppColors.white,
+        ),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.white,
+          brightness: Brightness.light,
+        ),
       ),
-      home: Homepage(),
+      home: ResponsiveLayout(
+        mobile: DesktopHomepage(),
+        desktop: DesktopHomepage(),
+      ),
     );
   }
 }
