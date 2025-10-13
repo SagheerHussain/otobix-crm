@@ -4,7 +4,7 @@ class AppUrls {
   static const String baseUrl =
       "https://otobix-app-backend-rq8m.onrender.com/api/";
   // static const String baseUrl =
-  //     "http://192.168.100.99:4000/api/"; // For Mobile Testing
+  //     "http://192.168.100.99:4000/api/"; // For Mobile Testing.
 
   static String get getBidsSummary => "${baseUrl}admin/bids/summary";
 
