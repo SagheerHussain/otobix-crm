@@ -46,19 +46,21 @@ class DesktopBidHistoryPage extends StatelessWidget {
           );
         }
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildScreenTitle(),
-              const SizedBox(height: 20),
-              _buildTopReports(c.summary.value),
-              const SizedBox(height: 20),
-              _buildRecentBidsList(),
-              const SizedBox(height: 8),
-              _buildPager(),
-            ],
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildScreenTitle(),
+                const SizedBox(height: 20),
+                _buildTopReports(c.summary.value),
+                const SizedBox(height: 20),
+                _buildRecentBidsList(),
+                const SizedBox(height: 8),
+                _buildPager(),
+              ],
+            ),
           ),
         );
       }),
