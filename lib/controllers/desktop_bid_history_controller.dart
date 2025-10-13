@@ -64,7 +64,7 @@ class DesktopBidHistoryController extends GetxController {
 
     try {
       final endpoint =
-          '${AppUrls.getLast10Bids}?page=$page&limit=${limit.value}';
+          '${AppUrls.getRecentBidsList}?page=$page&limit=${limit.value}';
       final http.Response resp = await ApiService.get(endpoint: endpoint);
 
       if (resp.statusCode < 200 || resp.statusCode >= 300) {

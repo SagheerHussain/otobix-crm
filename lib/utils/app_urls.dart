@@ -8,7 +8,8 @@ class AppUrls {
 
   static String get getBidsSummary => "${baseUrl}admin/bids/summary";
 
-  static String get getLast10Bids => "${baseUrl}admin/bids/last10bids";
+  static String get getRecentBidsList =>
+      "${baseUrl}admin/bids/recent-bids-list";
 
   static String get getDashboardReportsSummary =>
       "${baseUrl}admin/dashboard/get-reports-summary";
