@@ -4,10 +4,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:otobix_crm/models/bid_summary_model.dart';
-
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
 import 'package:otobix_crm/widgets/table_widget.dart';
-
 import '../controllers/desktop_bid_history_controller.dart';
 
 class DesktopBidHistoryPage extends StatelessWidget {
@@ -21,7 +19,8 @@ class DesktopBidHistoryPage extends StatelessWidget {
     return Scaffold(
       body: Obx(() {
         if (c.loading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+              child: CircularProgressIndicator(color: AppColors.green));
         }
         if (c.error.value != null) {
           return Center(
@@ -57,6 +56,8 @@ class DesktopBidHistoryPage extends StatelessWidget {
               _buildTopReports(c.summary.value),
               const SizedBox(height: 20),
               _buildRecentBidsList(),
+              const SizedBox(height: 8),
+              _buildPager(),
             ],
           ),
         );
@@ -64,7 +65,6 @@ class DesktopBidHistoryPage extends StatelessWidget {
     );
   }
 
-  // Screen Title (unchanged)
   Widget _buildScreenTitle() {
     return Row(
       children: [
@@ -80,7 +80,6 @@ class DesktopBidHistoryPage extends StatelessWidget {
     );
   }
 
-  // Top Reports — now takes server data
   Widget _buildTopReports(BidsSummaryModel? s) {
     String _n(int? v) => (v ?? 0).toString();
 
@@ -152,7 +151,6 @@ class DesktopBidHistoryPage extends StatelessWidget {
     );
   }
 
-  // Recent Bids List — uses controller data
   Widget _buildRecentBidsList() {
     final columns = const [
       DataColumn(label: Text("Bidder")),
@@ -162,11 +160,9 @@ class DesktopBidHistoryPage extends StatelessWidget {
       DataColumn(label: Text("Status")),
     ];
 
-    final rows = c.bids.map((b) {
-      // at top of the widget
-      final timeFmt =
-          DateFormat('dd MMM yyyy • hh:mm a'); // e.g., 10 Oct 2025 • 03:45 PM
+    final timeFmt = DateFormat('dd MMM yyyy • hh:mm a');
 
+    final rows = c.bids.map((b) {
       return DataRow(
         cells: [
           DataCell(Text(b.userName)),
@@ -198,6 +194,54 @@ class DesktopBidHistoryPage extends StatelessWidget {
       );
     }).toList();
 
-    return TableWidget(title: "Recent Bids", columns: columns, rows: rows);
+    // 🔒 Fixed height, scrolls vertically (and horizontally if needed)
+    return TableWidget(
+      title: "Recent Bids",
+      titleSize: 20,
+      height: 500, // ⬅️ change this to the height you want
+      minTableWidth: MediaQuery.of(Get.context!).size.width - 250,
+      // columns: columns,
+      isLoading: c.isBidsLoading.value,
+      rows: rows,
+      columns: const [
+        DataColumn(label: Text("Bidder")),
+        DataColumn(label: Text("Car")),
+        DataColumn(label: Text("Bid Amount")),
+        DataColumn(label: Text("Time")),
+        DataColumn(label: Text("Status")),
+      ],
+      // rows: myRows,
+      // Ensure length == columns.length
+      columnWidths: const [100, 250, 100, 200, 80],
+    );
+  }
+
+  Widget _buildPager() {
+    return Obx(() {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Page ${c.page.value} of ${c.totalPages.value} • ${c.total.value} total',
+            style: TextStyle(color: AppColors.grey.withValues(alpha: 0.8)),
+          ),
+          Row(
+            children: [
+              OutlinedButton.icon(
+                onPressed: c.hasPrev.value ? c.prevPage : null,
+                icon: const Icon(Icons.chevron_left),
+                label: const Text('Prev'),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: c.hasNext.value ? c.nextPage : null,
+                icon: const Icon(Icons.chevron_right),
+                label: const Text('Next'),
+              ),
+            ],
+          ),
+        ],
+      );
+    });
   }
 }

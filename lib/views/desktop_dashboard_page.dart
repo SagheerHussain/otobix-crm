@@ -1,10 +1,17 @@
+import 'dart:math' as math;
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:otobix_crm/controllers/desktop_dashboard_controller.dart';
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
 
 class DesktopDashboardPage extends StatelessWidget {
-  const DesktopDashboardPage({super.key});
+  DesktopDashboardPage({super.key});
+
+  final DesktopDashboardController getxController =
+      Get.put(DesktopDashboardController());
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +52,9 @@ class DesktopDashboardPage extends StatelessWidget {
     );
   }
 
-  // Top Reports
+  // Top Reports  // Top Reports (now reactive)
   Widget _buildTopReports() {
-    // Info Container
+    final getxController = Get.find<DesktopDashboardController>();
     Widget infoContainer({
       required String title,
       required String count,
@@ -59,7 +66,7 @@ class DesktopDashboardPage extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.grey.withValues(alpha: 0.5)),
+          border: Border.all(color: AppColors.grey.withOpacity(0.5)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +76,7 @@ class DesktopDashboardPage extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                color: AppColors.grey.withValues(alpha: 0.7),
+                color: AppColors.grey.withOpacity(0.7),
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
               ),
@@ -88,37 +95,49 @@ class DesktopDashboardPage extends StatelessWidget {
       );
     }
 
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: [
-        infoContainer(
-          title: "Total Dealers",
-          count: "14",
-          icon: FontAwesomeIcons.userTie,
-        ),
-        infoContainer(
-          title: "Total Cars",
-          count: "06",
-          icon: FontAwesomeIcons.car,
-        ),
-        infoContainer(
-          title: "Upcoming Cars",
-          count: "04",
-          icon: FontAwesomeIcons.calendarPlus,
-        ),
-        infoContainer(
-          title: "Live Cars",
-          count: "09",
-          icon: FontAwesomeIcons.circlePlay,
-        ),
-        infoContainer(
-          title: "Otobuy Cars",
-          count: "04",
-          icon: FontAwesomeIcons.cartShopping,
-        ),
-      ],
-    );
+    return Obx(() {
+      return Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          infoContainer(
+            title: "Total Dealers",
+            count: getxController.isLoadingSummary.value
+                ? '...'
+                : getxController.totalDealers.value.toString(),
+            icon: FontAwesomeIcons.userTie,
+          ),
+          infoContainer(
+            title: "Total Cars",
+            count: getxController.isLoadingSummary.value
+                ? '...'
+                : getxController.totalCars.value.toString(),
+            icon: FontAwesomeIcons.car,
+          ),
+          infoContainer(
+            title: "Upcoming Cars",
+            count: getxController.isLoadingSummary.value
+                ? '...'
+                : getxController.upcomingCars.value.toString(),
+            icon: FontAwesomeIcons.calendarPlus,
+          ),
+          infoContainer(
+            title: "Live Cars",
+            count: getxController.isLoadingSummary.value
+                ? '...'
+                : getxController.liveCars.value.toString(),
+            icon: FontAwesomeIcons.circlePlay,
+          ),
+          infoContainer(
+            title: "Otobuy Cars",
+            count: getxController.isLoadingSummary.value
+                ? '...'
+                : getxController.otobuyCars.value.toString(),
+            icon: FontAwesomeIcons.cartShopping,
+          ),
+        ],
+      );
+    });
   }
 
   // Charts Section
@@ -171,91 +190,220 @@ class DesktopDashboardPage extends StatelessWidget {
 
   // 1️⃣ Dealers - Bar Chart
   Widget _buildDealersChart() {
-    return _chartContainer(
-      title: "Dealers Overview",
-      width: 600,
-      child: BarChart(
-        BarChartData(
-          borderData: FlBorderData(show: false),
-          gridData: FlGridData(show: false),
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, _) {
-                  const labels = [
-                    'Mon',
-                    'Tue',
-                    'Wed',
-                    'Thu',
-                    'Fri',
-                    'Sat',
-                    'Sun',
-                  ];
-                  return Text(
-                    labels[value.toInt() % labels.length],
-                    style: TextStyle(color: AppColors.grey, fontSize: 12),
-                  );
-                },
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: true, reservedSize: 30),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-          ),
-          barGroups: [
-            BarChartGroupData(
-              x: 0,
-              barRods: [
-                BarChartRodData(toY: 4, color: AppColors.green, width: 20),
-              ],
-            ),
-            BarChartGroupData(
-              x: 1,
-              barRods: [
-                BarChartRodData(toY: 7, color: AppColors.green, width: 20),
-              ],
-            ),
-            BarChartGroupData(
-              x: 2,
-              barRods: [
-                BarChartRodData(toY: 5, color: AppColors.green, width: 20),
-              ],
-            ),
-            BarChartGroupData(
-              x: 3,
-              barRods: [
-                BarChartRodData(toY: 8, color: AppColors.green, width: 20),
-              ],
-            ),
-            BarChartGroupData(
-              x: 4,
-              barRods: [
-                BarChartRodData(toY: 6, color: AppColors.green, width: 20),
-              ],
-            ),
-            BarChartGroupData(
-              x: 5,
-              barRods: [
-                BarChartRodData(toY: 6, color: AppColors.green, width: 20),
-              ],
-            ),
-            BarChartGroupData(
-              x: 6,
-              barRods: [
-                BarChartRodData(toY: 6, color: AppColors.green, width: 20),
-              ],
+    final c = Get.find<DesktopDashboardController>();
+
+    return Obx(() {
+      // Fallback labels if API didn't send categories
+      final categories = (c.dealersCategories.isEmpty)
+          ? const [
+              'Jan',
+              'Feb',
+              'Mar',
+              'Apr',
+              'May',
+              'Jun',
+              'Jul',
+              'Aug',
+              'Sep',
+              'Oct',
+              'Nov',
+              'Dec'
+            ]
+          : List<String>.from(c.dealersCategories);
+
+      // Build an immutable 12-length double list from series (no nulls, no mutations)
+      final data = List<double>.generate(
+        12,
+        (i) =>
+            (i < c.dealersSeries.length ? c.dealersSeries[i].toDouble() : 0.0),
+        growable: false,
+      );
+
+      // Compute a neat Y-axis range & interval (avoid repeated labels)
+      final double maxVal = data.isEmpty ? 0.0 : data.reduce(math.max);
+      final double maxY = (maxVal <= 5)
+          ? 5.0
+          : ((maxVal / 5).ceil() * 5).toDouble(); // round up to multiple of 5
+      final double interval = (maxY <= 10) ? 1.0 : (maxY / 5).ceilToDouble();
+
+      // Bars
+      final barGroups = List<BarChartGroupData>.generate(12, (i) {
+        return BarChartGroupData(
+          x: i,
+          barRods: [
+            BarChartRodData(
+              toY: data[i],
+              color: AppColors.green,
+              width: 16,
+              borderRadius: BorderRadius.circular(4),
             ),
           ],
-        ),
-      ),
-    );
+        );
+      });
+
+      return _chartContainer(
+        title: "Dealers Overview (${c.dealersYear.value})",
+        width: 800,
+        child: c.isLoadingDealers.value
+            ? const Center(
+                child: CircularProgressIndicator(color: AppColors.green))
+            : BarChart(
+                BarChartData(
+                  minY: 0,
+                  maxY: maxY,
+                  groupsSpace: 8,
+                  borderData: FlBorderData(show: false),
+                  gridData: FlGridData(show: false),
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 34,
+                        getTitlesWidget: (value, _) {
+                          final i = value.toInt();
+                          if (i < 0 || i >= 12) return const SizedBox.shrink();
+                          final label =
+                              (i < categories.length) ? categories[i] : '';
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              label,
+                              style: TextStyle(
+                                  color: AppColors.grey, fontSize: 12),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        interval: interval,
+                        getTitlesWidget: (value, _) {
+                          // Show only clean multiples of `interval`
+                          final isTick = (value % interval).abs() < 1e-6;
+                          if (!isTick) return const SizedBox.shrink();
+                          return Text(
+                            value.toInt().toString(),
+                            style:
+                                TextStyle(color: AppColors.grey, fontSize: 11),
+                          );
+                        },
+                      ),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  barGroups: barGroups,
+                ),
+              ),
+      );
+    });
+  }
+
+  Widget _buildDealersChart1() {
+    final c = Get.find<DesktopDashboardController>();
+
+    return Obx(() {
+      final categories = (c.dealersCategories.isEmpty)
+          ? const [
+              'Jan',
+              'Feb',
+              'Mar',
+              'Apr',
+              'May',
+              'Jun',
+              'Jul',
+              'Aug',
+              'Sep',
+              'Oct',
+              'Nov',
+              'Dec'
+            ]
+          : List<String>.from(c.dealersCategories);
+
+      // Build a padded list of 12 doubles without mutating the source RxList
+      final data = List<double>.generate(
+        12,
+        (i) =>
+            (i < c.dealersSeries.length ? c.dealersSeries[i].toDouble() : 0.0),
+        growable: false,
+      );
+
+      final barGroups = List<BarChartGroupData>.generate(12, (i) {
+        return BarChartGroupData(
+          x: i,
+          barRods: [
+            BarChartRodData(
+              toY: data[i],
+              color: AppColors.green,
+              width: 16,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ],
+        );
+      });
+
+      return _chartContainer(
+        title: "Dealers Overview (${c.dealersYear.value})",
+        width: 800,
+        child: c.isLoadingDealers.value
+            ? const Center(
+                child: CircularProgressIndicator(color: AppColors.green))
+            : BarChart(
+                BarChartData(
+                  borderData: FlBorderData(show: false),
+                  gridData: FlGridData(show: false),
+                  groupsSpace: 8,
+                  titlesData: FlTitlesData(
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 34,
+                        getTitlesWidget: (value, _) {
+                          final i = value.toInt();
+                          if (i < 0 || i >= 12) return const SizedBox.shrink();
+                          final label = (i < categories.length)
+                              ? categories[i]
+                              : ''; // safe if categories length < 12
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              label,
+                              style: TextStyle(
+                                  color: AppColors.grey, fontSize: 12),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        getTitlesWidget: (value, _) => Text(
+                          value.toInt().toString(),
+                          style: TextStyle(color: AppColors.grey, fontSize: 11),
+                        ),
+                      ),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  barGroups: barGroups,
+                ),
+              ),
+      );
+    });
   }
 
   // 2️⃣ All Cars - Pie Chart
@@ -503,7 +651,7 @@ class DesktopDashboardPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           Expanded(child: child),
         ],
       ),

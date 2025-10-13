@@ -129,7 +129,7 @@ class DesktopHomepage extends StatelessWidget {
         builder: (context, _) {
           switch (controller.sidebarController.selectedIndex) {
             case 0:
-              return const DesktopDashboardPage();
+              return DesktopDashboardPage();
             case 1:
               return DesktopBidHistoryPage();
             default:
