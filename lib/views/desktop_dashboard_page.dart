@@ -242,7 +242,7 @@ class DesktopDashboardPage extends StatelessWidget {
       });
 
       return _chartContainer(
-        title: "Dealers Overview (${c.dealersYear.value})",
+        title: "Dealers Overview",
         width: 800,
         child: c.isLoadingDealers.value
             ? const Center(

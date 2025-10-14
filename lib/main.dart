@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
+import 'package:otobix_crm/utils/shared_prefs_helper.dart';
 import 'package:otobix_crm/views/splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPrefsHelper.init(); // <-- ensure this exists and completes
   runApp(const MyApp());
 }
 

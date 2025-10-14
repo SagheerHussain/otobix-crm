@@ -47,8 +47,12 @@ class LoginController extends GetxController {
         final userRole = user['userType'];
         final userId = user['id'];
         final approvalStatus = user['approvalStatus'];
+        final userName = user['userName'];
+        final userEmail = user['email'];
+        final userPhone = user['phoneNumber'];
 
-        if (approvalStatus == 'Approved') {
+        if (approvalStatus == 'Approved' &&
+            userRole == AppConstants.roles.admin) {
           await SharedPrefsHelper.saveString(SharedPrefsHelper.tokenKey, token);
         }
 
@@ -57,12 +61,27 @@ class LoginController extends GetxController {
           jsonEncode(user),
         );
 
+        await SharedPrefsHelper.saveString(SharedPrefsHelper.userIdKey, userId);
+
+        await SharedPrefsHelper.saveString(
+          SharedPrefsHelper.userNameKey,
+          userName,
+        );
+
+        await SharedPrefsHelper.saveString(
+          SharedPrefsHelper.userEmailKey,
+          userEmail,
+        );
+
+        await SharedPrefsHelper.saveString(
+          SharedPrefsHelper.userPhoneKey,
+          userPhone,
+        );
+
         await SharedPrefsHelper.saveString(
           SharedPrefsHelper.userRoleKey,
           userRole,
         );
-
-        await SharedPrefsHelper.saveString(SharedPrefsHelper.userIdKey, userId);
 
         if (userRole == AppConstants.roles.admin) {
           Get.offAll(

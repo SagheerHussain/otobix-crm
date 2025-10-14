@@ -154,14 +154,6 @@ class DesktopBidHistoryPage extends StatelessWidget {
   }
 
   Widget _buildRecentBidsList() {
-    final columns = const [
-      DataColumn(label: Text("Bidder")),
-      DataColumn(label: Text("Car")),
-      DataColumn(label: Text("Bid Amount")),
-      DataColumn(label: Text("Time")),
-      DataColumn(label: Text("Status")),
-    ];
-
     final timeFmt = DateFormat('dd MMM yyyy • hh:mm a');
 
     final rows = c.bids.map((b) {
@@ -206,41 +198,234 @@ class DesktopBidHistoryPage extends StatelessWidget {
       isLoading: c.isBidsLoading.value,
       rows: rows,
       columns: const [
-        DataColumn(label: Text("Bidder")),
-        DataColumn(label: Text("Car")),
-        DataColumn(label: Text("Bid Amount")),
-        DataColumn(label: Text("Time")),
-        DataColumn(label: Text("Status")),
+        DataColumn(
+            label:
+                Text("Bidder", style: TextStyle(fontWeight: FontWeight.bold))),
+        DataColumn(
+            label: Text("Car", style: TextStyle(fontWeight: FontWeight.bold))),
+        DataColumn(
+            label: Text("Bid Amount",
+                style: TextStyle(fontWeight: FontWeight.bold))),
+        DataColumn(
+            label: Text("Time", style: TextStyle(fontWeight: FontWeight.bold))),
+        DataColumn(
+            label:
+                Text("Status", style: TextStyle(fontWeight: FontWeight.bold))),
       ],
       // rows: myRows,
       // Ensure length == columns.length
       columnWidths: const [100, 250, 100, 200, 80],
+      actionsWidget: _buildActionWidget(),
     );
   }
 
   Widget _buildPager() {
+    // Helper to build a compact set of visible pages with ellipses
+    List<dynamic> _visiblePages(int current, int total) {
+      if (total <= 7) {
+        return List<int>.generate(total, (i) => i + 1);
+      }
+
+      final start = (current - 2).clamp(1, total);
+      final end = (current + 2).clamp(1, total);
+
+      final set = <int>{1, total};
+      for (int i = start; i <= end; i++) set.add(i);
+
+      final pages = set.toList()..sort();
+
+      // Insert "…" where gaps exist
+      final withDots = <dynamic>[];
+      for (int i = 0; i < pages.length; i++) {
+        withDots.add(pages[i]);
+        if (i < pages.length - 1 && pages[i + 1] != pages[i] + 1) {
+          withDots.add('…');
+        }
+      }
+      return withDots;
+    }
+
+    Widget _pageChip(dynamic item, bool isActive) {
+      if (item is String) {
+        // Ellipsis
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Text('…',
+              style: TextStyle(color: AppColors.grey.withValues(alpha: .9))),
+        );
+      }
+
+      final int pageNum = item as int;
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: InkWell(
+          onTap: () => c.goToPage(pageNum),
+          borderRadius: BorderRadius.circular(6),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: isActive
+                  ? AppColors.green.withValues(alpha: .15)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: isActive
+                    ? AppColors.green
+                    : AppColors.grey.withValues(alpha: .5),
+              ),
+            ),
+            child: Text(
+              '$pageNum',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isActive ? AppColors.green : AppColors.black,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Obx(() {
+      final current = c.page.value;
+      final total = c.totalPages.value;
+
+      // Build jump controller with current page prefilled
+      final jumpController = TextEditingController(text: current.toString());
+
+      final pageItems = _visiblePages(current, total);
+
+      return Row(
+        children: [
+          // Left: Prev
+          OutlinedButton.icon(
+            onPressed: c.hasPrev.value ? c.prevPage : null,
+            icon: const Icon(Icons.chevron_left),
+            label: const Text('Prev'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.green, // text & icon
+              side: const BorderSide(color: AppColors.green), // outline
+            ),
+          ),
+
+          // Center: numbered pages + "Go to"
+          Expanded(
+            child: Center(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  // Page numbers
+                  ...pageItems
+                      .map((it) => _pageChip(it, it is int && it == current)),
+
+                  const SizedBox(width: 16),
+
+                  // Go to page
+                  Container(
+                    height: 40,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                          color: AppColors.grey.withValues(alpha: .6)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(width: 10),
+                        SizedBox(
+                          width: 50,
+                          child: TextField(
+                            controller: jumpController,
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.center,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Page',
+                              isDense: true,
+                            ),
+                            onSubmitted: (value) {
+                              final p = int.tryParse(value.trim());
+                              if (p == null) return;
+                              if (p < 1 || p > total) return;
+                              c.goToPage(p);
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        SizedBox(
+                          height: 30,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              final p =
+                                  int.tryParse(jumpController.text.trim());
+                              if (p == null) return;
+                              if (p < 1 || p > total) return;
+                              c.goToPage(p);
+                            },
+                            style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                elevation: 0,
+                                foregroundColor: AppColors.green),
+                            child: const Text('Go'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Right: Next
+          OutlinedButton.icon(
+            onPressed: c.hasNext.value ? c.nextPage : null,
+            icon: const Icon(Icons.chevron_right),
+            label: const Text('Next'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.green, // text & icon
+              side: const BorderSide(color: AppColors.green), // outline
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildActionWidget() {
     return Obx(() {
       return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'Page ${c.page.value} of ${c.totalPages.value} • ${c.total.value} total',
-            style: TextStyle(color: AppColors.grey.withValues(alpha: 0.8)),
+          const Text(
+            'Showing:',
+            style: TextStyle(fontWeight: FontWeight.w600),
           ),
-          Row(
-            children: [
-              OutlinedButton.icon(
-                onPressed: c.hasPrev.value ? c.prevPage : null,
-                icon: const Icon(Icons.chevron_left),
-                label: const Text('Prev'),
+          const SizedBox(width: 8),
+          SizedBox(
+            height: 40,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: c.selectedRange.value,
+                alignment: AlignmentDirectional.centerStart,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                borderRadius: BorderRadius.circular(5),
+                items: const [
+                  DropdownMenuItem(value: 'today', child: Text('Today')),
+                  DropdownMenuItem(value: 'week', child: Text('This Week')),
+                  DropdownMenuItem(value: 'month', child: Text('This Month')),
+                  DropdownMenuItem(value: 'year', child: Text('This Year')),
+                  DropdownMenuItem(value: 'all', child: Text('All Time')),
+                ],
+                onChanged: (v) {
+                  if (v == null) return;
+                  c.changeRange(v);
+                },
               ),
-              const SizedBox(width: 8),
-              OutlinedButton.icon(
-                onPressed: c.hasNext.value ? c.nextPage : null,
-                icon: const Icon(Icons.chevron_right),
-                label: const Text('Next'),
-              ),
-            ],
+            ),
           ),
         ],
       );

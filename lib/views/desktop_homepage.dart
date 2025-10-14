@@ -40,6 +40,8 @@ class DesktopHomepage extends StatelessWidget {
 
   // Appbar widget
   Widget _buildAppbar() {
+    final getxController = Get.find<DesktopHomepageController>();
+
     // Search bar widget
     Widget buildSearchBar() {
       return Container(
@@ -98,17 +100,119 @@ class DesktopHomepage extends StatelessWidget {
             ),
             Row(
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.green),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(50),
-                    child: Image(
-                      image: AssetImage(AppImages.profile),
-                      width: 40,
-                      height: 40,
+                // Profile Logout Button
+                PopupMenuButton<int>(
+                  tooltip: 'Account',
+                  // color: AppColors.grey.withValues(alpha: .2),
+                  offset: const Offset(0, 48),
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  onSelected: (v) {
+                    if (v == 1) getxController.logout();
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem<int>(
+                      enabled: false,
+                      child: FutureBuilder<Map<String, String>>(
+                        future: getxController.loadUserFromPrefs(),
+                        builder: (context, snap) {
+                          final data = snap.data ??
+                              const {'name': '', 'email': '', 'phone': ''};
+                          return SizedBox(
+                            width: 260,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 20,
+                                      backgroundImage:
+                                          AssetImage(AppImages.logo),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        (data['name']?.isNotEmpty ?? false)
+                                            ? data['name']!
+                                            : 'User',
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            color: AppColors.black),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  'Email',
+                                  style: TextStyle(
+                                      fontSize: 11, color: AppColors.black),
+                                ),
+                                const SizedBox(height: 2),
+                                SelectableText(
+                                  data['email']?.isNotEmpty == true
+                                      ? data['email']!
+                                      : '—',
+                                  style: const TextStyle(
+                                      fontSize: 13, color: AppColors.black),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Phone',
+                                  style: TextStyle(
+                                      fontSize: 11, color: AppColors.black),
+                                ),
+                                const SizedBox(height: 2),
+                                SelectableText(
+                                  data['phone']?.isNotEmpty == true
+                                      ? data['phone']!
+                                      : '—',
+                                  style: const TextStyle(
+                                      fontSize: 13, color: AppColors.black),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const PopupMenuDivider(),
+                    PopupMenuItem<int>(
+                      value: 1,
+                      child: Row(
+                        children: const [
+                          Icon(
+                            Icons.logout,
+                            size: 18,
+                            color: AppColors.red,
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            'Logout',
+                            style: TextStyle(color: AppColors.red),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.green),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(50),
+                        child: Image(
+                          image: AssetImage(AppImages.logo),
+                          width: 40,
+                          height: 40,
+                        ),
+                      ),
                     ),
                   ),
                 ),

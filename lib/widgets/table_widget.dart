@@ -22,6 +22,9 @@ class TableWidget extends StatefulWidget {
   // Loading
   final bool isLoading;
 
+  // Widgets
+  final Widget? actionsWidget;
+
   const TableWidget({
     super.key,
     required this.title,
@@ -37,6 +40,7 @@ class TableWidget extends StatefulWidget {
     this.horizontalMargin = 16,
     this.titleSize = 16,
     this.isLoading = false,
+    this.actionsWidget,
   });
 
   @override
@@ -151,17 +155,21 @@ class _TableWidgetState extends State<TableWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Text(
-            widget.title,
-            style: TextStyle(
-              color: AppColors.black,
-              fontSize: widget.titleSize,
-              fontWeight: FontWeight.w700,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              widget.title,
+              style: TextStyle(
+                color: AppColors.black,
+                fontSize: widget.titleSize,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-          ),
+            widget.actionsWidget ?? const SizedBox.shrink(),
+          ],
         ),
+        const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
             color: AppColors.white,

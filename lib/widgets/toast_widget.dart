@@ -13,13 +13,13 @@ class ToastWidget {
     String? subtitle,
     int seconds = 3,
   }) {
-    final desc = subtitle != null ? Text(subtitle) : null;
+    final description = subtitle ?? '';
 
     switch (type) {
       case ToastType.success:
         ElegantNotification.success(
           title: Text(title),
-          description: Text('$desc'),
+          description: Text(description),
           border: Border.all(color: AppColors.green),
           toastDuration: Duration(seconds: seconds),
           borderRadius: BorderRadius.circular(12),
@@ -33,7 +33,7 @@ class ToastWidget {
       case ToastType.error:
         ElegantNotification.error(
           title: Text(title),
-          description: Text('$desc'),
+          description: Text(description),
           border: Border.all(color: AppColors.red),
           toastDuration: Duration(seconds: seconds),
           borderRadius: BorderRadius.circular(12),
@@ -47,7 +47,7 @@ class ToastWidget {
       case ToastType.info:
         ElegantNotification.info(
           title: Text(title),
-          description: Text('$desc'),
+          description: Text(description),
           border: Border.all(color: AppColors.blue),
           toastDuration: Duration(seconds: seconds),
           borderRadius: BorderRadius.circular(12),
@@ -65,7 +65,7 @@ class ToastWidget {
             title,
             style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
           ),
-          description: desc ?? const SizedBox.shrink(),
+          description: Text(description),
           icon: const Icon(Icons.warning_amber_rounded, color: Colors.white),
           background: const Color(0xFFEF6C00),
           progressIndicatorColor: Colors.white,
