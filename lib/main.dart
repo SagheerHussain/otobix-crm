@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:otobix_crm/views/desktop_homepage.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
-import 'package:otobix_crm/utils/responsive_layout.dart';
+import 'package:otobix_crm/views/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,10 +28,7 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
       ),
-      home: ResponsiveLayout(
-        mobile: DesktopHomepage(),
-        desktop: DesktopHomepage(),
-      ),
+      home: SplashScreen(),
     );
   }
 }

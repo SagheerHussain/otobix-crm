@@ -6,6 +6,8 @@ class AppUrls {
   // static const String baseUrl =
   //     "http://192.168.100.99:4000/api/"; // For Mobile Testing.
 
+  static String get login => "${baseUrl}user/login";
+
   static String get getBidsSummary => "${baseUrl}admin/bids/summary";
 
   static String get getRecentBidsList =>
