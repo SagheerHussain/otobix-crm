@@ -24,6 +24,7 @@ class TableWidget extends StatefulWidget {
 
   // Widgets
   final Widget? actionsWidget;
+  final Widget? emptyDataWidget;
 
   const TableWidget({
     super.key,
@@ -41,6 +42,7 @@ class TableWidget extends StatefulWidget {
     this.titleSize = 16,
     this.isLoading = false,
     this.actionsWidget,
+    this.emptyDataWidget,
   });
 
   @override
@@ -210,41 +212,61 @@ class _TableWidgetState extends State<TableWidget> {
                         ),
                       ),
                     )
-                  : SizedBox(
-                      height: widget.height - widget.headingRowHeight,
-                      child: Scrollbar(
-                        controller: _vBody,
-                        thumbVisibility: true,
-                        child: SingleChildScrollView(
-                          controller: _vBody,
-                          scrollDirection: Axis.vertical,
+                  : rows.isEmpty
+                      ? SizedBox(
+                          height: widget.height - widget.headingRowHeight,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                widget.emptyDataWidget ??
+                                    const Text(
+                                      'No data available',
+                                      style: TextStyle(
+                                        color: AppColors.green,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : SizedBox(
+                          height: widget.height - widget.headingRowHeight,
                           child: Scrollbar(
-                            controller: _hBody,
-                            thumbVisibility:
-                                true, // horizontal thumb for body only
-                            notificationPredicate: (n) =>
-                                n.metrics.axis == Axis.horizontal,
+                            controller: _vBody,
+                            thumbVisibility: true,
                             child: SingleChildScrollView(
-                              controller: _hBody,
-                              scrollDirection: Axis.horizontal,
-                              child: ConstrainedBox(
-                                constraints:
-                                    BoxConstraints(minWidth: minTableWidth),
-                                child: DataTable(
-                                  headingRowHeight: 0, // hide duplicate header
-                                  dataRowMinHeight: widget.dataRowMinHeight,
-                                  dataRowMaxHeight: widget.dataRowMaxHeight,
-                                  columnSpacing: widget.columnSpacing,
-                                  horizontalMargin: widget.horizontalMargin,
-                                  columns: columns,
-                                  rows: rows,
+                              controller: _vBody,
+                              scrollDirection: Axis.vertical,
+                              child: Scrollbar(
+                                controller: _hBody,
+                                thumbVisibility:
+                                    true, // horizontal thumb for body only
+                                notificationPredicate: (n) =>
+                                    n.metrics.axis == Axis.horizontal,
+                                child: SingleChildScrollView(
+                                  controller: _hBody,
+                                  scrollDirection: Axis.horizontal,
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        BoxConstraints(minWidth: minTableWidth),
+                                    child: DataTable(
+                                      headingRowHeight:
+                                          0, // hide duplicate header
+                                      dataRowMinHeight: widget.dataRowMinHeight,
+                                      dataRowMaxHeight: widget.dataRowMaxHeight,
+                                      columnSpacing: widget.columnSpacing,
+                                      horizontalMargin: widget.horizontalMargin,
+                                      columns: columns,
+                                      rows: rows,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
             ],
           ),
         ),

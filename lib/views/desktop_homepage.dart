@@ -52,7 +52,8 @@ class DesktopHomepage extends StatelessWidget {
           border: Border.all(color: AppColors.grey),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const TextField(
+        child: TextField(
+          onChanged: getxController.setSearch, // ← push text globally
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: 'Search',

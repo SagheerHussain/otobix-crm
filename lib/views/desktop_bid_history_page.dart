@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:otobix_crm/controllers/desktop_homepage_controller.dart';
 import 'package:otobix_crm/models/bid_summary_model.dart';
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
 import 'package:otobix_crm/widgets/table_widget.dart';
@@ -156,67 +157,94 @@ class DesktopBidHistoryPage extends StatelessWidget {
   Widget _buildRecentBidsList() {
     final timeFmt = DateFormat('dd MMM yyyy • hh:mm a');
 
-    final rows = c.bids.map((b) {
-      return DataRow(
-        cells: [
-          DataCell(Text(b.userName)),
-          DataCell(Text(b.car)),
-          DataCell(Text("Rs. ${b.bidAmount}/-")),
-          DataCell(Text(timeFmt.format(b.time.toLocal()))),
-          DataCell(
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: b.isActive
-                    ? AppColors.green.withValues(alpha: 0.15)
-                    : AppColors.red.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Text(
-                b.isActive ? "Active" : "Closed",
-                style: TextStyle(
+    final home = Get.find<DesktopHomepageController>();
+
+    return Obx(() {
+      // reacts to both bids and search text
+      final query = home.searchText.value;
+      final list = c.filterByBidderName(query);
+
+      final rows = list.map((b) {
+        return DataRow(
+          cells: [
+            DataCell(Text(b.userName)),
+            DataCell(Text(b.dealershipName)),
+            DataCell(Text(b.car)),
+            DataCell(Text(b.appointmentId)),
+            DataCell(Text("Rs. ${b.bidAmount}/-")),
+            DataCell(Text(timeFmt.format(b.time.toLocal()))),
+            DataCell(
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
                   color: b.isActive
-                      ? AppColors.green.withValues(alpha: 0.7)
-                      : AppColors.red.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
+                      ? AppColors.green.withValues(alpha: 0.15)
+                      : AppColors.red.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  b.isActive ? "Active" : "Closed",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: b.isActive
+                        ? AppColors.green.withValues(alpha: 0.7)
+                        : AppColors.red.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      );
-    }).toList();
+          ],
+        );
+      }).toList();
 
-    // 🔒 Fixed height, scrolls vertically (and horizontally if needed)
-    return TableWidget(
-      title: "Recent Bids",
-      titleSize: 20,
-      height: 500, // ⬅️ change this to the height you want
-      minTableWidth: MediaQuery.of(Get.context!).size.width - 250,
-      // columns: columns,
-      isLoading: c.isBidsLoading.value,
-      rows: rows,
-      columns: const [
-        DataColumn(
-            label:
-                Text("Bidder", style: TextStyle(fontWeight: FontWeight.bold))),
-        DataColumn(
-            label: Text("Car", style: TextStyle(fontWeight: FontWeight.bold))),
-        DataColumn(
-            label: Text("Bid Amount",
-                style: TextStyle(fontWeight: FontWeight.bold))),
-        DataColumn(
-            label: Text("Time", style: TextStyle(fontWeight: FontWeight.bold))),
-        DataColumn(
-            label:
-                Text("Status", style: TextStyle(fontWeight: FontWeight.bold))),
-      ],
-      // rows: myRows,
-      // Ensure length == columns.length
-      columnWidths: const [100, 250, 100, 200, 80],
-      actionsWidget: _buildActionWidget(),
-    );
+      // 🔒 Fixed height, scrolls vertically (and horizontally if needed)
+      return TableWidget(
+        title: "Recent Bids",
+        titleSize: 20,
+        height: 500, // ⬅️ change this to the height you want
+        minTableWidth: MediaQuery.of(Get.context!).size.width - 250,
+        // columns: columns,
+        isLoading: c.isBidsLoading.value,
+        rows: rows,
+        columns: const [
+          DataColumn(
+              label: Text("Bidder",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text("Dealership Name",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label:
+                  Text("Car", style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text("Appointment Id",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text("Bid Amount",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label:
+                  Text("Time", style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text("Status",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+        ],
+        // rows: myRows,
+        // Ensure length == columns.length
+        columnWidths: const [100, 150, 250, 150, 100, 200, 80],
+        actionsWidget: _buildActionWidget(),
+        emptyDataWidget: Text(
+          'No bids available for ${c.selectedRange.value}',
+          style: TextStyle(
+            color: AppColors.green,
+            fontSize: 18,
+          ),
+        ),
+      );
+    });
   }
 
   Widget _buildPager() {
