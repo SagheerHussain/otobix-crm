@@ -94,6 +94,7 @@ class LoginController extends GetxController {
           ToastWidget.show(
             context: Get.context!,
             title: "You are not authorized to visit this site.",
+            subtitle: "Please try again later.",
             type: ToastType.error,
           );
         }
@@ -102,6 +103,7 @@ class LoginController extends GetxController {
         ToastWidget.show(
           context: Get.context!,
           title: data['message'] ?? "Failed to login",
+          subtitle: "Please try again later.",
           type: ToastType.error,
         );
       }
@@ -110,6 +112,7 @@ class LoginController extends GetxController {
       ToastWidget.show(
         context: Get.context!,
         title: "Error during login. Please try again.",
+        subtitle: "Please try again later.",
         type: ToastType.error,
       );
     } finally {

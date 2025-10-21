@@ -17,6 +17,8 @@ class ButtonWidget extends StatelessWidget {
   final Color loaderColor;
   final double fontSize;
   final double elevation;
+  final FontWeight fontWeight;
+  final Color? borderColor;
 
   const ButtonWidget({
     super.key,
@@ -34,6 +36,8 @@ class ButtonWidget extends StatelessWidget {
     this.loaderColor = AppColors.white,
     this.fontSize = 15,
     this.elevation = 0,
+    this.fontWeight = FontWeight.bold,
+    this.borderColor,
   });
 
   @override
@@ -50,6 +54,8 @@ class ButtonWidget extends StatelessWidget {
             width: width,
             decoration: BoxDecoration(
               color: backgroundColor,
+              border:
+                  borderColor != null ? Border.all(color: borderColor!) : null,
               borderRadius: BorderRadius.circular(borderRadius),
             ),
             child: Center(
@@ -67,7 +73,7 @@ class ButtonWidget extends StatelessWidget {
                       style: textStyle ??
                           TextStyle(
                             color: textColor,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: fontWeight,
                             fontSize: fontSize,
                           ),
                     ),

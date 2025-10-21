@@ -23,6 +23,7 @@ class TableWidget extends StatefulWidget {
   final bool isLoading;
 
   // Widgets
+  final Widget? titleWidget;
   final Widget? actionsWidget;
   final Widget? emptyDataWidget;
 
@@ -41,6 +42,7 @@ class TableWidget extends StatefulWidget {
     this.horizontalMargin = 16,
     this.titleSize = 16,
     this.isLoading = false,
+    this.titleWidget,
     this.actionsWidget,
     this.emptyDataWidget,
   });
@@ -160,14 +162,15 @@ class _TableWidgetState extends State<TableWidget> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              widget.title,
-              style: TextStyle(
-                color: AppColors.black,
-                fontSize: widget.titleSize,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            widget.titleWidget ??
+                Text(
+                  widget.title,
+                  style: TextStyle(
+                    color: AppColors.black,
+                    fontSize: widget.titleSize,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
             widget.actionsWidget ?? const SizedBox.shrink(),
           ],
         ),
@@ -252,6 +255,7 @@ class _TableWidgetState extends State<TableWidget> {
                                     constraints:
                                         BoxConstraints(minWidth: minTableWidth),
                                     child: DataTable(
+                                      showCheckboxColumn: false,
                                       headingRowHeight:
                                           0, // hide duplicate header
                                       dataRowMinHeight: widget.dataRowMinHeight,

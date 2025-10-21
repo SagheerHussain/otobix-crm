@@ -114,27 +114,27 @@ class DesktopDashboardPage extends StatelessWidget {
                 : getxController.totalCars.value.toString(),
             icon: FontAwesomeIcons.car,
           ),
-          infoContainer(
-            title: "Upcoming Cars",
-            count: getxController.isLoadingSummary.value
-                ? '...'
-                : getxController.upcomingCars.value.toString(),
-            icon: FontAwesomeIcons.calendarPlus,
-          ),
-          infoContainer(
-            title: "Live Cars",
-            count: getxController.isLoadingSummary.value
-                ? '...'
-                : getxController.liveCars.value.toString(),
-            icon: FontAwesomeIcons.circlePlay,
-          ),
-          infoContainer(
-            title: "Otobuy Cars",
-            count: getxController.isLoadingSummary.value
-                ? '...'
-                : getxController.otobuyCars.value.toString(),
-            icon: FontAwesomeIcons.cartShopping,
-          ),
+          // infoContainer(
+          //   title: "Upcoming Cars",
+          //   count: getxController.isLoadingSummary.value
+          //       ? '...'
+          //       : getxController.upcomingCars.value.toString(),
+          //   icon: FontAwesomeIcons.calendarPlus,
+          // ),
+          // infoContainer(
+          //   title: "Live Cars",
+          //   count: getxController.isLoadingSummary.value
+          //       ? '...'
+          //       : getxController.liveCars.value.toString(),
+          //   icon: FontAwesomeIcons.circlePlay,
+          // ),
+          // infoContainer(
+          //   title: "Otobuy Cars",
+          //   count: getxController.isLoadingSummary.value
+          //       ? '...'
+          //       : getxController.otobuyCars.value.toString(),
+          //   icon: FontAwesomeIcons.cartShopping,
+          // ),
         ],
       );
     });

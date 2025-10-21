@@ -3,18 +3,19 @@ import 'package:get/get.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_images.dart';
 import 'package:otobix_crm/views/desktop_bid_history_page.dart';
+import 'package:otobix_crm/views/desktop_cars_page.dart';
 import 'package:otobix_crm/views/desktop_dashboard_page.dart';
 import 'package:otobix_crm/views/page_not_found_page.dart';
 import 'package:otobix_crm/widgets/sidebar_widget.dart';
 import '../controllers/desktop_homepage_controller.dart';
 
 class DesktopHomepage extends StatelessWidget {
-  const DesktopHomepage({super.key});
+  DesktopHomepage({super.key});
+
+  final controller = Get.put(DesktopHomepageController());
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(DesktopHomepageController());
-
     return Scaffold(
       body: Column(
         children: [
@@ -47,10 +48,11 @@ class DesktopHomepage extends StatelessWidget {
       return Container(
         width: 300,
         height: 40,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: AppColors.white,
           border: Border.all(color: AppColors.grey),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(80),
         ),
         child: TextField(
           onChanged: getxController.setSearch, // ← push text globally
@@ -95,7 +97,7 @@ class DesktopHomepage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-                const SizedBox(width: 30),
+                const SizedBox(width: 100),
                 buildSearchBar(),
               ],
             ),
@@ -237,6 +239,8 @@ class DesktopHomepage extends StatelessWidget {
               return DesktopDashboardPage();
             case 1:
               return DesktopBidHistoryPage();
+            case 2:
+              return DesktopCarsPage();
             default:
               return const Center(child: PageNotFoundPage());
           }

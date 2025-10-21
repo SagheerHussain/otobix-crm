@@ -19,6 +19,11 @@ class AppUrls {
   static String get getDashboardDealersByMonth =>
       "${baseUrl}admin/dashboard/get-dealers-by-months";
 
+  static String get getCarsSummaryCounts =>
+      "${baseUrl}admin/cars/get-summary-counts";
+
+  static String get getCarsList => "${baseUrl}admin/cars/get-cars-list";
+
   // static String getUserMyBidsCarsList({required String userId}) =>
   //     "${baseUrl}user/get-user-my-bids-cars-list?userId=$userId";
 

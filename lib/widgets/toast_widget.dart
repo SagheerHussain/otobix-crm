@@ -11,17 +11,21 @@ class ToastWidget {
     required String title,
     required ToastType type,
     String? subtitle,
-    int seconds = 3,
+    int seconds = 5,
   }) {
     final description = subtitle ?? '';
 
     switch (type) {
       case ToastType.success:
         ElegantNotification.success(
-          title: Text(title),
+          title: Text(title,
+              style:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
           description: Text(description),
-          border: Border.all(color: AppColors.green),
+          icon: const Icon(Icons.check, color: AppColors.green),
+          border: Border.all(color: AppColors.green.withValues(alpha: 0.7)),
           toastDuration: Duration(seconds: seconds),
+          verticalDividerColor: AppColors.green.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(12),
           showProgressIndicator: false,
           width: 360,
@@ -32,10 +36,14 @@ class ToastWidget {
 
       case ToastType.error:
         ElegantNotification.error(
-          title: Text(title),
+          title: Text(title,
+              style:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
           description: Text(description),
-          border: Border.all(color: AppColors.red),
+          icon: const Icon(Icons.error, color: AppColors.red),
+          border: Border.all(color: AppColors.red.withValues(alpha: 0.7)),
           toastDuration: Duration(seconds: seconds),
+          verticalDividerColor: AppColors.red.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(12),
           showProgressIndicator: false,
           width: 360,
@@ -46,10 +54,14 @@ class ToastWidget {
 
       case ToastType.info:
         ElegantNotification.info(
-          title: Text(title),
+          title: Text(title,
+              style:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
           description: Text(description),
-          border: Border.all(color: AppColors.blue),
+          icon: const Icon(Icons.info, color: AppColors.blue),
+          border: Border.all(color: AppColors.blue.withValues(alpha: 0.7)),
           toastDuration: Duration(seconds: seconds),
+          verticalDividerColor: AppColors.blue.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(12),
           showProgressIndicator: false,
           width: 360,
@@ -66,10 +78,12 @@ class ToastWidget {
             style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
           ),
           description: Text(description),
-          icon: const Icon(Icons.warning_amber_rounded, color: Colors.white),
+          icon:
+              const Icon(Icons.warning_amber_rounded, color: AppColors.yellow),
           background: const Color(0xFFEF6C00),
           progressIndicatorColor: Colors.white,
           border: Border.all(color: AppColors.yellow),
+          verticalDividerColor: AppColors.yellow.withValues(alpha: 0.5),
           toastDuration: Duration(seconds: seconds),
           borderRadius: BorderRadius.circular(12),
           showProgressIndicator: false,

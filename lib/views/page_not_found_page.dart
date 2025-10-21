@@ -35,9 +35,9 @@ class PageNotFoundPage extends StatelessWidget {
             Text(
               "Page Not Found",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
-              ),
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -53,9 +53,8 @@ class PageNotFoundPage extends StatelessWidget {
                 final homepagecontroller =
                     Get.find<DesktopHomepageController>();
                 homepagecontroller.sidebarController.selectIndex(0);
-                Get.offAll(() => const DesktopHomepage());
+                Get.offAll(() => DesktopHomepage());
               },
-
               icon: const Icon(Icons.home_outlined, color: AppColors.white),
               label: const Text(
                 "Go to Dashboard",

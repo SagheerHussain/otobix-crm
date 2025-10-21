@@ -1,4 +1,3 @@
-// lib/features/bids/pages/desktop_bid_history_page.dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -6,44 +5,31 @@ import 'package:intl/intl.dart';
 import 'package:otobix_crm/controllers/desktop_homepage_controller.dart';
 import 'package:otobix_crm/models/bid_summary_model.dart';
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
+import 'package:otobix_crm/widgets/refresh_page_widget.dart';
 import 'package:otobix_crm/widgets/table_widget.dart';
 import '../controllers/desktop_bid_history_controller.dart';
 
 class DesktopBidHistoryPage extends StatelessWidget {
   DesktopBidHistoryPage({super.key});
 
-  final DesktopBidHistoryController c =
+  final DesktopBidHistoryController bidHistoryController =
       Get.put(DesktopBidHistoryController(), permanent: true);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Obx(() {
-        if (c.loading.value) {
+        if (bidHistoryController.isPageLoading.value) {
           return const Center(
               child: CircularProgressIndicator(color: AppColors.green));
         }
-        if (c.error.value != null) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.error_outline, size: 40),
-                const SizedBox(height: 8),
-                Text(
-                  'Failed to load bids',
-                  style: TextStyle(
-                      color: AppColors.red, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                Text(c.error.value!),
-                const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: c.load,
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
+        if (bidHistoryController.error.value != null) {
+          return RefreshPageWidget(
+            icon: Icons.error_outline,
+            title: "Error Fetching Bids Summary",
+            message: bidHistoryController.error.value!,
+            actionText: "Refresh",
+            onAction: bidHistoryController.load,
           );
         }
 
@@ -55,8 +41,8 @@ class DesktopBidHistoryPage extends StatelessWidget {
               children: [
                 _buildScreenTitle(),
                 const SizedBox(height: 20),
-                _buildTopReports(c.summary.value),
-                const SizedBox(height: 20),
+                _buildTopReports(bidHistoryController.summary.value),
+                const SizedBox(height: 30),
                 _buildRecentBidsList(),
                 const SizedBox(height: 8),
                 _buildPager(),
@@ -68,6 +54,7 @@ class DesktopBidHistoryPage extends StatelessWidget {
     );
   }
 
+// Title
   Widget _buildScreenTitle() {
     return Row(
       children: [
@@ -83,8 +70,10 @@ class DesktopBidHistoryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTopReports(BidsSummaryModel? s) {
-    String _n(int? v) => (v ?? 0).toString();
+// Top Reports
+  Widget _buildTopReports(BidsSummaryModel? summary) {
+    // Number formatter
+    String formateNumber(int? v) => (v ?? 0).toString();
 
     Widget infoContainer({
       required String title,
@@ -131,63 +120,90 @@ class DesktopBidHistoryPage extends StatelessWidget {
       runSpacing: 10,
       children: [
         infoContainer(
-          title: "Total Bids",
-          count: _n(s?.totalBids),
-          icon: FontAwesomeIcons.gavel,
-        ),
-        infoContainer(
-          title: "Total Bidders",
-          count: _n(s?.totalBidders),
-          icon: FontAwesomeIcons.users,
-        ),
-        infoContainer(
-          title: "Bids Today",
-          count: _n(s?.todaysBids),
+          title: "Upcoming Bids",
+          count: formateNumber(summary?.upcomingBids),
           icon: FontAwesomeIcons.clock,
         ),
         infoContainer(
-          title: "Bids This Week",
-          count: _n(s?.weeksBids),
-          icon: FontAwesomeIcons.calendarWeek,
+          title: "Live Bids",
+          count: formateNumber(summary?.liveBids),
+          icon: FontAwesomeIcons.fire,
         ),
+        infoContainer(
+          title: "Upcoming Auto Bids",
+          count: formateNumber(summary?.upcomingAutoBids),
+          icon: FontAwesomeIcons.robot,
+        ),
+        infoContainer(
+          title: "Live Auto Bids",
+          count: formateNumber(summary?.liveAutoBids),
+          icon: FontAwesomeIcons.bolt,
+        ),
+        infoContainer(
+          title: "Otobuy Offers",
+          count: formateNumber(summary?.otobuyOffers),
+          icon: FontAwesomeIcons.tags,
+        ),
+        //
+        // infoContainer(
+        //   title: "Total Bids",
+        //   count: formateNumber(summary?.totalBids),
+        //   icon: FontAwesomeIcons.gavel,
+        // ),
+        // infoContainer(
+        //   title: "Total Bidders",
+        //   count: formateNumber(summary?.totalBidders),
+        //   icon: FontAwesomeIcons.users,
+        // ),
+        // infoContainer(
+        //   title: "Bids Today",
+        //   count: formateNumber(summary?.todaysBids),
+        //   icon: FontAwesomeIcons.clock,
+        // ),
+        // infoContainer(
+        //   title: "Bids This Week",
+        //   count: formateNumber(summary?.weeksBids),
+        //   icon: FontAwesomeIcons.calendarWeek,
+        // ),
       ],
     );
   }
 
+// Recent Bids List
   Widget _buildRecentBidsList() {
-    final timeFmt = DateFormat('dd MMM yyyy • hh:mm a');
+    final timeFormat = DateFormat('dd MMM yyyy • hh:mm a');
 
-    final home = Get.find<DesktopHomepageController>();
+    final homeController = Get.find<DesktopHomepageController>();
 
     return Obx(() {
       // reacts to both bids and search text
-      final query = home.searchText.value;
-      final list = c.filterByBidderName(query);
+      final query = homeController.searchText.value;
+      final bidsList = bidHistoryController.filterByAppointmentId(query);
 
-      final rows = list.map((b) {
+      final rows = bidsList.map((bid) {
         return DataRow(
           cells: [
-            DataCell(Text(b.userName)),
-            DataCell(Text(b.dealershipName)),
-            DataCell(Text(b.car)),
-            DataCell(Text(b.appointmentId)),
-            DataCell(Text("Rs. ${b.bidAmount}/-")),
-            DataCell(Text(timeFmt.format(b.time.toLocal()))),
+            DataCell(Text(bid.userName)),
+            DataCell(Text(bid.dealershipName)),
+            DataCell(Text(bid.car)),
+            DataCell(Text(bid.appointmentId)),
+            DataCell(Text("Rs. ${bid.bidAmount}/-")),
+            DataCell(Text(timeFormat.format(bid.time.toLocal()))),
             DataCell(
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: b.isActive
+                  color: bid.isActive
                       ? AppColors.green.withValues(alpha: 0.15)
                       : AppColors.red.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  b.isActive ? "Active" : "Closed",
+                  bid.isActive ? "Active" : "Closed",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: b.isActive
+                    color: bid.isActive
                         ? AppColors.green.withValues(alpha: 0.7)
                         : AppColors.red.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w600,
@@ -200,16 +216,15 @@ class DesktopBidHistoryPage extends StatelessWidget {
         );
       }).toList();
 
-      // 🔒 Fixed height, scrolls vertically (and horizontally if needed)
+      // Table Widget
       return TableWidget(
         title: "Recent Bids",
         titleSize: 20,
-        height: 500, // ⬅️ change this to the height you want
+        height: 500,
         minTableWidth: MediaQuery.of(Get.context!).size.width - 250,
-        // columns: columns,
-        isLoading: c.isBidsLoading.value,
+        isLoading: bidHistoryController.isBidsLoading.value,
         rows: rows,
-        columns: const [
+        columns: [
           DataColumn(
               label: Text("Bidder",
                   style: TextStyle(fontWeight: FontWeight.bold))),
@@ -217,13 +232,17 @@ class DesktopBidHistoryPage extends StatelessWidget {
               label: Text("Dealership Name",
                   style: TextStyle(fontWeight: FontWeight.bold))),
           DataColumn(
-              label:
-                  Text("Car", style: TextStyle(fontWeight: FontWeight.bold))),
-          DataColumn(
-              label: Text("Appointment Id",
+              label: Text("Car Name",
                   style: TextStyle(fontWeight: FontWeight.bold))),
           DataColumn(
-              label: Text("Bid Amount",
+              label: Text("Appointment ID",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text(
+                  bidHistoryController.selectedFilter.value ==
+                          DesktopBidHistoryController.otobuyOffersFilter
+                      ? "Offer Amount"
+                      : "Bid Amount",
                   style: TextStyle(fontWeight: FontWeight.bold))),
           DataColumn(
               label:
@@ -232,12 +251,14 @@ class DesktopBidHistoryPage extends StatelessWidget {
               label: Text("Status",
                   style: TextStyle(fontWeight: FontWeight.bold))),
         ],
-        // rows: myRows,
         // Ensure length == columns.length
         columnWidths: const [100, 150, 250, 150, 100, 200, 80],
+        titleWidget: _buildTitleWidget(),
         actionsWidget: _buildActionWidget(),
         emptyDataWidget: Text(
-          'No bids available for ${c.selectedRange.value}',
+          // 'No ${bidHistoryController.selectedFilter.value} bids for ${bidHistoryController.selectedRange.value}',
+          'No ${DesktopBidHistoryController.bidFiltersLabel(bidHistoryController.selectedFilter.value)} for ${DesktopBidHistoryController.timeRangeLabels(bidHistoryController.selectedRange.value)}',
+
           style: TextStyle(
             color: AppColors.green,
             fontSize: 18,
@@ -247,9 +268,10 @@ class DesktopBidHistoryPage extends StatelessWidget {
     });
   }
 
+// Pager Widget
   Widget _buildPager() {
     // Helper to build a compact set of visible pages with ellipses
-    List<dynamic> _visiblePages(int current, int total) {
+    List<dynamic> visiblePages(int current, int total) {
       if (total <= 7) {
         return List<int>.generate(total, (i) => i + 1);
       }
@@ -273,7 +295,7 @@ class DesktopBidHistoryPage extends StatelessWidget {
       return withDots;
     }
 
-    Widget _pageChip(dynamic item, bool isActive) {
+    Widget pageChip(dynamic item, bool isActive) {
       if (item is String) {
         // Ellipsis
         return Padding(
@@ -287,7 +309,7 @@ class DesktopBidHistoryPage extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: InkWell(
-          onTap: () => c.goToPage(pageNum),
+          onTap: () => bidHistoryController.goToPage(pageNum),
           borderRadius: BorderRadius.circular(6),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -315,19 +337,21 @@ class DesktopBidHistoryPage extends StatelessWidget {
     }
 
     return Obx(() {
-      final current = c.page.value;
-      final total = c.totalPages.value;
+      final current = bidHistoryController.page.value;
+      final total = bidHistoryController.totalPages.value;
 
       // Build jump controller with current page prefilled
       final jumpController = TextEditingController(text: current.toString());
 
-      final pageItems = _visiblePages(current, total);
+      final pageItems = visiblePages(current, total);
 
       return Row(
         children: [
           // Left: Prev
           OutlinedButton.icon(
-            onPressed: c.hasPrev.value ? c.prevPage : null,
+            onPressed: bidHistoryController.hasPrev.value
+                ? bidHistoryController.prevPage
+                : null,
             icon: const Icon(Icons.chevron_left),
             label: const Text('Prev'),
             style: OutlinedButton.styleFrom(
@@ -345,7 +369,7 @@ class DesktopBidHistoryPage extends StatelessWidget {
                 children: [
                   // Page numbers
                   ...pageItems
-                      .map((it) => _pageChip(it, it is int && it == current)),
+                      .map((it) => pageChip(it, it is int && it == current)),
 
                   const SizedBox(width: 16),
 
@@ -377,7 +401,7 @@ class DesktopBidHistoryPage extends StatelessWidget {
                               final p = int.tryParse(value.trim());
                               if (p == null) return;
                               if (p < 1 || p > total) return;
-                              c.goToPage(p);
+                              bidHistoryController.goToPage(p);
                             },
                           ),
                         ),
@@ -390,7 +414,7 @@ class DesktopBidHistoryPage extends StatelessWidget {
                                   int.tryParse(jumpController.text.trim());
                               if (p == null) return;
                               if (p < 1 || p > total) return;
-                              c.goToPage(p);
+                              bidHistoryController.goToPage(p);
                             },
                             style: ElevatedButton.styleFrom(
                                 padding:
@@ -410,7 +434,9 @@ class DesktopBidHistoryPage extends StatelessWidget {
 
           // Right: Next
           OutlinedButton.icon(
-            onPressed: c.hasNext.value ? c.nextPage : null,
+            onPressed: bidHistoryController.hasNext.value
+                ? bidHistoryController.nextPage
+                : null,
             icon: const Icon(Icons.chevron_right),
             label: const Text('Next'),
             style: OutlinedButton.styleFrom(
@@ -423,6 +449,63 @@ class DesktopBidHistoryPage extends StatelessWidget {
     });
   }
 
+// Table Title Widget
+  Widget _buildTitleWidget() {
+    return Obx(() {
+      return Row(
+        children: [
+          // Text(
+          //   "Bid History",
+          //   style: TextStyle(
+          //     color: AppColors.black,
+          //     fontSize: 20,
+          //     fontWeight: FontWeight.bold,
+          //   ),
+          // ),
+
+          // const SizedBox(width: 20),
+
+          // Filter chips (Upcoming | Live | Auto | Otobuy)
+          Wrap(
+            spacing: 8,
+            children: bidHistoryController.filters.map((filter) {
+              final isSelected =
+                  bidHistoryController.selectedFilter.value == filter;
+
+              final labelText =
+                  DesktopBidHistoryController.bidFiltersLabel(filter);
+
+              return ChoiceChip(
+                label: Text(
+                  labelText,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? AppColors.green : AppColors.black,
+                  ),
+                ),
+                showCheckmark: false,
+                selected: isSelected,
+                selectedColor: AppColors.green.withValues(alpha: .15),
+                backgroundColor: AppColors.white,
+                shape: StadiumBorder(
+                  side: BorderSide(
+                    color: isSelected
+                        ? AppColors.green
+                        : AppColors.grey.withValues(alpha: .5),
+                  ),
+                ),
+                onSelected: (selectedFilter) {
+                  if (selectedFilter) bidHistoryController.changeFilter(filter);
+                },
+              );
+            }).toList(),
+          ),
+        ],
+      );
+    });
+  }
+
+  // Table Action Widget
   Widget _buildActionWidget() {
     return Obx(() {
       return Row(
@@ -437,7 +520,7 @@ class DesktopBidHistoryPage extends StatelessWidget {
             height: 40,
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
-                value: c.selectedRange.value,
+                value: bidHistoryController.selectedRange.value,
                 alignment: AlignmentDirectional.centerStart,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 borderRadius: BorderRadius.circular(5),
@@ -448,9 +531,9 @@ class DesktopBidHistoryPage extends StatelessWidget {
                   DropdownMenuItem(value: 'year', child: Text('This Year')),
                   DropdownMenuItem(value: 'all', child: Text('All Time')),
                 ],
-                onChanged: (v) {
-                  if (v == null) return;
-                  c.changeRange(v);
+                onChanged: (selectedRangeValue) {
+                  if (selectedRangeValue == null) return;
+                  bidHistoryController.changeRange(selectedRangeValue);
                 },
               ),
             ),

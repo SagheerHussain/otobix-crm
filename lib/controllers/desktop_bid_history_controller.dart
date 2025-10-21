@@ -8,13 +8,61 @@ import 'package:otobix_crm/utils/api_service.dart';
 
 class DesktopBidHistoryController extends GetxController {
   // Loading & error
-  final loading = false.obs;
+  final isPageLoading = false.obs;
   final isBidsLoading = false.obs;
   final error = RxnString();
 
   // Data
   final summary = Rxn<BidsSummaryModel>();
   final bids = <BidsListModel>[].obs;
+
+// Bid filters
+  static const String upcomingBidsFilter = 'upcomingBids';
+  static const String liveBidsFilter = 'liveBids';
+  static const String upcomingAutoBidsFilter = 'upcomingAutoBids';
+  static const String liveAutoBidsFilter = 'liveAutoBids';
+  static const String otobuyOffersFilter = 'otobuyOffers';
+  static const List<String> allBidFilters = [
+    upcomingBidsFilter,
+    liveBidsFilter,
+    upcomingAutoBidsFilter,
+    liveAutoBidsFilter,
+    otobuyOffersFilter,
+  ];
+
+// Bid filters labels
+  static String bidFiltersLabel(String key) => switch (key) {
+        upcomingBidsFilter => 'Upcoming Bids',
+        liveBidsFilter => 'Live Bids',
+        upcomingAutoBidsFilter => 'Upcoming Auto Bids',
+        liveAutoBidsFilter => 'Live Auto Bids',
+        otobuyOffersFilter => 'Otobuy Offers',
+        _ => key,
+      };
+
+// Time ranges
+  static const String todayRange = 'today';
+  static const String weekRange = 'week';
+  static const String monthRange = 'month';
+  static const String yearRange = 'year';
+  static const String allRange = 'all';
+
+  static const List<String> allTimeRanges = [
+    todayRange,
+    weekRange,
+    monthRange,
+    yearRange,
+    allRange
+  ];
+
+  static String timeRangeLabels(String key) => switch (key) {
+        todayRange => 'Today',
+        weekRange => 'This Week',
+        monthRange => 'This Month',
+        yearRange => 'This Year',
+        allRange => 'All Time',
+        _ => key,
+      };
 
   // Pagination state
   final page = 1.obs;
@@ -24,9 +72,19 @@ class DesktopBidHistoryController extends GetxController {
   final hasNext = false.obs;
   final hasPrev = false.obs;
 
-  // Range filter (UI dropdown)
-  // allowed: today | week | month | year | all
-  final selectedRange = 'today'.obs;
+  // Selections
+  final selectedRange = todayRange.obs;
+  final selectedFilter = liveBidsFilter
+      .obs; // default: liveBids (your previous default was 'live')
+
+  // Expose filter list centrally (no hardcoding in views)
+  final List<String> filters = allBidFilters;
+
+  void changeFilter(String value) {
+    if (selectedFilter.value == value) return;
+    selectedFilter.value = value;
+    reload();
+  }
 
   @override
   void onInit() {
@@ -35,7 +93,6 @@ class DesktopBidHistoryController extends GetxController {
   }
 
   Future<void> loadInitial() async {
-    // keep summary & bids separate; summary stays as-is
     await Future.wait([_loadSummary(), _loadBids(page: 1)]);
   }
 
@@ -51,13 +108,13 @@ class DesktopBidHistoryController extends GetxController {
     await _loadBids(page: page.value - 1);
   }
 
-  // Called by dropdown
   void changeRange(String value) {
     if (selectedRange.value == value) return;
     selectedRange.value = value;
-    reload(); // reset to page 1
+    reload();
   }
 
+// Fetch summary
   Future<void> _loadSummary() async {
     try {
       final http.Response resp =
@@ -68,17 +125,20 @@ class DesktopBidHistoryController extends GetxController {
       final sJson = jsonDecode(resp.body) as Map<String, dynamic>;
       summary.value = BidsSummaryModel.fromJson(sJson);
     } catch (e) {
-      error.value = 'Summary error: $e';
+      error.value = 'Could not fetch bids summary';
     }
   }
 
+// Fetch bids list
   Future<void> _loadBids({required int page}) async {
     isBidsLoading.value = true;
     error.value = null;
 
     try {
+      // NEW unified endpoint with centralized type + range
       final endpoint =
-          '${AppUrls.getRecentBidsList}?page=$page&limit=${limit.value}&range=${selectedRange.value}';
+          '${AppUrls.getRecentBidsList}?type=${selectedFilter.value}&range=${selectedRange.value}&page=$page&limit=${limit.value}';
+
       final http.Response resp = await ApiService.get(endpoint: endpoint);
 
       if (resp.statusCode < 200 || resp.statusCode >= 300) {
@@ -102,7 +162,7 @@ class DesktopBidHistoryController extends GetxController {
       hasNext.value = (p['hasNext'] ?? false) as bool;
       hasPrev.value = (p['hasPrev'] ?? false) as bool;
     } catch (e) {
-      error.value = e.toString();
+      error.value = 'Could not fetch bids list';
     } finally {
       isBidsLoading.value = false;
     }
@@ -113,8 +173,8 @@ class DesktopBidHistoryController extends GetxController {
     await _loadBids(page: p);
   }
 
-  /// Return a *new* list filtered by bidder (userName).
-  List<BidsListModel> filterByBidderName(String query) {
+  /// Search by appointmentId
+  List<BidsListModel> filterByAppointmentId(String query) {
     final q = query.trim().toLowerCase();
     if (q.isEmpty) return bids.toList();
     return bids
@@ -122,6 +182,6 @@ class DesktopBidHistoryController extends GetxController {
         .toList();
   }
 
-  // For the Retry button in your view
+// Load
   Future<void> load() => reload();
 }
