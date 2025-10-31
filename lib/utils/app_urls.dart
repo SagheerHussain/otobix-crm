@@ -1,10 +1,10 @@
 class AppUrls {
-  // static const String baseUrl = "http://localhost:4000/api/";
-  // static const String baseUrlOld = "https://otobix-app-backend.onrender.com/api/";
+  // static const String baseUrl = "http://localhost:4000/api/"; // For Localhost
+  // static const String baseUrlOld = "https://otobix-app-backend.onrender.com/api/"; // For Development
   static const String baseUrl =
-      "https://otobix-app-backend-rq8m.onrender.com/api/";
+      "https://otobix-app-backend-rq8m.onrender.com/api/"; // For Production
   // static const String baseUrl =
-  //     "http://192.168.100.99:4000/api/"; // For Mobile Testing.
+  //     "http://192.168.100.99:4000/api/"; // For Mobile Testing
 
   static String get login => "${baseUrl}user/login";
 
