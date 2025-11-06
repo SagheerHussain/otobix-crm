@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:otobix_crm/models/cars_list_model.dart';
 import 'package:otobix_crm/network/api_service.dart';
-import 'package:otobix_crm/Network/socket_service.dart';
+import 'package:otobix_crm/network/socket_service.dart';
 import 'package:otobix_crm/utils/app_constants.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
 import 'package:otobix_crm/utils/shared_prefs_helper.dart';

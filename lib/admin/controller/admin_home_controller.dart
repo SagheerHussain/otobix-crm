@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:otobix_crm/network/api_service.dart';
-import 'package:otobix_crm/Network/socket_service.dart';
+import 'package:otobix_crm/network/socket_service.dart';
 import 'package:otobix_crm/utils/app_constants.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
 import 'package:otobix_crm/utils/socket_events.dart';
