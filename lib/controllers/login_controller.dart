@@ -91,7 +91,7 @@ class LoginController extends GetxController {
 
         await SharedPrefsHelper.saveString(
           SharedPrefsHelper.userImageUrlKey,
-          userImageUrl,
+          userImageUrl ?? "",
         );
 
         if (userRole == AppConstants.roles.admin) {

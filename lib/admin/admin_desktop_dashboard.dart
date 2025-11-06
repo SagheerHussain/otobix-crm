@@ -197,16 +197,16 @@ class _AdminDesktopDashboardState extends State<AdminDesktopDashboard> {
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
-          trailing: isActive
-              ? Container(
-                  width: 4,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.green,
-                    shape: BoxShape.circle,
-                  ),
-                )
-              : null,
+          // trailing: isActive
+          //     ? Container(
+          //         width: 4,
+          //         height: 4,
+          //         decoration: BoxDecoration(
+          //           color: AppColors.green,
+          //           shape: BoxShape.circle,
+          //         ),
+          //       )
+          //     : null,
           onTap: () {
             currentIndex.value = item.index;
           },

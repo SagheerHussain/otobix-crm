@@ -4,8 +4,8 @@ import 'package:otobix_crm/admin/controller/admin_profile_controller.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_constants.dart';
 
-class EditProfileScreen extends StatelessWidget {
-  EditProfileScreen({super.key});
+class EditDesktopProfileScreen extends StatelessWidget {
+  EditDesktopProfileScreen({super.key});
 
   final _formKey = GlobalKey<FormState>();
   final controller = Get.put(AdminProfileController());
@@ -309,8 +309,9 @@ class EditProfileScreen extends StatelessWidget {
                 ),
               ),
               ElevatedButton.icon(
-                icon: Icon(Icons.save, size: 18),
-                label: Text('Save Changes'),
+                icon: Icon(Icons.save, size: 18, color: Colors.white),
+                label:
+                    Text('Save Changes', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.green,
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:otobix_crm/controllers/desktop_bid_history_controller.dart';
 import 'package:otobix_crm/controllers/desktop_homepage_controller.dart';
 import 'package:otobix_crm/models/bid_summary_model.dart';
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
 import 'package:otobix_crm/widgets/refresh_page_widget.dart';
 import 'package:otobix_crm/widgets/table_widget.dart';
-import '../controllers/desktop_bid_history_controller.dart';
 
 class DesktopBidHistoryPage extends StatelessWidget {
   DesktopBidHistoryPage({super.key});

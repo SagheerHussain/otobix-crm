@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/admin_desktop_cars_list_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_edit_profile_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_settings_page.dart';
 import 'package:otobix_crm/admin/edit_account_page.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/admin/admin_cars_list_page.dart';
 import 'package:otobix_crm/admin/admin_settings_page.dart';
 import 'package:otobix_crm/admin/controller/admin_profile_controller.dart';
+import 'package:otobix_crm/utils/responsive_layout.dart';
 
 class AdminDesktopProfilePage extends StatefulWidget {
   const AdminDesktopProfilePage({super.key});
@@ -221,7 +225,10 @@ class _AdminDesktopProfilePageState extends State<AdminDesktopProfilePage> {
                       subtitle: "Update your personal information",
                       color: AppColors.green,
                       onTap: () {
-                        Get.to(EditProfileScreen());
+                        Get.to(ResponsiveLayout(
+                          mobile: EditProfileScreen(),
+                          desktop: EditDesktopProfileScreen(),
+                        ));
                       },
                     ),
 
@@ -234,7 +241,10 @@ class _AdminDesktopProfilePageState extends State<AdminDesktopProfilePage> {
                       subtitle: "View and manage all cars",
                       color: AppColors.blue,
                       onTap: () {
-                        Get.to(AdminCarsListPage());
+                        Get.to(ResponsiveLayout(
+                          mobile: AdminCarsListPage(),
+                          desktop: AdminDesktopCarsListPage(),
+                        ));
                       },
                     ),
 
@@ -247,7 +257,10 @@ class _AdminDesktopProfilePageState extends State<AdminDesktopProfilePage> {
                       subtitle: "Update terms and privacy policy",
                       color: Colors.orange,
                       onTap: () {
-                        Get.to(const AdminSettingsPage());
+                        Get.to(const ResponsiveLayout(
+                          mobile: AdminSettingsPage(),
+                          desktop: AdminDesktopSettingsPage(),
+                        ));
                       },
                     ),
 

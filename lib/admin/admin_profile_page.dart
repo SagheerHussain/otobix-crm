@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/admin_desktop_cars_list_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_edit_profile_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_settings_page.dart';
 import 'package:otobix_crm/admin/edit_account_page.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/admin/admin_cars_list_page.dart';
 import 'package:otobix_crm/admin/admin_settings_page.dart';
 import 'package:otobix_crm/admin/controller/admin_profile_controller.dart';
+import 'package:otobix_crm/utils/responsive_layout.dart';
 
 class AdminProfilePage extends StatefulWidget {
   const AdminProfilePage({super.key});
@@ -83,7 +87,10 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     title: "Edit Profile",
                     description: "Change your name, email, and more.",
                     onTap: () {
-                      Get.to(EditProfileScreen());
+                      Get.to(ResponsiveLayout(
+                        mobile: EditProfileScreen(),
+                        desktop: EditDesktopProfileScreen(),
+                      ));
                     },
                   ),
 
@@ -102,7 +109,10 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     title: "Cars List",
                     description: "View all cars list.",
                     onTap: () {
-                      Get.to(AdminCarsListPage());
+                      Get.to(ResponsiveLayout(
+                        mobile: AdminCarsListPage(),
+                        desktop: AdminDesktopCarsListPage(),
+                      ));
                     },
                   ),
 
@@ -112,7 +122,10 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     title: "Settings",
                     description: "Update terms and privacy policy.",
                     onTap: () {
-                      Get.to(AdminSettingsPage());
+                      Get.to(ResponsiveLayout(
+                        mobile: AdminSettingsPage(),
+                        desktop: AdminDesktopSettingsPage(),
+                      ));
                     },
                   ),
 
