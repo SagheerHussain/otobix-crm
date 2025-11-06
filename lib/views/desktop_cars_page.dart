@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:otobix_crm/controllers/desktop_cars_controller.dart';
 import 'package:otobix_crm/controllers/desktop_homepage_controller.dart';
 import 'package:otobix_crm/models/car_summary_model.dart';
-import 'package:otobix_crm/models/cars_list_model.dart';
+import 'package:otobix_crm/models/cars_list_model_for_crm.dart';
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
 import 'package:otobix_crm/widgets/refresh_page_widget.dart';
 import 'package:otobix_crm/widgets/table_widget.dart';
 import 'package:otobix_crm/widgets/pager_widget.dart';
-
-import '../controllers/desktop_cars_controller.dart';
 
 class DesktopCarsPage extends StatelessWidget {
   DesktopCarsPage({super.key});
@@ -359,7 +358,7 @@ class DesktopCarsPage extends StatelessWidget {
     });
   }
 
-  void _showCarDetails(BuildContext context, CarsListModel car) {
+  void _showCarDetails(BuildContext context, CarsListModelForCrm car) {
     Get.dialog(
       Dialog(
         constraints: BoxConstraints(

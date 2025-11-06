@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:otobix_crm/models/bid_summary_model.dart';
 import 'package:otobix_crm/models/bids_list_model.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
-import 'package:otobix_crm/utils/api_service.dart';
+import 'package:otobix_crm/network/api_service.dart';
 
 class DesktopBidHistoryController extends GetxController {
   // Loading & error

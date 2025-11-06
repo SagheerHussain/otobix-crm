@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:otobix_crm/models/cars_list_model_for_crm.dart';
+import 'package:otobix_crm/network/api_service.dart';
 import 'package:otobix_crm/models/car_summary_model.dart';
-import 'package:otobix_crm/models/cars_list_model.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
-import 'package:otobix_crm/utils/api_service.dart';
 import 'package:otobix_crm/widgets/toast_widget.dart';
 
 class DesktopCarsController extends GetxController {
@@ -21,7 +21,7 @@ class DesktopCarsController extends GetxController {
   // Cars List state
   final isCarsListLoading = false.obs;
   final carsListError = RxnString();
-  final carsList = <CarsListModel>[].obs;
+  final carsList = <CarsListModelForCrm>[].obs;
 
   // Filters (client-side labels -> API query)
   static const String filterAll = 'all';
@@ -61,7 +61,6 @@ class DesktopCarsController extends GetxController {
   Future<void> loadInitial() async {
     isPageLoading.value = true;
     pageError.value = null;
-
     await Future.wait([
       _loadCarSummary(),
       fetchCarsList(resetPage: true),
@@ -124,7 +123,7 @@ class DesktopCarsController extends GetxController {
       if (resetPage) page.value = 1;
 
       // Build query
-      final base = AppUrls.getCarsList; // e.g. '/admin/cars'
+      final base = AppUrls.getCarsListForCRM; // e.g. '/admin/cars'
       final status = selectedFilter.value;
       final qStatus = (status == filterAll) ? '' : '&status=$status';
       final url = '$base?page=${page.value}&limit=${limit.value}$qStatus';
@@ -139,7 +138,7 @@ class DesktopCarsController extends GetxController {
 
         carsList
           ..clear()
-          ..addAll(list.map((e) => CarsListModel.fromJson(e)));
+          ..addAll(list.map((e) => CarsListModelForCrm.fromJson(e)));
 
         total.value = (pg['total'] as num?)?.toInt() ?? 0;
         totalPages.value = (pg['totalPages'] as num?)?.toInt() ?? 1;
@@ -213,7 +212,7 @@ class DesktopCarsController extends GetxController {
   }
 
   /// Search by appointmentId
-  List<CarsListModel> filterByAppointmentId(String query) {
+  List<CarsListModelForCrm> filterByAppointmentId(String query) {
     final q = query.trim().toLowerCase();
     if (q.isEmpty) return carsList.toList();
     return carsList

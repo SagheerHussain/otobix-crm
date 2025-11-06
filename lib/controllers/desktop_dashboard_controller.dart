@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:otobix_crm/utils/api_service.dart';
+import 'package:otobix_crm/network/api_service.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
 
 class DesktopDashboardController extends GetxController {

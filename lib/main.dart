@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:otobix_crm/admin/admin_dashboard.dart';
+import 'package:otobix_crm/network/socket_service.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
+import 'package:otobix_crm/utils/app_constants.dart';
+import 'package:otobix_crm/utils/app_urls.dart';
+import 'package:otobix_crm/utils/responsive_layout.dart';
 import 'package:otobix_crm/utils/shared_prefs_helper.dart';
-import 'package:otobix_crm/views/splash_screen.dart';
+import 'package:otobix_crm/views/desktop_homepage.dart';
+import 'package:otobix_crm/views/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SharedPrefsHelper.init(); // <-- ensure this exists and completes
-  runApp(const MyApp());
+
+  final firstScreen = await loadInitialData();
+
+  runApp(MyApp(firstScreen: firstScreen));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget firstScreen;
+
+  const MyApp({super.key, required this.firstScreen});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +42,40 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
       ),
-      home: SplashScreen(),
+      home: firstScreen,
     );
   }
+}
+
+// Load Initial Data
+Future<Widget> loadInitialData() async {
+  await SharedPrefsHelper.init();
+  SocketService.instance.initSocket(AppUrls.socketBaseUrl);
+
+  final token = await SharedPrefsHelper.getString(SharedPrefsHelper.tokenKey);
+  final userRole =
+      await SharedPrefsHelper.getString(SharedPrefsHelper.userRoleKey);
+
+  Widget firstScreen;
+
+  if (token != null && token.isNotEmpty) {
+    if (userRole == AppConstants.roles.admin) {
+      // Admin
+      firstScreen = AdminDashboard();
+    } else if (userRole == AppConstants.roles.salesManager) {
+      // Sales Manager
+      firstScreen = ResponsiveLayout(
+        mobile: DesktopHomepage(),
+        desktop: DesktopHomepage(),
+      );
+
+      // Login
+    } else {
+      firstScreen = LoginPage();
+    }
+  } else {
+    firstScreen = LoginPage();
+  }
+
+  return firstScreen;
 }

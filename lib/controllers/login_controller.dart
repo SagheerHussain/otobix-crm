@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:otobix_crm/utils/api_service.dart';
+import 'package:otobix_crm/admin/admin_dashboard.dart';
+import 'package:otobix_crm/network/api_service.dart';
 import 'package:otobix_crm/utils/app_constants.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
 import 'package:otobix_crm/utils/responsive_layout.dart';
@@ -55,6 +56,10 @@ class LoginController extends GetxController {
             userRole == AppConstants.roles.admin) {
           await SharedPrefsHelper.saveString(SharedPrefsHelper.tokenKey, token);
         }
+        if (approvalStatus == 'Approved' &&
+            userRole == AppConstants.roles.salesManager) {
+          await SharedPrefsHelper.saveString(SharedPrefsHelper.tokenKey, token);
+        }
 
         await SharedPrefsHelper.saveString(
           SharedPrefsHelper.userKey,
@@ -84,6 +89,10 @@ class LoginController extends GetxController {
         );
 
         if (userRole == AppConstants.roles.admin) {
+          Get.offAll(
+            () => AdminDashboard(),
+          );
+        } else if (userRole == AppConstants.roles.salesManager) {
           Get.offAll(
             () => ResponsiveLayout(
               mobile: DesktopHomepage(),
