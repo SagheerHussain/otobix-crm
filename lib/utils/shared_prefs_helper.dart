@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SharedPrefsHelper {
   static const String tokenKey = 'token';
   static const String userNameKey = 'userName';
+  static const String userImageUrlKey = 'userImageUrl';
   static const String userEmailKey = 'userEmail';
   static const String userPhoneKey = 'userPhone';
   static const String userRoleKey = 'userRole';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:otobix_crm/admin/admin_dashboard.dart';
+import 'package:otobix_crm/admin/admin_desktop_dashboard.dart';
 import 'package:otobix_crm/network/socket_service.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_constants.dart';
@@ -61,7 +62,10 @@ Future<Widget> loadInitialData() async {
   if (token != null && token.isNotEmpty) {
     if (userRole == AppConstants.roles.admin) {
       // Admin
-      firstScreen = AdminDashboard();
+      firstScreen = ResponsiveLayout(
+        mobile: AdminDashboard(),
+        desktop: AdminDesktopDashboard(),
+      );
     } else if (userRole == AppConstants.roles.salesManager) {
       // Sales Manager
       firstScreen = ResponsiveLayout(

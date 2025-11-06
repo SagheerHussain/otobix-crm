@@ -47,6 +47,7 @@ class LoginController extends GetxController {
         final user = data['user'];
         final userRole = user['userType'];
         final userId = user['id'];
+        final userImageUrl = user['imageUrl'];
         final approvalStatus = user['approvalStatus'];
         final userName = user['userName'];
         final userEmail = user['email'];
@@ -86,6 +87,11 @@ class LoginController extends GetxController {
         await SharedPrefsHelper.saveString(
           SharedPrefsHelper.userRoleKey,
           userRole,
+        );
+
+        await SharedPrefsHelper.saveString(
+          SharedPrefsHelper.userImageUrlKey,
+          userImageUrl,
         );
 
         if (userRole == AppConstants.roles.admin) {

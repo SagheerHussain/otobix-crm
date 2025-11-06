@@ -34,6 +34,9 @@ class AdminHomeController extends GetxController {
     AppConstants.roles.salesManager,
   ];
 
+  // For desktop ui tab bar
+  RxInt currentTabIndex = 0.obs;
+
   @override
   void onInit() {
     super.onInit();

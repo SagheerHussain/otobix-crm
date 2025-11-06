@@ -187,6 +187,7 @@ class AdminRejectedUsersListPage extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       isScrollControlled: true,
+      constraints: BoxConstraints(maxWidth: Get.width * 0.9),
       builder: (context) {
         return DraggableScrollableSheet(
           expand: false,

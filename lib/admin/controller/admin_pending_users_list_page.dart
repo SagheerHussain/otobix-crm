@@ -7,7 +7,6 @@ import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/empty_data_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
 import 'package:otobix_crm/widgets/toast_widget.dart';
-import 'package:otobix_crm/admin/controller/admin_approved_users_list_controller.dart';
 import 'package:otobix_crm/admin/controller/admin_pending_users_list_controller.dart';
 import 'package:otobix_crm/admin/controller/admin_rejected_users_list_controller.dart';
 
@@ -412,6 +411,7 @@ class AdminPendingUsersListPage extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       isScrollControlled: true,
+      constraints: BoxConstraints(maxWidth: Get.width * 0.9),
       builder: (context) {
         return DraggableScrollableSheet(
           expand: false,
