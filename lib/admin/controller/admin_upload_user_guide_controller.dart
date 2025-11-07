@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
+import 'package:otobix_crm/utils/shared_prefs_helper.dart';
 import 'package:otobix_crm/widgets/toast_widget.dart';
 
 class AdminUploadUserGuideController extends GetxController {
@@ -42,6 +43,11 @@ class AdminUploadUserGuideController extends GetxController {
     final hasTitle = titleCtrl.value.trim().isNotEmpty;
     final uri = Uri.parse(AppUrls.uploadDealerGuide);
     final req = http.MultipartRequest('POST', uri);
+
+    // ✅ Add Bearer Token here as header
+    final String token =
+        await SharedPrefsHelper.getString(SharedPrefsHelper.tokenKey) ?? '';
+    req.headers['Authorization'] = 'Bearer $token';
 
     // optional title
     if (hasTitle) req.fields['title'] = titleCtrl.value.trim();

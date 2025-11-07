@@ -12,132 +12,7 @@ class EditDesktopProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDesktop = MediaQuery.of(context).size.width > 768;
-
-    if (isDesktop) {
-      return _buildDesktopLayout();
-    } else {
-      return _buildMobileLayout();
-    }
-  }
-
-  // Mobile Layout (your existing code)
-  Widget _buildMobileLayout() {
-    return Obx(() {
-      if (controller.isLoading.value) {
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
-      }
-      return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: AppColors.grey.withValues(alpha: .1),
-          iconTheme: const IconThemeData(color: AppColors.green),
-          title: const Text(
-            'Edit My Profile',
-            style: TextStyle(
-              color: Colors.green,
-              fontSize: 16,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                controller.updateProfile();
-              },
-              child: const Text(
-                'Save',
-                style: TextStyle(color: Colors.redAccent, fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Stack(
-                  alignment: Alignment.bottomRight,
-                  children: [
-                    Obx(() {
-                      final imageUrl = controller.imageUrl.value;
-                      final imageFile = controller.imageFile.value;
-
-                      return CircleAvatar(
-                        radius: 55,
-                        backgroundImage: imageFile != null
-                            ? FileImage(imageFile) as ImageProvider
-                            : (imageUrl.isNotEmpty
-                                ? NetworkImage(
-                                    imageUrl.startsWith('http')
-                                        ? imageUrl
-                                        : imageUrl,
-                                  )
-                                : null),
-                        child: imageFile == null && imageUrl.isEmpty
-                            ? const Icon(Icons.person, size: 55)
-                            : null,
-                      );
-                    }),
-                    Positioned(
-                      bottom: 0,
-                      right: 4,
-                      child: InkWell(
-                        onTap: () {
-                          controller.pickImageFromDevice();
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            border: Border.all(color: Colors.redAccent),
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.redAccent,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                _buildTextField('Email', controller.userEmail),
-                _buildTextField('Location', controller.location),
-                if (controller.userRole.value == 'Dealer') ...[
-                  _buildTextField('Dealership Name', controller.dealershipName),
-                  _buildTextField(
-                    'Primary Contact Person',
-                    controller.primaryContactPerson,
-                  ),
-                  _buildTextField(
-                    'Primary Contact Number',
-                    controller.primaryContactNumber,
-                  ),
-                  _buildTextField(
-                    'Secondary Contact Person',
-                    controller.secondaryContactPerson,
-                  ),
-                  _buildTextField(
-                    'Secondary Contact Number',
-                    controller.secondaryContactNumber,
-                  ),
-                ],
-                if ([
-                  AppConstants.roles.dealer,
-                  AppConstants.roles.customer,
-                  AppConstants.roles.salesManager,
-                ].contains(controller.userRole.value))
-                  _buildAddressList(controller),
-                const SizedBox(height: 40),
-              ],
-            ),
-          ),
-        ),
-      );
-    });
+    return _buildDesktopLayout();
   }
 
   // Desktop Layout
@@ -159,6 +34,26 @@ class EditDesktopProfileScreen extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  IconButton(
+                    onPressed: () => Get.back(),
+                    icon: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(Icons.arrow_back, color: Colors.grey[600]),
+                    ),
+                  ),
+                  SizedBox(width: 32),
                   // Left Side - Profile Picture
                   _buildProfileSection(),
 
@@ -496,81 +391,6 @@ class EditDesktopProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-      ],
-    );
-  }
-
-  // Mobile version methods (keep your existing ones)
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: AppColors.blue,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 6),
-          TextFormField(
-            controller: controller,
-            style: const TextStyle(fontSize: 14),
-            decoration: InputDecoration(
-              enabled: false,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 10,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppColors.blue),
-              ),
-              fillColor: Colors.grey.shade100,
-              filled: true,
-            ),
-            validator: (value) =>
-                value == null || value.isEmpty ? 'Required' : null,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddressList(AdminProfileController controller) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 16),
-        Text(
-          'Addresses',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: AppColors.blue,
-          ),
-        ),
-        ...controller.addressList.map(
-          (addr) => _buildTextField(
-            'Address ${controller.addressList.indexOf(addr) + 1}',
-            TextEditingController(text: addr)
-              ..addListener(() {
-                controller.addressList[controller.addressList.indexOf(addr)] =
-                    addr;
-              }),
-          ),
-        ),
       ],
     );
   }

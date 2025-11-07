@@ -239,6 +239,7 @@ class _AdminDesktopDashboardState extends State<AdminDesktopDashboard> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.blue.withOpacity(0.1),
+                    border: Border.all(color: AppColors.blue, width: 1),
                   ),
                   child: userImageUrl.isNotEmpty
                       ? ClipOval(

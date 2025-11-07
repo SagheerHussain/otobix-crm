@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/admin_desktop_live_cars_list_page.dart';
 import 'package:otobix_crm/admin/controller/tab_bar_buttons_controller.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
-import 'package:otobix_crm/widgets/tab_bar_buttons_widget.dart';
 import 'package:otobix_crm/admin/admin_auction_completed_cars_list_page.dart';
 import 'package:otobix_crm/admin/admin_live_cars_list_page.dart';
 import 'package:otobix_crm/admin/admin_oto_buy_cars_list_page.dart';
@@ -12,6 +12,7 @@ import 'package:otobix_crm/admin/controller/admin_cars_list_controller.dart';
 import 'package:otobix_crm/admin/controller/admin_live_cars_list_controller.dart';
 import 'package:otobix_crm/admin/controller/admin_oto_buy_cars_list_controller.dart';
 import 'package:otobix_crm/admin/controller/admin_upcoming_cars_list_controller.dart';
+import 'package:otobix_crm/utils/responsive_layout.dart';
 
 class AdminDesktopCarsListPage extends StatelessWidget {
   AdminDesktopCarsListPage({super.key});
@@ -52,10 +53,10 @@ class AdminDesktopCarsListPage extends StatelessWidget {
             // Header Section
             _buildDesktopHeader(),
 
-            SizedBox(height: 24),
+            // SizedBox(height: 24),
 
-            // Stats Cards
-            _buildStatsCards(),
+            // // Stats Cards
+            // _buildStatsCards(),
 
             SizedBox(height: 32),
 
@@ -96,7 +97,10 @@ class AdminDesktopCarsListPage extends StatelessWidget {
                           children: [
                             _buildDesktopPageContainer(
                                 AdminUpcomingCarsListPage()),
-                            _buildDesktopPageContainer(AdminLiveCarsListPage()),
+                            _buildDesktopPageContainer(ResponsiveLayout(
+                              mobile: AdminLiveCarsListPage(),
+                              desktop: AdminDesktopLiveCarsListPage(),
+                            )),
                             _buildDesktopPageContainer(
                                 AdminAuctionCompletedCarsListPage()),
                             _buildDesktopPageContainer(
@@ -120,8 +124,27 @@ class AdminDesktopCarsListPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            IconButton(
+              onPressed: () => Get.back(),
+              icon: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(Icons.arrow_back, color: Colors.grey[600]),
+              ),
+            ),
+            SizedBox(width: 24),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -142,25 +165,6 @@ class AdminDesktopCarsListPage extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-            IconButton(
-              onPressed: () => Get.back(),
-              icon: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Icon(Icons.arrow_back, color: Colors.grey[600]),
-              ),
             ),
           ],
         ),
@@ -393,23 +397,31 @@ class AdminDesktopCarsListPage extends StatelessWidget {
           child: Row(
             children: [
               _buildDesktopTab(
-                  'Upcoming', upcomingController.upcomingCarsCount.value, 0),
+                  'Upcoming',
+                  upcomingController.upcomingCarsCount.value,
+                  0,
+                  Icons.schedule_outlined,
+                  Colors.orange),
               SizedBox(width: 16),
-              _buildDesktopTab('Live', liveController.liveCarsCount.value, 1),
+              _buildDesktopTab('Live', liveController.liveCarsCount.value, 1,
+                  Icons.live_tv_outlined, AppColors.red),
               SizedBox(width: 16),
               _buildDesktopTab(
                   'Completed',
                   auctionCompletedController.auctionCompletedCarsCount.value,
-                  2),
+                  2,
+                  Icons.check_circle_outline,
+                  AppColors.green),
               SizedBox(width: 16),
-              _buildDesktopTab(
-                  'OtoBuy', otoBuyController.otoBuyCarsCount.value, 3),
+              _buildDesktopTab('OtoBuy', otoBuyController.otoBuyCarsCount.value,
+                  3, Icons.shopping_cart_outlined, AppColors.blue),
             ],
           ),
         ));
   }
 
-  Widget _buildDesktopTab(String title, int count, int index) {
+  Widget _buildDesktopTab(
+      String title, int count, int index, IconData icon, Color color) {
     final isSelected = tabBarController.selectedIndex.value == index;
     return Expanded(
       child: Material(
@@ -431,31 +443,47 @@ class AdminDesktopCarsListPage extends StatelessWidget {
                 width: 2,
               ),
             ),
-            child: Column(
+            child: Row(
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isSelected ? AppColors.green : Colors.grey[700],
-                  ),
-                ),
-                SizedBox(height: 8),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.green : Colors.grey[200],
-                    borderRadius: BorderRadius.circular(20),
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    count.toString(),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: isSelected ? Colors.white : Colors.grey[700],
+                  child: Icon(icon, color: color, size: 24),
+                ),
+                SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.green : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        count.toString(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: isSelected ? Colors.white : Colors.grey[700],
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(height: 8),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isSelected ? AppColors.green : Colors.grey[700],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

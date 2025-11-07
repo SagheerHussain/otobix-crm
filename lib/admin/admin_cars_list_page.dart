@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/admin_desktop_live_cars_list_page.dart';
 import 'package:otobix_crm/admin/controller/tab_bar_buttons_controller.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
+import 'package:otobix_crm/utils/responsive_layout.dart';
 import 'package:otobix_crm/widgets/tab_bar_buttons_widget.dart';
 import 'package:otobix_crm/admin/admin_auction_completed_cars_list_page.dart';
 import 'package:otobix_crm/admin/admin_live_cars_list_page.dart';
@@ -48,7 +50,10 @@ class AdminCarsListPage extends StatelessWidget {
                 controller: tabBarController.tabController,
                 children: [
                   AdminUpcomingCarsListPage(),
-                  AdminLiveCarsListPage(),
+                  ResponsiveLayout(
+                    mobile: AdminLiveCarsListPage(),
+                    desktop: AdminDesktopLiveCarsListPage(),
+                  ),
                   AdminAuctionCompletedCarsListPage(),
                   AdminOtoBuyCarsListPage(),
                 ],

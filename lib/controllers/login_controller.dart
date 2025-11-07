@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:otobix_crm/admin/admin_dashboard.dart';
+import 'package:otobix_crm/admin/admin_desktop_dashboard.dart';
 import 'package:otobix_crm/network/api_service.dart';
 import 'package:otobix_crm/utils/app_constants.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
@@ -96,7 +97,10 @@ class LoginController extends GetxController {
 
         if (userRole == AppConstants.roles.admin) {
           Get.offAll(
-            () => AdminDashboard(),
+            () => ResponsiveLayout(
+              mobile: AdminDashboard(),
+              desktop: AdminDesktopDashboard(),
+            ),
           );
         } else if (userRole == AppConstants.roles.salesManager) {
           Get.offAll(
