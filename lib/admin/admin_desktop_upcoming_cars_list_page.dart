@@ -14,8 +14,8 @@ import 'package:otobix_crm/widgets/shimmer_widget.dart';
 import 'package:otobix_crm/widgets/toast_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_upcoming_cars_list_controller.dart';
 
-class AdminUpcomingCarsListPage extends StatelessWidget {
-  AdminUpcomingCarsListPage({super.key});
+class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
+  AdminDesktopUpcomingCarsListPage({super.key});
 
   // Initialized in my cars page
   final AdminUpcomingCarsListController upcomingController =
@@ -50,6 +50,26 @@ class AdminUpcomingCarsListPage extends StatelessWidget {
   // Upcoming Cars List
   Widget _buildUpcomingCarsList() {
     return Expanded(
+      child: GridView.builder(
+        padding: const EdgeInsets.all(10),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, // 3 items per row
+          crossAxisSpacing: 10, // Horizontal spacing between items
+          mainAxisSpacing: 10, // Vertical spacing between items
+          childAspectRatio:
+              2.5, // Adjust this ratio to control card proportions
+        ),
+        itemCount: upcomingController.filteredUpcomingCarsList.length,
+        itemBuilder: (context, index) {
+          final car = upcomingController.filteredUpcomingCarsList[index];
+          return _buildCarCard(car);
+        },
+      ),
+    );
+  }
+
+  Widget _buildUpcomingCarsList1() {
+    return Expanded(
       child: ListView.separated(
         shrinkWrap: true,
         itemCount: upcomingController.filteredUpcomingCarsList.length,
@@ -58,224 +78,213 @@ class AdminUpcomingCarsListPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final car = upcomingController.filteredUpcomingCarsList[index];
           // InkWell for car card
-          return GestureDetector(
-            onTap: () => _showAuctionBottomSheet(car),
-            child: Card(
-              elevation: 4,
-              color: AppColors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
+          return _buildCarCard(car);
+        },
+      ),
+    );
+  }
+
+  Widget _buildCarCard(CarsListModel car) {
+    return GestureDetector(
+      onTap: () => _showAuctionBottomSheet(car),
+      child: Card(
+        elevation: 4,
+        color: AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      children: [
-                        Row(
+                  Row(
+                    children: [
+                      // Car details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Car details
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      // Car Image
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: CachedNetworkImage(
-                                          imageUrl: car.imageUrl,
-                                          width: 120,
-                                          height: 80,
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) =>
-                                              Container(
-                                            height: 80,
-                                            width: 120,
-                                            color: AppColors.grey
-                                                .withValues(alpha: .3),
-                                            child: const Center(
-                                              child: SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  color: AppColors.green,
-                                                  strokeWidth: 2,
-                                                ),
-                                              ),
-                                            ),
+                            Row(
+                              children: [
+                                // Car Image
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: CachedNetworkImage(
+                                    imageUrl: car.imageUrl,
+                                    width: 120,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      height: 80,
+                                      width: 120,
+                                      color:
+                                          AppColors.grey.withValues(alpha: .3),
+                                      child: const Center(
+                                        child: SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            color: AppColors.green,
+                                            strokeWidth: 2,
                                           ),
-                                          errorWidget: (
-                                            context,
-                                            error,
-                                            stackTrace,
-                                          ) {
-                                            return Image.asset(
-                                              AppImages.carAlternateImage,
-                                              width: 120,
-                                              height: 80,
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
                                         ),
                                       ),
-                                      SizedBox(width: 10),
-                                      Flexible(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '${car.make} ${car.model} ${car.variant}',
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  'FMV: ',
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.priceDiscovery)}/-',
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    color: AppColors.green,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                    ),
+                                    errorWidget: (
+                                      context,
+                                      error,
+                                      stackTrace,
+                                    ) {
+                                      return Image.asset(
+                                        AppImages.carAlternateImage,
+                                        width: 120,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
                                   ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                ),
+                                SizedBox(width: 10),
+                                Flexible(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Go Live In: ',
+                                        '${car.make} ${car.model} ${car.variant}',
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.green,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Obx(
-                                        () => Text(
-                                          upcomingController
-                                                  .remainingTimes[car.id] ??
-                                              "--",
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.red,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Divider(),
-                                  const SizedBox(height: 5),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      Row(
                                         children: [
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.calendar_today,
-                                            text: GlobalFunctions
-                                                    .getFormattedDate(
-                                                  date: car
-                                                      .yearMonthOfManufacture,
-                                                  type:
-                                                      GlobalFunctions.monthYear,
-                                                ) ??
-                                                'N/A',
+                                          Text(
+                                            'FMV: ',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.local_gas_station,
-                                            text: car.fuelType,
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.speed,
-                                            text:
-                                                '${NumberFormat.decimalPattern('en_IN').format(car.odometerReadingInKms)} km',
-                                          ),
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.location_on,
-                                            text: car.inspectionLocation,
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.receipt_long,
-                                            text: car.roadTaxValidity ==
-                                                        'LTT' ||
-                                                    car.roadTaxValidity == 'OTT'
-                                                ? car.roadTaxValidity
-                                                : GlobalFunctions
-                                                        .getFormattedDate(
-                                                      date: car.taxValidTill,
-                                                      type: GlobalFunctions
-                                                          .monthYear,
-                                                    ) ??
-                                                    'N/A',
-                                          ),
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.person,
-                                            text: car.ownerSerialNumber == 1
-                                                ? 'First Owner'
-                                                : '${car.ownerSerialNumber} Owners',
+                                          Text(
+                                            'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.priceDiscovery)}/-',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: AppColors.green,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Go Live In: ',
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.green,
+                                  ),
+                                ),
+                                Obx(
+                                  () => Text(
+                                    upcomingController.remainingTimes[car.id] ??
+                                        "--",
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.red,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Divider(),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildIconAndTextWidget(
+                                      icon: Icons.calendar_today,
+                                      text: GlobalFunctions.getFormattedDate(
+                                            date: car.yearMonthOfManufacture,
+                                            type: GlobalFunctions.monthYear,
+                                          ) ??
+                                          'N/A',
+                                    ),
+                                    _buildIconAndTextWidget(
+                                      icon: Icons.local_gas_station,
+                                      text: car.fuelType,
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildIconAndTextWidget(
+                                      icon: Icons.speed,
+                                      text:
+                                          '${NumberFormat.decimalPattern('en_IN').format(car.odometerReadingInKms)} km',
+                                    ),
+                                    _buildIconAndTextWidget(
+                                      icon: Icons.location_on,
+                                      text: car.inspectionLocation,
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildIconAndTextWidget(
+                                      icon: Icons.receipt_long,
+                                      text: car.roadTaxValidity == 'LTT' ||
+                                              car.roadTaxValidity == 'OTT'
+                                          ? car.roadTaxValidity
+                                          : GlobalFunctions.getFormattedDate(
+                                                date: car.taxValidTill,
+                                                type: GlobalFunctions.monthYear,
+                                              ) ??
+                                              'N/A',
+                                    ),
+                                    _buildIconAndTextWidget(
+                                      icon: Icons.person,
+                                      text: car.ownerSerialNumber == 1
+                                          ? 'First Owner'
+                                          : '${car.ownerSerialNumber} Owners',
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 5),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 5),
                 ],
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

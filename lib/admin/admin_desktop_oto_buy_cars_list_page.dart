@@ -12,8 +12,8 @@ import 'package:otobix_crm/widgets/shimmer_widget.dart';
 import 'package:otobix_crm/widgets/tab_bar_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_oto_buy_cars_list_controller.dart';
 
-class AdminOtoBuyCarsListPage extends StatelessWidget {
-  AdminOtoBuyCarsListPage({super.key});
+class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
+  AdminDesktopOtoBuyCarsListPage({super.key});
 
   // Initialized in my cars page
   final AdminOtoBuyCarsListController otoBuyController =
@@ -47,14 +47,18 @@ class AdminOtoBuyCarsListPage extends StatelessWidget {
 
   Widget _buildOtoBuyCarsList() {
     return Expanded(
-      child: ListView.separated(
-        shrinkWrap: true,
+      child: GridView.builder(
+        padding: const EdgeInsets.all(10),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, // 3 items per row
+          crossAxisSpacing: 10, // Horizontal spacing between items
+          mainAxisSpacing: 10, // Vertical spacing between items
+          childAspectRatio:
+              2.5, // Adjust this ratio to control card proportions
+        ),
         itemCount: otoBuyController.filteredOtoBuyCarsList.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 5),
         itemBuilder: (context, index) {
           final car = otoBuyController.filteredOtoBuyCarsList[index];
-          // InkWell for car card
           return _buildCarCard(car);
         },
       ),

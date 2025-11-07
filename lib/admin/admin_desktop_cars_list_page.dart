@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/admin_desktop_completed_cars_list_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_live_cars_list_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_oto_buy_cars_list_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_upcoming_cars_list_page.dart';
 import 'package:otobix_crm/admin/controller/tab_bar_buttons_controller.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/admin/admin_auction_completed_cars_list_page.dart';
@@ -77,7 +80,7 @@ class AdminDesktopCarsListPage extends StatelessWidget {
                 child: Column(
                   children: [
                     // Search and Filter Bar
-                    _buildDesktopSearchFilterBar(),
+                    // _buildDesktopSearchFilterBar(),
 
                     // Desktop Tabs
                     _buildDesktopTabs(),
@@ -96,15 +99,24 @@ class AdminDesktopCarsListPage extends StatelessWidget {
                           controller: tabBarController.tabController,
                           children: [
                             _buildDesktopPageContainer(
-                                AdminUpcomingCarsListPage()),
+                              ResponsiveLayout(
+                                mobile: AdminUpcomingCarsListPage(),
+                                desktop: AdminDesktopUpcomingCarsListPage(),
+                              ),
+                            ),
                             _buildDesktopPageContainer(ResponsiveLayout(
                               mobile: AdminLiveCarsListPage(),
                               desktop: AdminDesktopLiveCarsListPage(),
                             )),
-                            _buildDesktopPageContainer(
-                                AdminAuctionCompletedCarsListPage()),
-                            _buildDesktopPageContainer(
-                                AdminOtoBuyCarsListPage()),
+                            _buildDesktopPageContainer(ResponsiveLayout(
+                              mobile: AdminAuctionCompletedCarsListPage(),
+                              desktop:
+                                  AdminDesktopAuctionCompletedCarsListPage(),
+                            )),
+                            _buildDesktopPageContainer(ResponsiveLayout(
+                              mobile: AdminOtoBuyCarsListPage(),
+                              desktop: AdminDesktopOtoBuyCarsListPage(),
+                            )),
                           ],
                         ),
                       ),

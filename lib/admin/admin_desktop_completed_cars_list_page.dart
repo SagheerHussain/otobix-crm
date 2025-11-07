@@ -16,8 +16,8 @@ import 'package:otobix_crm/widgets/tab_bar_widget.dart';
 import 'package:otobix_crm/widgets/toast_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_auction_completed_cars_list_controller.dart';
 
-class AdminAuctionCompletedCarsListPage extends StatelessWidget {
-  AdminAuctionCompletedCarsListPage({super.key});
+class AdminDesktopAuctionCompletedCarsListPage extends StatelessWidget {
+  AdminDesktopAuctionCompletedCarsListPage({super.key});
 
   // Initialized in my cars page
   final AdminAuctionCompletedCarsListController auctionCompletedController =
@@ -52,16 +52,20 @@ class AdminAuctionCompletedCarsListPage extends StatelessWidget {
 
   Widget _buildAuctionCompletedCarsList() {
     return Expanded(
-      child: ListView.separated(
-        shrinkWrap: true,
+      child: GridView.builder(
+        padding: const EdgeInsets.all(10),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, // 3 items per row
+          crossAxisSpacing: 10, // Horizontal spacing between items
+          mainAxisSpacing: 10, // Vertical spacing between items
+          childAspectRatio:
+              2.99, // Adjust this ratio to control card proportions
+        ),
         itemCount:
             auctionCompletedController.filteredAuctionCompletedCarsList.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 5),
         itemBuilder: (context, index) {
           final car = auctionCompletedController
               .filteredAuctionCompletedCarsList[index];
-          // InkWell for car card
           return _buildCarCard(car);
         },
       ),

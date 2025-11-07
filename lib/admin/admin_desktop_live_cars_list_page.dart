@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:otobix_crm/models/cars_list_model.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/global_functions.dart';
+import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/empty_data_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_live_cars_list_controller.dart';
@@ -148,7 +149,7 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
         crossAxisCount: 4,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
-        childAspectRatio: 0.75, // Adjust based on your content
+        childAspectRatio: 0.9, // Adjust based on your content
       ),
       itemCount: getxController.filteredLiveBidsCarsList.length,
       itemBuilder: (context, index) {
@@ -162,14 +163,42 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
     final String yearofManufacture =
         '${GlobalFunctions.getFormattedDate(date: car.yearMonthOfManufacture, type: GlobalFunctions.year)} ';
 
+    String maskRegistrationNumber(String? input) {
+      if (input == null || input.length <= 5) return '*****';
+      final visible = input.substring(0, input.length - 5);
+      return '$visible*****';
+    }
+
+    Widget iconDetail(IconData icon, String value) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, size: 20, color: AppColors.grey),
+          SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              value,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: InkWell(
         onTap: () => _showRemoveCarBottomSheet(car),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -178,15 +207,15 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(12),
+                    top: Radius.circular(16),
                   ),
                   child: CachedNetworkImage(
                     imageUrl: car.imageUrl,
-                    height: 180,
+                    height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Container(
-                      height: 180,
+                      height: 200,
                       width: double.infinity,
                       color: Colors.grey[300],
                       child: Center(
@@ -198,7 +227,7 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
                     ),
                     errorWidget: (context, error, stackTrace) {
                       return Container(
-                        height: 180,
+                        height: 200,
                         width: double.infinity,
                         color: Colors.grey[200],
                         child: Icon(
@@ -216,13 +245,20 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
                   top: 12,
                   left: 12,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: Colors.red,
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Text(
-                      'LIVE',
+                      'LIVE AUCTION',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 10,
@@ -237,10 +273,17 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
                   top: 12,
                   right: 12,
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(6),
+                      color: Colors.black87,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Obx(() => Text(
                           car.remainingAuctionTime.value,
@@ -258,10 +301,10 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
             // Car Details
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  // crossAxisAlignment: CrossAxisAlignment.start,
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Title and Basic Info
                     Column(
@@ -270,65 +313,125 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
                         Text(
                           '$yearofManufacture${car.make} ${car.model} ${car.variant}',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey[800],
+                            color: Colors.grey[900],
                           ),
-                          maxLines: 2,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
 
-                    // Key Details
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.speed, size: 12, color: Colors.grey),
-                            SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                '${NumberFormat.decimalPattern('en_IN').format(car.odometerReadingInKms)} km',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey[600],
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(Icons.local_gas_station,
-                                size: 12, color: Colors.grey),
-                            SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                car.fuelType,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey[600],
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                    // Bid Information
+                    // Car Specifications Grid
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 8),
+                      padding: EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         border: Border(
                           top: BorderSide(color: Colors.grey[200]!),
+                          bottom: BorderSide(color: Colors.grey[200]!),
                         ),
                       ),
+                      child: Column(
+                        children: [
+                          // First Row
+                          Row(
+                            children: [
+                              Expanded(
+                                child: iconDetail(
+                                  Icons.speed,
+                                  '${NumberFormat.decimalPattern('en_IN').format(car.odometerReadingInKms)} km',
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: iconDetail(
+                                  Icons.local_gas_station,
+                                  car.fuelType,
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: iconDetail(
+                                  Icons.settings,
+                                  car.commentsOnTransmission,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+
+                          // Second Row
+                          Row(
+                            children: [
+                              Expanded(
+                                child: iconDetail(
+                                  Icons.person,
+                                  car.ownerSerialNumber == 1
+                                      ? 'First Owner'
+                                      : '${car.ownerSerialNumber} Owners',
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: iconDetail(
+                                  Icons.receipt_long,
+                                  car.roadTaxValidity == 'LTT' ||
+                                          car.roadTaxValidity == 'OTT'
+                                      ? car.roadTaxValidity
+                                      : GlobalFunctions.getFormattedDate(
+                                            date: car.taxValidTill,
+                                            type: GlobalFunctions.monthYear,
+                                          ) ??
+                                          'N/A',
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: iconDetail(
+                                  Icons.science,
+                                  car.cubicCapacity != 0
+                                      ? '${car.cubicCapacity} cc'
+                                      : 'N/A',
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+
+                          // Third Row
+                          Row(
+                            children: [
+                              Expanded(
+                                child: iconDetail(
+                                  Icons.location_on,
+                                  car.inspectionLocation,
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: iconDetail(
+                                  Icons.directions_car_filled,
+                                  maskRegistrationNumber(
+                                      car.registrationNumber),
+                                ),
+                              ),
+                              Expanded(
+                                child: iconDetail(
+                                  Icons.apartment,
+                                  car.registeredRto,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                        ],
+                      ),
+                    ),
+
+                    // Bid Information and Action
+                    Container(
+                      padding: EdgeInsets.only(top: 12),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -338,14 +441,16 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
                               Text(
                                 'Highest Bid',
                                 style: TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 11,
                                   color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
+                              SizedBox(height: 2),
                               Obx(() => Text(
-                                    '₹${NumberFormat.decimalPattern('en_IN').format(car.highestBid.value)}',
+                                    'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid.value)}/-',
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 18,
                                       color: AppColors.green,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -354,18 +459,40 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
                           ),
                           Container(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                                horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
-                              color: AppColors.green.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              'Remove',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: AppColors.green,
-                                fontWeight: FontWeight.w600,
+                              gradient: LinearGradient(
+                                colors: [AppColors.green, AppColors.blue],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.green.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.remove_circle_outline,
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Remove Car',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -453,51 +580,187 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
     );
   }
 
-  // Keep your existing mobile methods (_buildCarsList, _buildLoadingWidget, etc.)
-  Widget _buildCarsList() {
-    return Expanded(
-      child: ListView.separated(
-        itemCount: getxController.filteredLiveBidsCarsList.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 15),
-        itemBuilder: (context, index) {
-          final car = getxController.filteredLiveBidsCarsList[index];
-          // ... your existing mobile list item builder
-          return Container(); // Your existing mobile card
-        },
-      ),
-    );
-  }
-
-  Widget _buildLoadingWidget() {
-    return Expanded(
-      child: ListView.separated(
-        itemCount: 3,
-        separatorBuilder: (_, __) => const SizedBox(height: 15),
-        itemBuilder: (context, index) {
-          // ... your existing mobile shimmer
-          return Container(); // Your existing mobile shimmer
-        },
-      ),
-    );
-  }
-
-  // Keep your existing helper methods
-  Widget _buildOtherDetails(CarsListModel car) {
-    // ... your existing implementation
-    return Container();
-  }
-
-  Widget _buildCarCardFooter(CarsListModel car) {
-    // ... your existing implementation
-    return Container();
-  }
-
+  // Bottom sheet
   void _showRemoveCarBottomSheet(final CarsListModel car) {
-    // ... your existing implementation
+    showModalBottomSheet(
+      context: Get.context!,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          maxChildSize: 0.9,
+          minChildSize: 0.3,
+          initialChildSize: 0.8,
+          builder: (_, scrollController) {
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return _buildBottomSheetContent(car);
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
+  // Bottom sheet content
   Widget _buildBottomSheetContent(final CarsListModel car) {
-    // ... your existing implementation
-    return Container();
+    return GetX<AdminLiveCarsListController>(
+      init: AdminLiveCarsListController(),
+      builder: (liveController) {
+        final canRemove = liveController.reasonText.value.trim().isNotEmpty &&
+            !liveController.isRemoveButtonLoading.value;
+
+        return Column(
+          children: [
+            const SizedBox(height: 20),
+            Center(
+              child: Container(
+                width: 48,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: CachedNetworkImage(
+                      imageUrl: car.imageUrl,
+                      width: 64,
+                      height: 48,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) =>
+                          const Icon(Icons.directions_car),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${car.make} ${car.model} ${car.variant}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            // Remove Car Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Divider(),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Reason of Removal',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: liveController.reasontextController,
+                    maxLines: 3,
+                    onChanged: (v) => liveController.reasonText.value = v,
+                    keyboardType: TextInputType.multiline,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter reason (required)',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AbsorbPointer(
+                          absorbing: !canRemove, // block taps when not allowed
+                          child: Opacity(
+                            opacity: canRemove ? 1 : 0.6,
+                            child: ButtonWidget(
+                              text: 'Remove Car',
+                              height: 40,
+                              fontSize: 12,
+                              isLoading: liveController.isRemoveButtonLoading,
+                              onTap: () async {
+                                final reason =
+                                    liveController.reasonText.value.trim();
+
+                                final ok = await Get.dialog<bool>(
+                                      AlertDialog(
+                                        title: const Text(
+                                          'Confirm removal',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        content: Text('Reason:\n$reason'),
+                                        actions: [
+                                          ButtonWidget(
+                                            text: 'Cancel',
+                                            height: 35,
+                                            width: 80,
+                                            fontSize: 12,
+                                            backgroundColor: AppColors.grey,
+                                            isLoading: false.obs,
+                                            onTap: () =>
+                                                Get.back(result: false),
+                                          ),
+                                          ButtonWidget(
+                                            text: 'Remove',
+                                            height: 35,
+                                            width: 80,
+                                            fontSize: 12,
+                                            backgroundColor: AppColors.red,
+                                            isLoading: false.obs,
+                                            onTap: () => Get.back(result: true),
+                                          ),
+                                        ],
+                                      ),
+                                    ) ??
+                                    false;
+                                if (!ok) return;
+
+                                // 👇 call your API / controller method
+                                await liveController.removeCar(carId: car.id);
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
