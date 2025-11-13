@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:otobix_crm/admin/admin_desktop_home_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_profile_page.dart';
+import 'package:otobix_crm/admin/admin_kam_page.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/admin/admin_home.dart';
 import 'package:otobix_crm/admin/admin_profile_page.dart';
@@ -21,7 +21,8 @@ class _AdminDesktopDashboardState extends State<AdminDesktopDashboard> {
   final List<Widget> pages = [
     ResponsiveLayout(mobile: AdminHome(), desktop: AdminDesktopHomePage()),
     ResponsiveLayout(
-        mobile: AdminProfilePage(), desktop: AdminDesktopProfilePage())
+        mobile: AdminProfilePage(), desktop: AdminDesktopProfilePage()),
+    ResponsiveLayout(mobile: AdminKamPage(), desktop: AdminKamPage()),
   ];
 
   // Navigation items for desktop sidebar
@@ -37,6 +38,12 @@ class _AdminDesktopDashboardState extends State<AdminDesktopDashboard> {
       activeIcon: Icons.person,
       label: "Profile",
       index: 1,
+    ),
+    NavigationItem(
+      icon: Icons.manage_accounts_outlined,
+      activeIcon: Icons.manage_accounts,
+      label: "KAM Management",
+      index: 2,
     ),
   ];
 

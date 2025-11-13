@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:otobix_crm/admin/controller/admin_cars_list_controller.dart';
 import 'package:otobix_crm/models/cars_list_model.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_images.dart';
@@ -15,7 +16,10 @@ import 'package:otobix_crm/admin/controller/admin_oto_buy_cars_list_controller.d
 class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
   AdminDesktopOtoBuyCarsListPage({super.key});
 
-  // Initialized in my cars page
+// Main controller
+  final AdminCarsListController carsListController =
+      Get.find<AdminCarsListController>();
+// Current page controller
   final AdminOtoBuyCarsListController otoBuyController =
       Get.find<AdminOtoBuyCarsListController>();
 
@@ -27,7 +31,11 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
           Obx(() {
             if (otoBuyController.isLoading.value) {
               return _buildLoadingWidget();
-            } else if (otoBuyController.filteredOtoBuyCarsList.isEmpty) {
+            }
+            final carsList = carsListController.searchCar(
+              carsList: otoBuyController.filteredOtoBuyCarsList,
+            );
+            if (carsList.isEmpty) {
               return Expanded(
                 child: Center(
                   child: const EmptyDataWidget(
@@ -37,7 +45,7 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
                 ),
               );
             } else {
-              return _buildOtoBuyCarsList();
+              return _buildOtoBuyCarsList(carsList);
             }
           }),
         ],
@@ -45,7 +53,7 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildOtoBuyCarsList() {
+  Widget _buildOtoBuyCarsList(List<CarsListModel> carsList) {
     return Expanded(
       child: GridView.builder(
         padding: const EdgeInsets.all(10),
@@ -56,9 +64,9 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
           childAspectRatio:
               2.5, // Adjust this ratio to control card proportions
         ),
-        itemCount: otoBuyController.filteredOtoBuyCarsList.length,
+        itemCount: carsList.length,
         itemBuilder: (context, index) {
-          final car = otoBuyController.filteredOtoBuyCarsList[index];
+          final car = carsList[index];
           return _buildCarCard(car);
         },
       ),
@@ -243,9 +251,13 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
                                           ) ??
                                           'N/A',
                                     ),
+                                    // _buildIconAndTextWidget(
+                                    //   icon: Icons.local_gas_station,
+                                    //   text: car.fuelType,
+                                    // ),
                                     _buildIconAndTextWidget(
-                                      icon: Icons.local_gas_station,
-                                      text: car.fuelType,
+                                      icon: Icons.numbers,
+                                      text: car.appointmentId,
                                     ),
                                   ],
                                 ),
@@ -268,11 +280,14 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
                                   children: [
                                     _buildIconAndTextWidget(
                                       icon: Icons.receipt_long,
-                                      text: GlobalFunctions.getFormattedDate(
-                                            date: car.taxValidTill,
-                                            type: GlobalFunctions.monthYear,
-                                          ) ??
-                                          'N/A',
+                                      text: car.roadTaxValidity == 'LTT' ||
+                                              car.roadTaxValidity == 'OTT'
+                                          ? car.roadTaxValidity
+                                          : GlobalFunctions.getFormattedDate(
+                                                date: car.taxValidTill,
+                                                type: GlobalFunctions.monthYear,
+                                              ) ??
+                                              'N/A',
                                     ),
                                     _buildIconAndTextWidget(
                                       icon: Icons.person,

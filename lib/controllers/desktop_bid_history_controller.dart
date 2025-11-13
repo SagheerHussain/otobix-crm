@@ -66,7 +66,7 @@ class DesktopBidHistoryController extends GetxController {
 
   // Pagination state
   final page = 1.obs;
-  final limit = 8.obs;
+  final limit = 200.obs;
   final total = 0.obs;
   final totalPages = 1.obs;
   final hasNext = false.obs;

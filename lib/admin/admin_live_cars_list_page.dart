@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:otobix_crm/admin/controller/admin_cars_list_controller.dart';
 import 'package:otobix_crm/models/cars_list_model.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_images.dart';
@@ -14,7 +15,10 @@ import 'package:otobix_crm/admin/controller/admin_live_cars_list_controller.dart
 class AdminLiveCarsListPage extends StatelessWidget {
   AdminLiveCarsListPage({super.key});
 
-  // final HomeController getxController = Get.put(HomeController());
+// Main controller
+  final AdminCarsListController carsListController =
+      Get.find<AdminCarsListController>();
+// Current page controller
   final AdminLiveCarsListController getxController =
       Get.find<AdminLiveCarsListController>();
 
@@ -29,7 +33,13 @@ class AdminLiveCarsListPage extends StatelessWidget {
             Obx(() {
               if (getxController.isLoading.value) {
                 return _buildLoadingWidget();
-              } else if (getxController.filteredLiveBidsCarsList.isEmpty) {
+              }
+
+              final carsList = carsListController.searchCar(
+                carsList: getxController.filteredLiveBidsCarsList,
+              );
+
+              if (carsList.isEmpty) {
                 return Expanded(
                   child: Center(
                     child: const EmptyDataWidget(
@@ -39,7 +49,7 @@ class AdminLiveCarsListPage extends StatelessWidget {
                   ),
                 );
               } else {
-                return _buildCarsList();
+                return _buildCarsList(carsList);
               }
             }),
           ],
@@ -48,14 +58,14 @@ class AdminLiveCarsListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCarsList() {
+  Widget _buildCarsList(List<CarsListModel> carsList) {
     return Expanded(
       child: ListView.separated(
         // padding: const EdgeInsets.symmetric(horizontal: 10),
-        itemCount: getxController.filteredLiveBidsCarsList.length,
+        itemCount: carsList.length,
         separatorBuilder: (_, __) => const SizedBox(height: 15),
         itemBuilder: (context, index) {
-          final car = getxController.filteredLiveBidsCarsList[index];
+          final car = carsList[index];
           final String yearofManufacture =
               '${GlobalFunctions.getFormattedDate(date: car.yearMonthOfManufacture, type: GlobalFunctions.year)} ';
 
@@ -331,7 +341,8 @@ class AdminLiveCarsListPage extends StatelessWidget {
         'Odometer Reading in Kms',
         '${NumberFormat.decimalPattern('en_IN').format(car.odometerReadingInKms)} km',
       ),
-      iconDetail(Icons.local_gas_station, 'Fuel Type', car.fuelType),
+      // iconDetail(Icons.local_gas_station, 'Fuel Type', car.fuelType),
+      iconDetail(Icons.numbers, 'Appointment ID', car.appointmentId),
 
       // iconDetail(
       //   Icons.calendar_month,

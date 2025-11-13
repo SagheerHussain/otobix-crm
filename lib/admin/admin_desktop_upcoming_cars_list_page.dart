@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:otobix_crm/admin/controller/admin_cars_list_controller.dart';
 import 'package:otobix_crm/models/cars_list_model.dart';
 import 'package:otobix_crm/network/api_service.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
@@ -17,7 +18,10 @@ import 'package:otobix_crm/admin/controller/admin_upcoming_cars_list_controller.
 class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
   AdminDesktopUpcomingCarsListPage({super.key});
 
-  // Initialized in my cars page
+// Main controller
+  final AdminCarsListController carsListController =
+      Get.find<AdminCarsListController>();
+// Current page controller
   final AdminUpcomingCarsListController upcomingController =
       Get.find<AdminUpcomingCarsListController>();
 
@@ -29,7 +33,11 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
           Obx(() {
             if (upcomingController.isLoading.value) {
               return _buildLoadingWidget();
-            } else if (upcomingController.filteredUpcomingCarsList.isEmpty) {
+            }
+            final carsList = carsListController.searchCar(
+              carsList: upcomingController.filteredUpcomingCarsList,
+            );
+            if (carsList.isEmpty) {
               return Expanded(
                 child: Center(
                   child: const EmptyDataWidget(
@@ -39,7 +47,7 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
                 ),
               );
             } else {
-              return _buildUpcomingCarsList();
+              return _buildUpcomingCarsList(carsList);
             }
           }),
         ],
@@ -48,7 +56,7 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
   }
 
   // Upcoming Cars List
-  Widget _buildUpcomingCarsList() {
+  Widget _buildUpcomingCarsList(List<CarsListModel> carsList) {
     return Expanded(
       child: GridView.builder(
         padding: const EdgeInsets.all(10),
@@ -59,9 +67,9 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
           childAspectRatio:
               2.5, // Adjust this ratio to control card proportions
         ),
-        itemCount: upcomingController.filteredUpcomingCarsList.length,
+        itemCount: carsList.length,
         itemBuilder: (context, index) {
-          final car = upcomingController.filteredUpcomingCarsList[index];
+          final car = carsList[index];
           return _buildCarCard(car);
         },
       ),
@@ -230,9 +238,13 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
                                           ) ??
                                           'N/A',
                                     ),
+                                    // _buildIconAndTextWidget(
+                                    //   icon: Icons.local_gas_station,
+                                    //   text: car.fuelType,
+                                    // ),
                                     _buildIconAndTextWidget(
-                                      icon: Icons.local_gas_station,
-                                      text: car.fuelType,
+                                      icon: Icons.numbers,
+                                      text: car.appointmentId,
                                     ),
                                   ],
                                 ),

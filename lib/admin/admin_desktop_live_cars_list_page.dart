@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:otobix_crm/admin/controller/admin_cars_list_controller.dart';
 import 'package:otobix_crm/models/cars_list_model.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/global_functions.dart';
@@ -13,6 +14,10 @@ import 'package:otobix_crm/admin/controller/admin_live_cars_list_controller.dart
 class AdminDesktopLiveCarsListPage extends StatelessWidget {
   AdminDesktopLiveCarsListPage({super.key});
 
+// Main controller
+  final AdminCarsListController carsListController =
+      Get.find<AdminCarsListController>();
+// Current page controller
   final AdminLiveCarsListController getxController =
       Get.find<AdminLiveCarsListController>();
 
@@ -35,7 +40,11 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
               child: Obx(() {
                 if (getxController.isLoading.value) {
                   return _buildDesktopLoadingGrid();
-                } else if (getxController.filteredLiveBidsCarsList.isEmpty) {
+                }
+                final carsList = carsListController.searchCar(
+                  carsList: getxController.filteredLiveBidsCarsList,
+                );
+                if (carsList.isEmpty) {
                   return Center(
                     child: EmptyDataWidget(
                       icon: Icons.car_rental,
@@ -44,7 +53,7 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
                     ),
                   );
                 } else {
-                  return _buildDesktopGrid();
+                  return _buildDesktopGrid(carsList);
                 }
               }),
             ),
@@ -142,7 +151,7 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktopGrid() {
+  Widget _buildDesktopGrid(List<CarsListModel> carsList) {
     return GridView.builder(
       padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -151,9 +160,9 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
         mainAxisSpacing: 20,
         childAspectRatio: 0.9, // Adjust based on your content
       ),
-      itemCount: getxController.filteredLiveBidsCarsList.length,
+      itemCount: carsList.length,
       itemBuilder: (context, index) {
-        final car = getxController.filteredLiveBidsCarsList[index];
+        final car = carsList[index];
         return _buildDesktopCarCard(car);
       },
     );
@@ -344,10 +353,16 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(width: 12),
+                              // Expanded(
+                              //   child: iconDetail(
+                              //     Icons.local_gas_station,
+                              //     car.fuelType,
+                              //   ),
+                              // ),
                               Expanded(
                                 child: iconDetail(
-                                  Icons.local_gas_station,
-                                  car.fuelType,
+                                  Icons.numbers,
+                                  car.appointmentId,
                                 ),
                               ),
                               SizedBox(width: 12),
@@ -589,6 +604,7 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       isScrollControlled: true,
+      constraints: BoxConstraints(maxWidth: Get.width * 0.5),
       builder: (context) {
         return DraggableScrollableSheet(
           expand: false,

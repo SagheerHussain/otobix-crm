@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:otobix_crm/admin/controller/admin_cars_list_controller.dart';
 import 'package:otobix_crm/models/cars_list_model.dart';
 import 'package:otobix_crm/network/api_service.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
@@ -19,7 +20,10 @@ import 'package:otobix_crm/admin/controller/admin_auction_completed_cars_list_co
 class AdminAuctionCompletedCarsListPage extends StatelessWidget {
   AdminAuctionCompletedCarsListPage({super.key});
 
-  // Initialized in my cars page
+// Main controller
+  final AdminCarsListController carsListController =
+      Get.find<AdminCarsListController>();
+// Current page controller
   final AdminAuctionCompletedCarsListController auctionCompletedController =
       Get.find<AdminAuctionCompletedCarsListController>();
 
@@ -31,8 +35,12 @@ class AdminAuctionCompletedCarsListPage extends StatelessWidget {
           Obx(() {
             if (auctionCompletedController.isLoading.value) {
               return _buildLoadingWidget();
-            } else if (auctionCompletedController
-                .filteredAuctionCompletedCarsList.isEmpty) {
+            }
+            final carsList = carsListController.searchCar(
+              carsList:
+                  auctionCompletedController.filteredAuctionCompletedCarsList,
+            );
+            if (carsList.isEmpty) {
               return Expanded(
                 child: Center(
                   child: const EmptyDataWidget(
@@ -42,7 +50,7 @@ class AdminAuctionCompletedCarsListPage extends StatelessWidget {
                 ),
               );
             } else {
-              return _buildAuctionCompletedCarsList();
+              return _buildAuctionCompletedCarsList(carsList);
             }
           }),
         ],
@@ -50,17 +58,15 @@ class AdminAuctionCompletedCarsListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAuctionCompletedCarsList() {
+  Widget _buildAuctionCompletedCarsList(List<CarsListModel> carsList) {
     return Expanded(
       child: ListView.separated(
         shrinkWrap: true,
-        itemCount:
-            auctionCompletedController.filteredAuctionCompletedCarsList.length,
+        itemCount: carsList.length,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         padding: const EdgeInsets.symmetric(horizontal: 5),
         itemBuilder: (context, index) {
-          final car = auctionCompletedController
-              .filteredAuctionCompletedCarsList[index];
+          final car = carsList[index];
           // InkWell for car card
           return _buildCarCard(car);
         },
@@ -193,9 +199,13 @@ class AdminAuctionCompletedCarsListPage extends StatelessWidget {
                                           ) ??
                                           'N/A',
                                     ),
+                                    // _buildIconAndTextWidget(
+                                    //   icon: Icons.local_gas_station,
+                                    //   text: car.fuelType,
+                                    // ),
                                     _buildIconAndTextWidget(
-                                      icon: Icons.local_gas_station,
-                                      text: car.fuelType,
+                                      icon: Icons.numbers,
+                                      text: car.appointmentId,
                                     ),
                                   ],
                                 ),
@@ -218,11 +228,14 @@ class AdminAuctionCompletedCarsListPage extends StatelessWidget {
                                   children: [
                                     _buildIconAndTextWidget(
                                       icon: Icons.receipt_long,
-                                      text: GlobalFunctions.getFormattedDate(
-                                            date: car.taxValidTill,
-                                            type: GlobalFunctions.monthYear,
-                                          ) ??
-                                          'N/A',
+                                      text: car.roadTaxValidity == 'LTT' ||
+                                              car.roadTaxValidity == 'OTT'
+                                          ? car.roadTaxValidity
+                                          : GlobalFunctions.getFormattedDate(
+                                                date: car.taxValidTill,
+                                                type: GlobalFunctions.monthYear,
+                                              ) ??
+                                              'N/A',
                                     ),
                                     _buildIconAndTextWidget(
                                       icon: Icons.person,
@@ -467,7 +480,6 @@ class AdminAuctionCompletedCarsListPage extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       isScrollControlled: true,
-      constraints: BoxConstraints(maxWidth: Get.width * 0.5),
       builder: (context) {
         return DraggableScrollableSheet(
           expand: false,

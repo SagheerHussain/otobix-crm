@@ -1,5 +1,5 @@
 class AppUrls {
-  // static const String baseUrl = "http://localhost:4000/api/"; // For Localhost
+//   static const String baseUrl = "http://localhost:4000/api/"; // For Localhost
   // static const String baseUrlOld = "https://otobix-app-backend.onrender.com/api/"; // For Development
   static const String baseUrl =
       "https://otobix-app-backend-rq8m.onrender.com/api/"; // For Production
@@ -23,6 +23,10 @@ class AppUrls {
       "${baseUrl}admin/cars/get-summary-counts";
 
   static String get getCarsListForCRM => "${baseUrl}admin/cars/get-cars-list";
+
+  static String get createKam => "${baseUrl}admin/kams/create";
+
+  static String get getKamsList => "${baseUrl}admin/kams/get-list";
 
 // New routes
 

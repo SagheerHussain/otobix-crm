@@ -8,6 +8,7 @@ class CarsListModel {
 
   ///
   final String id;
+  final String appointmentId;
   final String imageUrl;
   final String make;
   final String model;
@@ -43,6 +44,7 @@ class CarsListModel {
 
   CarsListModel({
     required this.id,
+    required this.appointmentId,
     required this.imageUrl,
     required this.make,
     required this.model,
@@ -83,6 +85,7 @@ class CarsListModel {
   }) {
     return CarsListModel(
       id: id,
+      appointmentId: data['appointmentId'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
       make: data['make'] ?? '',
       model: data['model'] ?? '',
@@ -131,6 +134,7 @@ class CarsListModel {
   // Convert Car object to JSON map
   Map<String, dynamic> toJson() {
     return {
+      'appointmentId': appointmentId,
       'imageUrl': imageUrl,
       'make': make,
       'model': model,

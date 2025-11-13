@@ -80,7 +80,7 @@ class AdminDesktopCarsListPage extends StatelessWidget {
                 child: Column(
                   children: [
                     // Search and Filter Bar
-                    // _buildDesktopSearchFilterBar(),
+                    _buildDesktopSearchFilterBar(),
 
                     // Desktop Tabs
                     _buildDesktopTabs(),
@@ -317,7 +317,7 @@ class AdminDesktopCarsListPage extends StatelessWidget {
         controller: mainController.searchController,
         style: TextStyle(fontSize: 14),
         decoration: InputDecoration(
-          hintText: 'Search cars by model, brand, VIN, or description...',
+          hintText: 'Search cars by Appointment ID...',
           hintStyle: TextStyle(color: Colors.grey[500]),
           prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
           filled: true,
