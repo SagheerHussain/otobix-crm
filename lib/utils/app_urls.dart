@@ -28,6 +28,13 @@ class AppUrls {
 
   static String get getKamsList => "${baseUrl}admin/kams/get-list";
 
+  static String get updateKam => "${baseUrl}admin/kams/update";
+
+  static String get deleteKam => "${baseUrl}admin/kams/delete";
+
+  static String get assignKamToDealer =>
+      "${baseUrl}admin/kams/assign-to-dealer";
+
 // New routes
 
   static String get sendOtp => "${baseUrl}otp/send-otp";

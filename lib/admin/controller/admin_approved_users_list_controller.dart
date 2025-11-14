@@ -11,6 +11,7 @@ import 'package:otobix_crm/widgets/toast_widget.dart';
 class AdminApprovedUsersListController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool isLoadingUpdateUserThroughAdmin = false.obs;
+  RxBool isAssignKamLoading = false.obs;
   RxList<UserModel> approvedUsersList = <UserModel>[].obs;
 
   final formKey = GlobalKey<FormState>();
@@ -120,5 +121,65 @@ class AdminApprovedUsersListController extends GetxController {
       approvedUsersList.value =
           usersList.map((user) => UserModel.fromJson(user)).toList();
     });
+  }
+
+  // Assign / Unassign KAM to a dealer
+  Future<void> assignKamToDealer({
+    required String dealerId,
+    String? kamId, // null or empty => unassign
+  }) async {
+    isAssignKamLoading.value = true;
+
+    try {
+      final body = <String, dynamic>{
+        'dealerId': dealerId,
+      };
+
+      // If kamId is provided and not empty, include it.
+      // If omitted, backend will unassign.
+      if (kamId != null && kamId.isNotEmpty) {
+        body['kamId'] = kamId;
+      }
+
+      final response = await ApiService.post(
+        endpoint: AppUrls.assignKamToDealer,
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        ToastWidget.show(
+          context: Get.context!,
+          title: (kamId == null || kamId.isEmpty)
+              ? "KAM unassigned successfully"
+              : "KAM assigned successfully",
+          type: ToastType.success,
+        );
+
+        // If you don't fully trust sockets / want immediate UI update:
+        // await fetchApprovedUsersList();
+      } else if (response.statusCode == 404) {
+        ToastWidget.show(
+          context: Get.context!,
+          title: "Dealer or KAM not found",
+          type: ToastType.error,
+        );
+      } else {
+        debugPrint("Error assigning KAM: ${response.body}");
+        ToastWidget.show(
+          context: Get.context!,
+          title: "Error assigning KAM.",
+          type: ToastType.error,
+        );
+      }
+    } catch (e) {
+      debugPrint("Error assigning KAM: $e");
+      ToastWidget.show(
+        context: Get.context!,
+        title: "Error assigning KAM.",
+        type: ToastType.error,
+      );
+    } finally {
+      isAssignKamLoading.value = false;
+    }
   }
 }

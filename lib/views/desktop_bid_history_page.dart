@@ -185,6 +185,7 @@ class DesktopBidHistoryPage extends StatelessWidget {
           cells: [
             DataCell(Text(bid.userName)),
             DataCell(Text(bid.dealershipName)),
+            DataCell(Text(bid.assignedKam)),
             DataCell(Text(bid.car)),
             DataCell(Text(bid.appointmentId)),
             DataCell(Text("Rs. ${bid.bidAmount}/-")),
@@ -232,6 +233,9 @@ class DesktopBidHistoryPage extends StatelessWidget {
               label: Text("Dealership Name",
                   style: TextStyle(fontWeight: FontWeight.bold))),
           DataColumn(
+              label: Text("Assigned KAM",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
               label: Text("Car Name",
                   style: TextStyle(fontWeight: FontWeight.bold))),
           DataColumn(
@@ -252,7 +256,7 @@ class DesktopBidHistoryPage extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold))),
         ],
         // Ensure length == columns.length
-        columnWidths: const [100, 150, 250, 150, 100, 200, 80],
+        columnWidths: const [100, 150, 150, 250, 150, 100, 200, 80],
         titleWidget: _buildTitleWidget(),
         actionsWidget: _buildActionWidget(),
         emptyDataWidget: Text(

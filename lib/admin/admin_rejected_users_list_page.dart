@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:otobix_crm/admin/controller/admin_kam_controller.dart';
 import 'package:otobix_crm/models/user_model.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_constants.dart';
@@ -274,7 +275,7 @@ class AdminRejectedUsersListPage extends StatelessWidget {
                     _infoTile("Addresses", user.addressList.join(", ")),
                   const SizedBox(height: 15),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ButtonWidget(
                         text: "Edit Profile",
@@ -285,6 +286,19 @@ class AdminRejectedUsersListPage extends StatelessWidget {
                           Get.back(); // Close the bottom sheet
                           Future.delayed(Duration(milliseconds: 200), () {
                             _showEditDialog(user); // Then show the dialog
+                          });
+                        },
+                      ),
+                      ButtonWidget(
+                        text: "Assign KAM",
+                        isLoading: false.obs,
+                        height: 35,
+                        fontSize: 12,
+                        backgroundColor: AppColors.blue,
+                        onTap: () {
+                          Get.back(); // Close the bottom sheet
+                          Future.delayed(Duration(milliseconds: 200), () {
+                            _showAssignKamDialog(user); // Then show the dialog
                           });
                         },
                       ),
@@ -572,6 +586,163 @@ class AdminRejectedUsersListPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+// Show assign KAM dialog
+  void _showAssignKamDialog(UserModel user) {
+    // Get KAM controller (use existing one if already registered)
+    final kamController = Get.isRegistered<AdminKamController>()
+        ? Get.find<AdminKamController>()
+        : Get.put(AdminKamController(), permanent: true);
+
+    // selected KAM id (empty string = unassign)
+    final selectedKamId = ''.obs;
+
+    showDialog(
+      context: Get.context!,
+      builder: (_) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            "Assign KAM",
+            style: TextStyle(
+              fontSize: 15,
+              color: AppColors.green,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Obx(() {
+            // While KAMs are loading
+            if (kamController.isLoading.value && kamController.kams.isEmpty) {
+              return const SizedBox(
+                height: 80,
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.green),
+                ),
+              );
+            }
+
+            // No KAMs available
+            if (kamController.kams.isEmpty) {
+              return const Text(
+                "No KAMs available. Please create a KAM first.",
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.grey,
+                ),
+              );
+            }
+
+            return SizedBox(
+              width: 400,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Dealer: ${user.userName}",
+                    style: const TextStyle(
+                      color: AppColors.grey,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "Select KAM (or choose Unassign):",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Dropdown
+                  Obx(
+                    () => DropdownButtonFormField<String>(
+                      initialValue: selectedKamId.value,
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 10,
+                        ),
+                      ),
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: '',
+                          child: Text("Unassign KAM"),
+                        ),
+                        ...kamController.kams.map(
+                          (kam) => DropdownMenuItem<String>(
+                            value: kam.id,
+                            child: Text(kam.name),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        selectedKamId.value = value ?? '';
+                      },
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+          actionsPadding:
+              const EdgeInsets.only(left: 20, right: 20, bottom: 15, top: 5),
+          actions: [
+            Row(
+              children: [
+                Expanded(
+                  child: ButtonWidget(
+                    text: "Cancel",
+                    isLoading: false.obs,
+                    height: 30,
+                    elevation: 3,
+                    fontSize: 12,
+                    backgroundColor: AppColors.red,
+                    onTap: () => Get.back(),
+                  ),
+                ),
+                if (kamController.kams.isNotEmpty) const SizedBox(width: 10),
+                if (kamController.kams.isNotEmpty)
+                  Expanded(
+                    child: Obx(
+                      () => ButtonWidget(
+                        text: selectedKamId.value.isEmpty
+                            ? "Unassign KAM"
+                            : "Assign KAM",
+                        isLoading: getxController.isAssignKamLoading,
+                        height: 30,
+                        elevation: 3,
+                        fontSize: 12,
+                        onTap: () async {
+                          await getxController.assignKamToDealer(
+                            dealerId: user.id,
+                            kamId: selectedKamId.value.isEmpty
+                                ? null // -> unassign
+                                : selectedKamId.value,
+                          );
+                          Get.back(); // close dialog
+                        },
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

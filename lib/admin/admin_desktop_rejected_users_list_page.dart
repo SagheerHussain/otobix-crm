@@ -8,18 +8,18 @@ import 'package:otobix_crm/utils/app_constants.dart';
 import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/empty_data_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
-import 'package:otobix_crm/admin/controller/admin_approved_users_list_controller.dart';
+import 'package:otobix_crm/admin/controller/admin_rejected_users_list_controller.dart';
 
-class AdminApprovedUsersListPage extends StatelessWidget {
+class AdminDesktopRejectedUsersListPage extends StatelessWidget {
   final RxString searchQuery;
   final RxList<String> selectedRoles;
-  AdminApprovedUsersListPage({
+  AdminDesktopRejectedUsersListPage({
     super.key,
     required this.searchQuery,
     required this.selectedRoles,
   });
 
-  final getxController = Get.put(AdminApprovedUsersListController());
+  final getxController = Get.put(AdminRejectedUserListController());
 
   @override
   Widget build(BuildContext context) {
@@ -28,14 +28,14 @@ class AdminApprovedUsersListPage extends StatelessWidget {
         if (getxController.isLoading.value) {
           return ListView.separated(
             padding: const EdgeInsets.all(15),
-            itemCount: 3,
+            itemCount: 2,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (_, __) => _buildUserShimmerCard(),
           );
         }
 
         // search + role filter
-        final filteredUsers = getxController.approvedUsersList.where((user) {
+        final filteredUsers = getxController.rejectedUsersList.where((user) {
           final query = (searchQuery.value).toLowerCase().trim();
 
           // Safe strings
@@ -57,27 +57,39 @@ class AdminApprovedUsersListPage extends StatelessWidget {
 
         if (filteredUsers.isEmpty) {
           return Center(
-            child: EmptyDataWidget(message: "No approved users found."),
+            child: EmptyDataWidget(message: "No rejected users found."),
           );
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(15),
-          itemCount: filteredUsers.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            final user = filteredUsers[index];
-            return _buildUserCard(user);
-          },
-        );
+        return _buildRejectedUsersList(filteredUsers);
       }),
+    );
+  }
+
+  // Approved Users List
+  Widget _buildRejectedUsersList(List<UserModel> usersList) {
+    return Expanded(
+      child: GridView.builder(
+        padding: const EdgeInsets.all(10),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, // 3 items per row
+          crossAxisSpacing: 10, // Horizontal spacing between items
+          mainAxisSpacing: 10, // Vertical spacing between items
+          childAspectRatio:
+              2.5, // Adjust this ratio to control card proportions
+        ),
+        itemCount: usersList.length,
+        itemBuilder: (context, index) {
+          final user = usersList[index];
+          return _buildUserCard(user);
+        },
+      ),
     );
   }
 
   Widget _buildUserCard(UserModel user) {
     return InkWell(
       onTap: () => _buildUserDetailsBottomSheet(user),
-      borderRadius: BorderRadius.circular(12),
       child: Card(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -116,7 +128,6 @@ class AdminApprovedUsersListPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-
                     // if (user.dealershipName != null &&
                     //     user.dealershipName!.isNotEmpty)
                     //   Text("Dealership: ${user.dealershipName!}"),
@@ -130,7 +141,7 @@ class AdminApprovedUsersListPage extends StatelessWidget {
                     // Text("Location: ${user.location}"),
                     if (user.createdAt != null)
                       Text(
-                        "Approved on: ${DateFormat('dd MMM yyyy').format(user.createdAt!)}",
+                        "Rejected on: ${DateFormat('dd MMM yyyy').format(user.createdAt!)}",
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.grey,
@@ -163,15 +174,15 @@ class AdminApprovedUsersListPage extends StatelessWidget {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.green.withValues(alpha: 0.2),
+                  color: AppColors.red.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(50),
                 ),
                 child: const Text(
-                  'Approved',
+                  'Rejected',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.green,
+                    color: AppColors.red,
                   ),
                 ),
               ),
@@ -190,6 +201,7 @@ class AdminApprovedUsersListPage extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       isScrollControlled: true,
+      constraints: BoxConstraints(maxWidth: Get.width * 0.9),
       builder: (context) {
         return DraggableScrollableSheet(
           expand: false,
@@ -245,6 +257,8 @@ class AdminApprovedUsersListPage extends StatelessWidget {
                     _infoTile("User Name", user.userName),
                   // if (user.password.isNotEmpty)
                   //   _infoTile("Password", user.password),
+                  if (user.assignedKam.isNotEmpty)
+                    _infoTile("Key Account Manager", user.assignedKam),
                   _infoTile("Phone", user.phoneNumber),
                   _infoTile("Location", user.location),
                   if (user.dealershipName != null &&
@@ -488,11 +502,11 @@ class AdminApprovedUsersListPage extends StatelessWidget {
                             // password: passwordController.text,
                           );
                           Get.back(); // Close the dialog
-                          // await getxController.fetchApprovedUsersList();
+                          // await getxController.fetchRejectedUsersList();
 
                           // //Temp for now
-                          // await Get.find<AdminRejectedUserListController>()
-                          //     .fetchRejectedUsersList();
+                          // await Get.find<AdminApprovedUsersListController>()
+                          //     .fetchApprovedUsersList();
                           // await Get.find<AdminPendingUsersListController>()
                           //     .fetchPendingUsersList();
                           //////////////
@@ -537,7 +551,6 @@ class AdminApprovedUsersListPage extends StatelessWidget {
                   horizontal: 10,
                   vertical: 10,
                 ),
-                errorMaxLines: 3,
                 suffixIcon: GestureDetector(
                   child: Icon(
                     getxController.obscurePasswordText.value
@@ -591,7 +604,7 @@ class AdminApprovedUsersListPage extends StatelessWidget {
     );
   }
 
-// Show assign KAM dialog
+//
   void _showAssignKamDialog(UserModel user) {
     // Get KAM controller (use existing one if already registered)
     final kamController = Get.isRegistered<AdminKamController>()

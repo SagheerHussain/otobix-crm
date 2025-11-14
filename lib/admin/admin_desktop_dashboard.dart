@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:otobix_crm/admin/admin_desktop_home_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_profile_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_kam_page.dart';
 import 'package:otobix_crm/admin/admin_kam_page.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/admin/admin_home.dart';
@@ -22,7 +23,7 @@ class _AdminDesktopDashboardState extends State<AdminDesktopDashboard> {
     ResponsiveLayout(mobile: AdminHome(), desktop: AdminDesktopHomePage()),
     ResponsiveLayout(
         mobile: AdminProfilePage(), desktop: AdminDesktopProfilePage()),
-    ResponsiveLayout(mobile: AdminKamPage(), desktop: AdminKamPage()),
+    ResponsiveLayout(mobile: AdminKamPage(), desktop: AdminDesktopKamPage()),
   ];
 
   // Navigation items for desktop sidebar

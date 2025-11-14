@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:otobix_crm/admin/admin_approved_users_list_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_approved_users_list_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_rejected_users_list_page.dart';
 import 'package:otobix_crm/admin/admin_rejected_users_list_page.dart';
+import 'package:otobix_crm/admin/controller/admin_desktop_pending_users_list_page.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
-import 'package:otobix_crm/utils/app_images.dart';
+import 'package:otobix_crm/utils/responsive_layout.dart';
 import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_home_controller.dart';
 import 'package:otobix_crm/admin/controller/admin_pending_users_list_page.dart';
@@ -113,18 +116,33 @@ class AdminDesktopHomePage extends StatelessWidget {
                         () => IndexedStack(
                           index: getxController.currentTabIndex.value,
                           children: [
-                            AdminPendingUsersListPage(
-                              searchQuery: getxController.searchQuery,
-                              selectedRoles: getxController.selectedRoles,
-                            ),
-                            AdminApprovedUsersListPage(
-                              searchQuery: getxController.searchQuery,
-                              selectedRoles: getxController.selectedRoles,
-                            ),
-                            AdminRejectedUsersListPage(
-                              searchQuery: getxController.searchQuery,
-                              selectedRoles: getxController.selectedRoles,
-                            ),
+                            ResponsiveLayout(
+                                mobile: AdminPendingUsersListPage(
+                                  searchQuery: getxController.searchQuery,
+                                  selectedRoles: getxController.selectedRoles,
+                                ),
+                                desktop: AdminDesktopPendingUsersListPage(
+                                  searchQuery: getxController.searchQuery,
+                                  selectedRoles: getxController.selectedRoles,
+                                )),
+                            ResponsiveLayout(
+                                mobile: AdminApprovedUsersListPage(
+                                  searchQuery: getxController.searchQuery,
+                                  selectedRoles: getxController.selectedRoles,
+                                ),
+                                desktop: AdminDesktopApprovedUsersListPage(
+                                  searchQuery: getxController.searchQuery,
+                                  selectedRoles: getxController.selectedRoles,
+                                )),
+                            ResponsiveLayout(
+                                mobile: AdminRejectedUsersListPage(
+                                  searchQuery: getxController.searchQuery,
+                                  selectedRoles: getxController.selectedRoles,
+                                ),
+                                desktop: AdminDesktopRejectedUsersListPage(
+                                  searchQuery: getxController.searchQuery,
+                                  selectedRoles: getxController.selectedRoles,
+                                )),
                           ],
                         ),
                       ),

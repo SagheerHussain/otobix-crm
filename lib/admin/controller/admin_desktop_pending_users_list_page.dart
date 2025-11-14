@@ -11,10 +11,10 @@ import 'package:otobix_crm/widgets/toast_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_pending_users_list_controller.dart';
 import 'package:otobix_crm/admin/controller/admin_rejected_users_list_controller.dart';
 
-class AdminPendingUsersListPage extends StatelessWidget {
+class AdminDesktopPendingUsersListPage extends StatelessWidget {
   final RxString searchQuery;
   final RxList<String> selectedRoles;
-  AdminPendingUsersListPage({
+  AdminDesktopPendingUsersListPage({
     super.key,
     required this.searchQuery,
     required this.selectedRoles,
@@ -62,16 +62,29 @@ class AdminPendingUsersListPage extends StatelessWidget {
           );
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(15),
-          itemCount: filteredUsers.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            final user = filteredUsers[index];
-            return _buildUserCard(user, context);
-          },
-        );
+        return _buildPendingUsersList(filteredUsers);
       }),
+    );
+  }
+
+  // Pending Users List
+  Widget _buildPendingUsersList(List<UserModel> usersList) {
+    return Expanded(
+      child: GridView.builder(
+        padding: const EdgeInsets.all(10),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, // 3 items per row
+          crossAxisSpacing: 10, // Horizontal spacing between items
+          mainAxisSpacing: 10, // Vertical spacing between items
+          childAspectRatio:
+              1.9, // Adjust this ratio to control card proportions
+        ),
+        itemCount: usersList.length,
+        itemBuilder: (context, index) {
+          final user = usersList[index];
+          return _buildUserCard(user, context);
+        },
+      ),
     );
   }
 
@@ -466,6 +479,8 @@ class AdminPendingUsersListPage extends StatelessWidget {
                   _infoTile("Role", user.userRole),
                   _infoTile("User Name", user.userName),
                   // _infoTile("Password", user.password),
+                  if (user.assignedKam.isNotEmpty)
+                    _infoTile("Key Account Manager", user.assignedKam),
                   _infoTile("Phone", user.phoneNumber),
                   _infoTile("Location", user.location),
                   if (user.dealershipName != null &&

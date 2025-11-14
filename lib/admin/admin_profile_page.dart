@@ -116,6 +116,19 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     },
                   ),
 
+                  // ProfileOption(
+                  //   icon: Icons.manage_accounts_outlined,
+                  //   color: AppColors.black,
+                  //   title: "KAMs Management",
+                  //   description: "Manage all KAMs.",
+                  //   onTap: () {
+                  //     Get.to(ResponsiveLayout(
+                  //       mobile: AdminKamPage(),
+                  //       desktop: AdminDesktopKamPage(),
+                  //     ));
+                  //   },
+                  // ),
+
                   ProfileOption(
                     icon: Icons.settings,
                     color: AppColors.blue,

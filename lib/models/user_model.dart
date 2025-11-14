@@ -11,6 +11,7 @@ class UserModel {
 
   final String id;
   final String userRole;
+  final String assignedKam;
   final String location;
   final String userName;
   final String email;
@@ -32,6 +33,7 @@ class UserModel {
   UserModel({
     required this.id,
     required this.userRole,
+    required this.assignedKam,
     required this.location,
     required this.userName,
     required this.email,
@@ -55,6 +57,7 @@ class UserModel {
     return UserModel(
       id: json['_id'] ?? '',
       userRole: json['userRole'] ?? '',
+      assignedKam: json['assignedKam'] ?? '',
       location: json['location'] ?? '',
       userName: json['userName'] ?? '',
       email: json['email'] ?? '',
@@ -81,6 +84,7 @@ class UserModel {
     return {
       '_id': id,
       'userRole': userRole,
+      'assignedKam': assignedKam,
       'location': location,
       'userName': userName,
       'email': email,

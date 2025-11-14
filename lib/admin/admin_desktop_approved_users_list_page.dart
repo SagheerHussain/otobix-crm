@@ -10,10 +10,10 @@ import 'package:otobix_crm/widgets/empty_data_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_approved_users_list_controller.dart';
 
-class AdminApprovedUsersListPage extends StatelessWidget {
+class AdminDesktopApprovedUsersListPage extends StatelessWidget {
   final RxString searchQuery;
   final RxList<String> selectedRoles;
-  AdminApprovedUsersListPage({
+  AdminDesktopApprovedUsersListPage({
     super.key,
     required this.searchQuery,
     required this.selectedRoles,
@@ -61,16 +61,29 @@ class AdminApprovedUsersListPage extends StatelessWidget {
           );
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(15),
-          itemCount: filteredUsers.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            final user = filteredUsers[index];
-            return _buildUserCard(user);
-          },
-        );
+        return _buildApprovedUsersList(filteredUsers);
       }),
+    );
+  }
+
+  // Approved Users List
+  Widget _buildApprovedUsersList(List<UserModel> usersList) {
+    return Expanded(
+      child: GridView.builder(
+        padding: const EdgeInsets.all(10),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, // 3 items per row
+          crossAxisSpacing: 10, // Horizontal spacing between items
+          mainAxisSpacing: 10, // Vertical spacing between items
+          childAspectRatio:
+              2.5, // Adjust this ratio to control card proportions
+        ),
+        itemCount: usersList.length,
+        itemBuilder: (context, index) {
+          final user = usersList[index];
+          return _buildUserCard(user);
+        },
+      ),
     );
   }
 
@@ -190,6 +203,7 @@ class AdminApprovedUsersListPage extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       isScrollControlled: true,
+      constraints: BoxConstraints(maxWidth: Get.width * 0.9),
       builder: (context) {
         return DraggableScrollableSheet(
           expand: false,
@@ -243,6 +257,8 @@ class AdminApprovedUsersListPage extends StatelessWidget {
                   _infoTile("Role", user.userRole),
                   if (user.userName.isNotEmpty)
                     _infoTile("User Name", user.userName),
+                  if (user.assignedKam.isNotEmpty)
+                    _infoTile("Key Account Manager", user.assignedKam),
                   // if (user.password.isNotEmpty)
                   //   _infoTile("Password", user.password),
                   _infoTile("Phone", user.phoneNumber),
@@ -510,88 +526,6 @@ class AdminApprovedUsersListPage extends StatelessWidget {
     );
   }
 
-  Widget _labeledField(String label, TextEditingController controller) {
-    return Form(
-      key: getxController.formKey,
-      autovalidateMode: AutovalidateMode.always,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.grey,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Obx(
-            () => TextFormField(
-              controller: controller,
-              obscureText: getxController.obscurePasswordText.value,
-              decoration: InputDecoration(
-                isDense: true,
-                border: OutlineInputBorder(),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 10,
-                ),
-                errorMaxLines: 3,
-                suffixIcon: GestureDetector(
-                  child: Icon(
-                    getxController.obscurePasswordText.value
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                    color: AppColors.grey,
-                    size: 15,
-                  ),
-                  onTap: () {
-                    getxController.obscurePasswordText.value =
-                        !getxController.obscurePasswordText.value;
-                  },
-                ),
-                suffixIconConstraints: const BoxConstraints(
-                  minWidth: 40,
-                  minHeight: 20,
-                ),
-              ),
-              style: const TextStyle(fontSize: 13),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Password is required';
-                }
-
-                if (value.length < 8) {
-                  return 'Password must be 8 characters long';
-                }
-
-                if (!RegExp(r'[A-Z]').hasMatch(value)) {
-                  return 'Password must include one uppercase letter';
-                }
-
-                if (!RegExp(r'[a-z]').hasMatch(value)) {
-                  return 'Password must include one lowercase letter';
-                }
-
-                if (!RegExp(r'[0-9]').hasMatch(value)) {
-                  return 'Password must include one number';
-                }
-
-                if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-                  return 'Password must include one special character';
-                }
-
-                return null; // ✅ Valid
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-// Show assign KAM dialog
   void _showAssignKamDialog(UserModel user) {
     // Get KAM controller (use existing one if already registered)
     final kamController = Get.isRegistered<AdminKamController>()
@@ -745,6 +679,87 @@ class AdminApprovedUsersListPage extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _labeledField(String label, TextEditingController controller) {
+    return Form(
+      key: getxController.formKey,
+      autovalidateMode: AutovalidateMode.always,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: AppColors.grey,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Obx(
+            () => TextFormField(
+              controller: controller,
+              obscureText: getxController.obscurePasswordText.value,
+              decoration: InputDecoration(
+                isDense: true,
+                border: OutlineInputBorder(),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 10,
+                ),
+                errorMaxLines: 3,
+                suffixIcon: GestureDetector(
+                  child: Icon(
+                    getxController.obscurePasswordText.value
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: AppColors.grey,
+                    size: 15,
+                  ),
+                  onTap: () {
+                    getxController.obscurePasswordText.value =
+                        !getxController.obscurePasswordText.value;
+                  },
+                ),
+                suffixIconConstraints: const BoxConstraints(
+                  minWidth: 40,
+                  minHeight: 20,
+                ),
+              ),
+              style: const TextStyle(fontSize: 13),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Password is required';
+                }
+
+                if (value.length < 8) {
+                  return 'Password must be 8 characters long';
+                }
+
+                if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                  return 'Password must include one uppercase letter';
+                }
+
+                if (!RegExp(r'[a-z]').hasMatch(value)) {
+                  return 'Password must include one lowercase letter';
+                }
+
+                if (!RegExp(r'[0-9]').hasMatch(value)) {
+                  return 'Password must include one number';
+                }
+
+                if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+                  return 'Password must include one special character';
+                }
+
+                return null; // ✅ Valid
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

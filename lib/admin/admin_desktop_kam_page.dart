@@ -10,8 +10,8 @@ import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/refresh_page_widget.dart';
 import 'package:otobix_crm/widgets/table_widget.dart';
 
-class AdminKamPage extends StatelessWidget {
-  AdminKamPage({super.key});
+class AdminDesktopKamPage extends StatelessWidget {
+  AdminDesktopKamPage({super.key});
 
   final DesktopHomepageController homepageController =
       Get.put(DesktopHomepageController());
@@ -21,15 +21,6 @@ class AdminKamPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: const Text(
-          'Key Account Managers',
-          style: TextStyle(fontSize: 16, color: AppColors.green),
-        ),
-        backgroundColor: AppColors.grey.withValues(alpha: .1),
-        iconTheme: const IconThemeData(color: AppColors.green),
-      ),
       body: Obx(() {
         if (kamController.isLoading.value) {
           return const Center(
@@ -52,6 +43,8 @@ class AdminKamPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildScreenTitle(),
+                const SizedBox(height: 30),
                 _buildKamsList(),
               ],
             ),
@@ -61,13 +54,43 @@ class AdminKamPage extends StatelessWidget {
     );
   }
 
+  // Title
+  Widget _buildScreenTitle() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Key Account Managers",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Manage your Key Account Managers",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   //
   Widget _buildTableTitleWidget() {
     return Text(
       "KAMs List",
       style: TextStyle(
         color: AppColors.black,
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: FontWeight.w700,
       ),
     );
@@ -77,9 +100,6 @@ class AdminKamPage extends StatelessWidget {
   Widget _buildTableActionsWidget() {
     return ButtonWidget(
       text: 'Add KAM',
-      height: 30,
-      width: 100,
-      fontSize: 12,
       isLoading: false.obs,
       onTap: () {
         showDialog(

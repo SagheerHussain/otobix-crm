@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/admin_desktop_kam_page.dart';
 import 'package:otobix_crm/admin/admin_kam_page.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/admin/admin_home.dart';
 import 'package:otobix_crm/admin/admin_profile_page.dart';
+import 'package:otobix_crm/utils/responsive_layout.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -19,7 +21,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
   // );
   RxInt currentIndex = 0.obs;
 
-  final List<Widget> pages = [AdminHome(), const AdminProfilePage()];
+  final List<Widget> pages = [
+    AdminHome(),
+    const AdminProfilePage(),
+    ResponsiveLayout(mobile: AdminKamPage(), desktop: AdminDesktopKamPage()),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +46,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
               icon: Icon(CupertinoIcons.person, size: 20),
               title: Text("Profile", style: TextStyle(fontSize: 14)),
               selectedColor: AppColors.blue,
+            ),
+            SalomonBottomBarItem(
+              icon: Icon(CupertinoIcons.person_2, size: 20),
+              title: Text("KAMs", style: TextStyle(fontSize: 14)),
+              selectedColor: AppColors.red,
             ),
           ],
         ),
