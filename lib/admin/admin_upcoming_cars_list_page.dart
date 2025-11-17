@@ -65,6 +65,9 @@ class AdminUpcomingCarsListPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 5),
         itemBuilder: (context, index) {
           final car = carsList[index];
+
+          final String yearMonthOfManufacture =
+              '${GlobalFunctions.getFormattedDate(date: car.yearMonthOfManufacture, type: GlobalFunctions.year)} ';
           // InkWell for car card
           return GestureDetector(
             onTap: () => _showAuctionBottomSheet(car),
@@ -136,7 +139,7 @@ class AdminUpcomingCarsListPage extends StatelessWidget {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              '${car.make} ${car.model} ${car.variant}',
+                                              '$yearMonthOfManufacture${car.make} ${car.model} ${car.variant}',
                                               maxLines: 3,
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(
@@ -214,8 +217,7 @@ class AdminUpcomingCarsListPage extends StatelessWidget {
                                             icon: Icons.calendar_today,
                                             text: GlobalFunctions
                                                     .getFormattedDate(
-                                                  date: car
-                                                      .yearMonthOfManufacture,
+                                                  date: car.registrationDate,
                                                   type:
                                                       GlobalFunctions.monthYear,
                                                 ) ??

@@ -55,7 +55,10 @@ class DesktopHomepage extends StatelessWidget {
           borderRadius: BorderRadius.circular(80),
         ),
         child: TextField(
+          controller: getxController.searchController,
           onChanged: getxController.setSearch, // ← push text globally
+          onSubmitted: getxController
+              .onSearchSubmitted, // 🔥 triggers screen-specific search
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: 'Search',

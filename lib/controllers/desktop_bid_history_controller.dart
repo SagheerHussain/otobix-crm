@@ -135,9 +135,14 @@ class DesktopBidHistoryController extends GetxController {
     error.value = null;
 
     try {
+      final search = searchQuery.value.trim();
+      final searchParam = search.isNotEmpty
+          ? '&search=${Uri.encodeQueryComponent(search)}'
+          : '';
+
       // NEW unified endpoint with centralized type + range
       final endpoint =
-          '${AppUrls.getRecentBidsList}?type=${selectedFilter.value}&range=${selectedRange.value}&page=$page&limit=${limit.value}';
+          '${AppUrls.getRecentBidsList}?type=${selectedFilter.value}&range=${selectedRange.value}&page=$page&limit=${limit.value}$searchParam';
 
       final http.Response resp = await ApiService.get(endpoint: endpoint);
 
@@ -180,6 +185,16 @@ class DesktopBidHistoryController extends GetxController {
     return bids
         .where((b) => b.appointmentId.toLowerCase().contains(q))
         .toList();
+  }
+
+  // 🔍 query that goes to the API
+  final searchQuery = ''.obs;
+
+  void setSearch(String v) {
+    final trimmed = v.trim();
+    if (searchQuery.value == trimmed) return;
+    searchQuery.value = trimmed;
+    reload(); // reload from page 1 with new search
   }
 
 // Load

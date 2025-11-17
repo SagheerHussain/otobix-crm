@@ -204,14 +204,14 @@ class AdminProfileController extends GetxController {
           type: ToastType.success,
         );
         imageFile.value = null;
-        // getUserProfile();
+        getUserProfile();
 
         Get.back();
-        ToastWidget.show(
-          context: Get.context!,
-          title: 'Profile updated successfully',
-          type: ToastType.success,
-        );
+        // ToastWidget.show(
+        //   context: Get.context!,
+        //   title: 'Profile updated successfully',
+        //   type: ToastType.success,
+        // );
       } else {
         ToastWidget.show(
           context: Get.context!,

@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:otobix_crm/controllers/desktop_bid_history_controller.dart';
-import 'package:otobix_crm/controllers/desktop_homepage_controller.dart';
 import 'package:otobix_crm/models/bid_summary_model.dart';
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
 import 'package:otobix_crm/widgets/refresh_page_widget.dart';
@@ -173,12 +172,13 @@ class DesktopBidHistoryPage extends StatelessWidget {
   Widget _buildRecentBidsList() {
     final timeFormat = DateFormat('dd MMM yyyy • hh:mm a');
 
-    final homeController = Get.find<DesktopHomepageController>();
+    // final homeController = Get.find<DesktopHomepageController>();
 
     return Obx(() {
       // reacts to both bids and search text
-      final query = homeController.searchText.value;
-      final bidsList = bidHistoryController.filterByAppointmentId(query);
+      // final query = homeController.searchText.value;
+      // final bidsList = bidHistoryController.filterByAppointmentId(query);
+      final bidsList = bidHistoryController.bids; // ✅ use API result directly
 
       final rows = bidsList.map((bid) {
         return DataRow(

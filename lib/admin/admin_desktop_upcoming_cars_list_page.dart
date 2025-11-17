@@ -76,23 +76,9 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildUpcomingCarsList1() {
-    return Expanded(
-      child: ListView.separated(
-        shrinkWrap: true,
-        itemCount: upcomingController.filteredUpcomingCarsList.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        itemBuilder: (context, index) {
-          final car = upcomingController.filteredUpcomingCarsList[index];
-          // InkWell for car card
-          return _buildCarCard(car);
-        },
-      ),
-    );
-  }
-
   Widget _buildCarCard(CarsListModel car) {
+    final String yearMonthOfManufacture =
+        '${GlobalFunctions.getFormattedDate(date: car.yearMonthOfManufacture, type: GlobalFunctions.year)} ';
     return GestureDetector(
       onTap: () => _showAuctionBottomSheet(car),
       child: Card(
@@ -161,7 +147,7 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '${car.make} ${car.model} ${car.variant}',
+                                        '$yearMonthOfManufacture${car.make} ${car.model} ${car.variant}',
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
@@ -233,7 +219,7 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
                                     _buildIconAndTextWidget(
                                       icon: Icons.calendar_today,
                                       text: GlobalFunctions.getFormattedDate(
-                                            date: car.yearMonthOfManufacture,
+                                            date: car.registrationDate,
                                             type: GlobalFunctions.monthYear,
                                           ) ??
                                           'N/A',

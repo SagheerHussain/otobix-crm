@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:otobix_crm/controllers/desktop_cars_controller.dart';
-import 'package:otobix_crm/controllers/desktop_homepage_controller.dart';
 import 'package:otobix_crm/models/car_summary_model.dart';
 import 'package:otobix_crm/models/cars_list_model_for_crm.dart';
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
@@ -184,9 +183,12 @@ class DesktopCarsPage extends StatelessWidget {
       // final cars = carsController.carsList;
 
 // Search using appointment id
-      final homeController = Get.find<DesktopHomepageController>();
-      final query = homeController.searchText.value;
-      final carsList = carsController.filterByAppointmentId(query);
+      // final homeController = Get.find<DesktopHomepageController>();
+      // final query = homeController.searchText.value;
+      // final carsList = carsController.filterByAppointmentId(query);
+
+      // ✅ Use only what the API returned (already filtered by search + pagination)
+      final carsList = carsController.carsList;
 
       final rows = carsList.map((car) {
         final statusText = DesktopCarsController.filterLabel(car.auctionStatus);

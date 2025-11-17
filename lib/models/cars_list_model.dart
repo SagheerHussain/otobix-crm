@@ -24,6 +24,7 @@ class CarsListModel {
   final String registrationNumber;
   final String registeredRto;
   final String registrationState;
+  final DateTime? registrationDate;
   final String inspectionLocation;
   final bool isInspected;
   final int cubicCapacity;
@@ -60,6 +61,7 @@ class CarsListModel {
     required this.registrationNumber,
     required this.registeredRto,
     required this.registrationState,
+    required this.registrationDate,
     required this.inspectionLocation,
     required this.isInspected,
     required this.cubicCapacity,
@@ -107,6 +109,7 @@ class CarsListModel {
       registrationNumber: data['registrationNumber'],
       registeredRto: data['registeredRto'],
       registrationState: data["registrationState"] ?? 'N/A',
+      registrationDate: parseMongoDbDate(data["registrationDate"]),
       inspectionLocation: data['inspectionLocation'],
       isInspected: data['isInspected'] ?? false,
       cubicCapacity: data['cubicCapacity'] ?? 0,
@@ -150,6 +153,7 @@ class CarsListModel {
       'registrationNumber': registrationNumber,
       'registeredRto': registeredRto,
       'registrationState': registrationState,
+      'registrationDate': registrationDate,
       'inspectionLocation': inspectionLocation,
       'isInspected': isInspected,
       'cubicCapacity': cubicCapacity,

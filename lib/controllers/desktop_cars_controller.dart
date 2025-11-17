@@ -52,6 +52,16 @@ class DesktopCarsController extends GetxController {
       (summaryError.value != null) || (carsListError.value != null);
   String? get firstError => summaryError.value ?? carsListError.value;
 
+  // 🔍 query that goes to the API
+  final searchQuery = ''.obs;
+
+  void setSearch(String v) {
+    final trimmed = v.trim();
+    if (searchQuery.value == trimmed) return;
+    searchQuery.value = trimmed;
+    fetchCarsList(resetPage: true); // always go back to page 1 when searching
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -126,7 +136,15 @@ class DesktopCarsController extends GetxController {
       final base = AppUrls.getCarsListForCRM; // e.g. '/admin/cars'
       final status = selectedFilter.value;
       final qStatus = (status == filterAll) ? '' : '&status=$status';
-      final url = '$base?page=${page.value}&limit=${limit.value}$qStatus';
+
+      // 🔍 NEW: add search query if present
+      final search = searchQuery.value.trim();
+      final qSearch = search.isNotEmpty
+          ? '&search=${Uri.encodeQueryComponent(search)}'
+          : '';
+
+      final url =
+          '$base?page=${page.value}&limit=${limit.value}$qStatus$qSearch';
 
       final http.Response response = await ApiService.get(endpoint: url);
 

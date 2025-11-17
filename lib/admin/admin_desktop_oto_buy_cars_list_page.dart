@@ -74,6 +74,8 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
   }
 
   Widget _buildCarCard(CarsListModel car) {
+    final String yearMonthOfManufacture =
+        '${GlobalFunctions.getFormattedDate(date: car.yearMonthOfManufacture, type: GlobalFunctions.year)} ';
     // InkWell for car card
     return GestureDetector(
       // onTap: () => _showOtoBuyCarsBottomSheet(car),
@@ -147,7 +149,7 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '${car.make} ${car.model} ${car.variant}',
+                                        '$yearMonthOfManufacture${car.make} ${car.model} ${car.variant}',
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
@@ -246,7 +248,7 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
                                     _buildIconAndTextWidget(
                                       icon: Icons.calendar_today,
                                       text: GlobalFunctions.getFormattedDate(
-                                            date: car.yearMonthOfManufacture,
+                                            date: car.registrationDate,
                                             type: GlobalFunctions.monthYear,
                                           ) ??
                                           'N/A',
@@ -310,266 +312,6 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // OtoBuy Cars List
-  Widget _buildOtoBuyCarsList1() {
-    return Expanded(
-      child: ListView.separated(
-        shrinkWrap: true,
-        itemCount: otoBuyController.filteredOtoBuyCarsList.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        itemBuilder: (context, index) {
-          final car = otoBuyController.filteredOtoBuyCarsList[index];
-
-          // InkWell for car card
-          return GestureDetector(
-            // onTap: () => _showOtoBuyCarsBottomSheet(car),
-            onTap: () {
-              final isSold = otoBuyController.isSold(car.id, car.auctionStatus);
-              !isSold ? _showAuctionCompletedCarsBottomSheet(car) : null;
-            },
-            child: Card(
-              elevation: 4,
-              color: AppColors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            // Car details
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      // Car Image
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: CachedNetworkImage(
-                                          imageUrl: car.imageUrl,
-                                          width: 120,
-                                          height: 80,
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) =>
-                                              Container(
-                                            height: 80,
-                                            width: 120,
-                                            color: AppColors.grey
-                                                .withValues(alpha: .3),
-                                            child: const Center(
-                                              child: SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  color: AppColors.green,
-                                                  strokeWidth: 2,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          errorWidget: (
-                                            context,
-                                            error,
-                                            stackTrace,
-                                          ) {
-                                            return Image.asset(
-                                              AppImages.carAlternateImage,
-                                              width: 120,
-                                              height: 80,
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Flexible(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '${car.make} ${car.model} ${car.variant}',
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  'OCP: ',
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.oneClickPrice)}/-',
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    color: AppColors.green,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Obx(() {
-                                    final sold = otoBuyController.isSold(
-                                      car.id,
-                                      car.auctionStatus,
-                                    );
-
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 10,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: sold
-                                                ? AppColors.red.withValues(
-                                                    alpha: .3,
-                                                  ) // or withOpacity(0.3)
-                                                : AppColors.green
-                                                    .withValues(alpha: .3),
-                                            borderRadius: BorderRadius.circular(
-                                              5,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            sold ? 'Sold' : 'In Otobuy',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          sold
-                                              ? 'Sold At: ${NumberFormat.decimalPattern('en_IN').format(otoBuyController.soldAtFor(car.id, car.soldAt.toDouble()))}/-'
-                                              : 'Current Offer: ${NumberFormat.decimalPattern('en_IN').format(otoBuyController.offerFor(car.id, car.otobuyOffer))}/-',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: AppColors.green,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  }),
-                                  const Divider(),
-                                  const SizedBox(height: 5),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.calendar_today,
-                                            text: GlobalFunctions
-                                                    .getFormattedDate(
-                                                  date: car
-                                                      .yearMonthOfManufacture,
-                                                  type:
-                                                      GlobalFunctions.monthYear,
-                                                ) ??
-                                                'N/A',
-                                          ),
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.local_gas_station,
-                                            text: car.fuelType,
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.speed,
-                                            text:
-                                                '${NumberFormat.decimalPattern('en_IN').format(car.odometerReadingInKms)} km',
-                                          ),
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.location_on,
-                                            text: car.inspectionLocation,
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.receipt_long,
-                                            text: GlobalFunctions
-                                                    .getFormattedDate(
-                                                  date: car.taxValidTill,
-                                                  type:
-                                                      GlobalFunctions.monthYear,
-                                                ) ??
-                                                'N/A',
-                                          ),
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.person,
-                                            text: car.ownerSerialNumber == 1
-                                                ? 'First Owner'
-                                                : '${car.ownerSerialNumber} Owners',
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
       ),
     );
   }

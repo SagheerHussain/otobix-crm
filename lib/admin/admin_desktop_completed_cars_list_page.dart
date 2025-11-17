@@ -79,6 +79,8 @@ class AdminDesktopAuctionCompletedCarsListPage extends StatelessWidget {
   }
 
   Widget _buildCarCard(CarsListModel car) {
+    final String yearMonthOfManufacture =
+        '${GlobalFunctions.getFormattedDate(date: car.yearMonthOfManufacture, type: GlobalFunctions.year)} ';
     // InkWell for car card
     return GestureDetector(
       onTap: () => _showAuctionCompletedCarsBottomSheet(car),
@@ -148,7 +150,7 @@ class AdminDesktopAuctionCompletedCarsListPage extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        '${car.make} ${car.model} ${car.variant}',
+                                        '$yearMonthOfManufacture${car.make} ${car.model} ${car.variant}',
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
@@ -198,7 +200,7 @@ class AdminDesktopAuctionCompletedCarsListPage extends StatelessWidget {
                                     _buildIconAndTextWidget(
                                       icon: Icons.calendar_today,
                                       text: GlobalFunctions.getFormattedDate(
-                                            date: car.yearMonthOfManufacture,
+                                            date: car.registrationDate,
                                             type: GlobalFunctions.monthYear,
                                           ) ??
                                           'N/A',
@@ -262,215 +264,6 @@ class AdminDesktopAuctionCompletedCarsListPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // Auction Completed Cars List
-  Widget _buildAuctionCompletedCarsList1() {
-    return Expanded(
-      child: ListView.separated(
-        shrinkWrap: true,
-        itemCount:
-            auctionCompletedController.filteredAuctionCompletedCarsList.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        itemBuilder: (context, index) {
-          final car = auctionCompletedController
-              .filteredAuctionCompletedCarsList[index];
-          // InkWell for car card
-          return GestureDetector(
-            onTap: () => _showAuctionCompletedCarsBottomSheet(car),
-            child: Card(
-              elevation: 4,
-              color: AppColors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            // Car details
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      // Car Image
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: CachedNetworkImage(
-                                          imageUrl: car.imageUrl,
-                                          width: 120,
-                                          height: 80,
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) =>
-                                              Container(
-                                            height: 80,
-                                            width: 120,
-                                            color: AppColors.grey
-                                                .withValues(alpha: .3),
-                                            child: const Center(
-                                              child: SizedBox(
-                                                height: 20,
-                                                width: 20,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  color: AppColors.green,
-                                                  strokeWidth: 2,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          errorWidget: (
-                                            context,
-                                            error,
-                                            stackTrace,
-                                          ) {
-                                            return Image.asset(
-                                              AppImages.carAlternateImage,
-                                              width: 120,
-                                              height: 80,
-                                              fit: BoxFit.cover,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Flexible(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '${car.make} ${car.model} ${car.variant}',
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  'HB: ',
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                Obx(
-                                                  () => Text(
-                                                    'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid.value)}/-',
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: AppColors.green,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 5),
-                                  const Divider(),
-                                  const SizedBox(height: 5),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.calendar_today,
-                                            text: GlobalFunctions
-                                                    .getFormattedDate(
-                                                  date: car
-                                                      .yearMonthOfManufacture,
-                                                  type:
-                                                      GlobalFunctions.monthYear,
-                                                ) ??
-                                                'N/A',
-                                          ),
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.local_gas_station,
-                                            text: car.fuelType,
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.speed,
-                                            text:
-                                                '${NumberFormat.decimalPattern('en_IN').format(car.odometerReadingInKms)} km',
-                                          ),
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.location_on,
-                                            text: car.inspectionLocation,
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.receipt_long,
-                                            text: GlobalFunctions
-                                                    .getFormattedDate(
-                                                  date: car.taxValidTill,
-                                                  type:
-                                                      GlobalFunctions.monthYear,
-                                                ) ??
-                                                'N/A',
-                                          ),
-                                          _buildIconAndTextWidget(
-                                            icon: Icons.person,
-                                            text: car.ownerSerialNumber == 1
-                                                ? 'First Owner'
-                                                : '${car.ownerSerialNumber} Owners',
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -688,176 +481,6 @@ class AdminDesktopAuctionCompletedCarsListPage extends StatelessWidget {
               ),
             ),
           ],
-        );
-      },
-    );
-  }
-
-  // ===================== MOVE TO OTOBUY (fixed) =====================
-  Widget _buildMoveToOtobuyWidget1(CarsListModel car) {
-    // Keep these OUTSIDE the builder so they persist across setState calls
-    final nf = NumberFormat.decimalPattern('en_IN');
-    final fmv = (car.priceDiscovery ?? 0).toInt();
-
-    // Suggested one-click prices
-    final List<int> suggested = (fmv <= 0)
-        ? [100000, 150000, 200000, 250000]
-        : [
-            fmv,
-            (fmv * 1.10).round(),
-            (fmv * 1.20).round(),
-            (fmv * 1.30).round(),
-          ];
-
-    final priceCtrl =
-        TextEditingController(); // ephemeral controller for the sheet
-    double? selectedPrice;
-
-    return StatefulBuilder(
-      builder: (context, setState) {
-        void _selectChip(int v) {
-          selectedPrice = v.toDouble();
-          priceCtrl.text = nf.format(v);
-          setState(() {}); // rebuild with new selection
-        }
-
-        void _onPriceChanged(String s) {
-          final raw = s.replaceAll(RegExp(r'[^0-9]'), '');
-          selectedPrice = raw.isEmpty ? null : double.tryParse(raw);
-          setState(() {});
-        }
-
-        Future<void> _moveToOtobuy() async {
-          if (selectedPrice == null || selectedPrice! <= 0) {
-            ToastWidget.show(
-              context: context,
-              title: 'Missing price',
-              subtitle: 'Please select or enter a valid one-click price.',
-              type: ToastType.error,
-            );
-            return;
-          }
-
-          // TODO: call your API here
-          // await ApiService.post(endpoint: AppUrls.moveToOtobuy, body: {
-          //   "carId": car.id,
-          //   "oneClickPrice": selectedPrice!.round(),
-          // });
-
-          ToastWidget.show(
-            context: context,
-            title: 'Moved to Otobuy',
-            subtitle: 'Car moved at Rs. ${nf.format(selectedPrice!.round())}.',
-            type: ToastType.success,
-          );
-        }
-
-        // 👇 This padding lifts the content above the keyboard
-        final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-
-        return AnimatedPadding(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-          padding: EdgeInsets.only(bottom: bottomInset),
-          child: SingleChildScrollView(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.fromLTRB(15, 12, 15, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 10),
-                const Text(
-                  'One-click price',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 10),
-
-                // Suggested price chips
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: suggested.map((v) {
-                    final isSel = (selectedPrice?.round() == v);
-                    return GestureDetector(
-                      onTap: () => _selectChip(v),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isSel
-                              ? AppColors.green.withValues(alpha: .1)
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(
-                            color: isSel
-                                ? AppColors.green
-                                : Colors.grey.withValues(alpha: .25),
-                          ),
-                        ),
-                        child: Text(
-                          'Rs. ${nf.format(v)}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            color: isSel ? AppColors.green : AppColors.black,
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-
-                const SizedBox(height: 14),
-
-                // Custom price (inside your existing _tile look)
-                _tile(
-                  icon: Icons.sell_outlined,
-                  title: 'Custom price',
-                  subtitle: selectedPrice == null
-                      ? 'Enter amount'
-                      : 'Selected: Rs. ${nf.format(selectedPrice!.round())}/-',
-                  trailing: SizedBox(
-                    width: 160,
-                    child: TextField(
-                      controller: priceCtrl,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      decoration: const InputDecoration(
-                        hintText: 'Rs.',
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 8,
-                        ),
-                      ),
-                      onChanged: _onPriceChanged,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // Action
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: ButtonWidget(
-                        text: 'Move to Otobuy',
-                        isLoading: false.obs,
-                        onTap: _moveToOtobuy,
-                        height: 40,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
         );
       },
     );
@@ -1193,64 +816,6 @@ class AdminDesktopAuctionCompletedCarsListPage extends StatelessWidget {
     );
   }
 
-  Widget _tile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    Widget? trailing,
-    VoidCallback? onTap,
-    bool enabled = true,
-  }) {
-    return InkWell(
-      onTap: enabled ? onTap : null,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.withValues(alpha: .2)),
-          color: enabled ? Colors.white : Colors.grey.withValues(alpha: .05),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppColors.grey.withValues(alpha: .12),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, size: 18, color: AppColors.grey),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                      color: enabled ? AppColors.black : Colors.black54,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12, color: Colors.black54),
-                  ),
-                ],
-              ),
-            ),
-            if (trailing != null) trailing,
-          ],
-        ),
-      ),
-    );
-  }
-
   // Loading widget
   Widget _buildLoadingWidget() {
     return Expanded(
@@ -1360,7 +925,7 @@ class _MoveToOtobuyTabState extends State<_MoveToOtobuyTab> {
   void initState() {
     super.initState();
     nf = NumberFormat.decimalPattern('en_IN');
-    final fmv = (widget.car.priceDiscovery ?? 0).toInt();
+    final fmv = widget.car.priceDiscovery.toInt();
 
     // Chips (100%, 110%, 120%, 130%) or fallbacks
     suggested = (fmv <= 0)
