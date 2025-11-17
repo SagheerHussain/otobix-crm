@@ -68,22 +68,19 @@ class AdminDesktopRejectedUsersListPage extends StatelessWidget {
 
   // Approved Users List
   Widget _buildRejectedUsersList(List<UserModel> usersList) {
-    return Expanded(
-      child: GridView.builder(
-        padding: const EdgeInsets.all(10),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, // 3 items per row
-          crossAxisSpacing: 10, // Horizontal spacing between items
-          mainAxisSpacing: 10, // Vertical spacing between items
-          childAspectRatio:
-              2.5, // Adjust this ratio to control card proportions
-        ),
-        itemCount: usersList.length,
-        itemBuilder: (context, index) {
-          final user = usersList[index];
-          return _buildUserCard(user);
-        },
+    return GridView.builder(
+      padding: const EdgeInsets.all(10),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3, // 3 items per row
+        crossAxisSpacing: 10, // Horizontal spacing between items
+        mainAxisSpacing: 10, // Vertical spacing between items
+        childAspectRatio: 2.5, // Adjust this ratio to control card proportions
       ),
+      itemCount: usersList.length,
+      itemBuilder: (context, index) {
+        final user = usersList[index];
+        return _buildUserCard(user);
+      },
     );
   }
 
