@@ -45,7 +45,7 @@ class AdminAuctionCompletedCarsListPage extends StatelessWidget {
                 child: Center(
                   child: const EmptyDataWidget(
                     icon: Icons.local_car_wash,
-                    message: 'No Cars in Upcoming',
+                    message: 'No Auction Completed Cars',
                   ),
                 ),
               );

@@ -1,10 +1,10 @@
 class AppUrls {
-//   static const String baseUrl = "http://localhost:4000/api/"; // For Localhost
+  //   static const String baseUrl = "http://localhost:4000/api/"; // For Localhost
   // static const String baseUrlOld = "https://otobix-app-backend.onrender.com/api/"; // For Development
   static const String baseUrl =
-      "https://otobix-app-backend-rq8m.onrender.com/api/"; // For Production
-  // static const String baseUrl =
-  //     "http://192.168.100.99:4000/api/"; // For Mobile Testing
+      "https://ob-dealerapp-kong.onrender.com/api/"; // For Production
+  //   static const String baseUrl =
+  //       "http://192.168.100.99:4000/api/"; // For Mobile Testing
 
   static String get login => "${baseUrl}user/login";
 
@@ -35,7 +35,7 @@ class AppUrls {
   static String get assignKamToDealer =>
       "${baseUrl}admin/kams/assign-to-dealer";
 
-// New routes
+  // New routes
 
   static String get sendOtp => "${baseUrl}otp/send-otp";
 
@@ -148,8 +148,7 @@ class AppUrls {
   static String getUserBidsForCar({
     required String userId,
     required String carId,
-  }) =>
-      "${baseUrl}user/get-user-bids-for-car?userId=$userId&carId=$carId";
+  }) => "${baseUrl}user/get-user-bids-for-car?userId=$userId&carId=$carId";
 
   static String get uploadTermsAndConditions => "${baseUrl}terms/upload";
 
