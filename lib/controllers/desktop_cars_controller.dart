@@ -12,6 +12,7 @@ class DesktopCarsController extends GetxController {
   // Page-level state
   final isPageLoading = false.obs;
   final pageError = RxnString();
+  final isHighestBidsOnCarLoading = false.obs;
 
   // Summary state
   final isSummaryLoading = false.obs;
@@ -125,6 +126,7 @@ class DesktopCarsController extends GetxController {
     }
   }
 
+// Fetch cars list
   Future<void> fetchCarsList({bool resetPage = false}) async {
     try {
       isCarsListLoading.value = true;
@@ -184,6 +186,36 @@ class DesktopCarsController extends GetxController {
       );
     } finally {
       isCarsListLoading.value = false;
+    }
+  }
+
+  // Fetch highest bids
+  Future<List<Map<String, dynamic>>> fetchHighestBidsOnCar({
+    required String carId,
+  }) async {
+    try {
+      isHighestBidsOnCarLoading.value = true;
+
+      final response = await ApiService.post(
+        endpoint: AppUrls.getHighestBidsPerCar,
+        body: {'carId': carId},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final list = (data['dealers'] as List)
+            .map((e) => e as Map<String, dynamic>)
+            .toList();
+
+        return list;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      return [];
+    } finally {
+      isHighestBidsOnCarLoading.value = false;
     }
   }
 

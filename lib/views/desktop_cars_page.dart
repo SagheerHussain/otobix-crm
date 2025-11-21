@@ -6,6 +6,7 @@ import 'package:otobix_crm/controllers/desktop_cars_controller.dart';
 import 'package:otobix_crm/models/car_summary_model.dart';
 import 'package:otobix_crm/models/cars_list_model_for_crm.dart';
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
+import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/refresh_page_widget.dart';
 import 'package:otobix_crm/widgets/table_widget.dart';
 import 'package:otobix_crm/widgets/pager_widget.dart';
@@ -361,6 +362,202 @@ class DesktopCarsPage extends StatelessWidget {
   }
 
   void _showCarDetails(BuildContext context, CarsListModelForCrm car) {
+    final getxController = Get.find<DesktopCarsController>();
+    Get.dialog(
+      Dialog(
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.5,
+            maxHeight: MediaQuery.of(context).size.height * 0.5,
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Remove the problematic Expanded and use IntrinsicHeight instead
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // LEFT SIDE: CAR DETAILS - Use Flexible with fit: FlexFit.loose
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.2,
+                      ),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (car.thumbnailUrl.isNotEmpty)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  car.thumbnailUrl,
+                                  height: 180,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            const SizedBox(height: 10),
+                            Text(
+                              car.title,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            _detailRow('Appointment ID', car.appointmentId),
+                            _detailRow('City', car.city),
+                            _detailRow(
+                              'Odometer',
+                              '${NumberFormat.decimalPattern('en_IN').format(car.odometerKm)} km',
+                            ),
+                            _detailRow(
+                              'Highest Bid',
+                              'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-',
+                            ),
+                            _detailRow(
+                              'Status',
+                              DesktopCarsController.filterLabel(
+                                  car.auctionStatus),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 24),
+
+                  // RIGHT SIDE: DEALER HIGHEST BIDS - Use Expanded with bounded constraints
+                  Expanded(
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.2,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Dealer Highest Bids',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Use Container with explicit height instead of Expanded
+                          SizedBox(
+                            height: 300, // Fixed height or use constraints
+                            child: FutureBuilder<List<Map<String, dynamic>>>(
+                              future: getxController.fetchHighestBidsOnCar(
+                                  carId: car.id),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+
+                                if (snapshot.hasError) {
+                                  return const Text(
+                                    'Error loading bids',
+                                    style: TextStyle(color: Colors.red),
+                                  );
+                                }
+
+                                final bids = snapshot.data ?? [];
+
+                                if (bids.isEmpty) {
+                                  return const Text(
+                                      'No bids yet for this car.');
+                                }
+
+                                return ListView.separated(
+                                  itemCount: bids.length,
+                                  separatorBuilder: (_, __) => const Divider(),
+                                  itemBuilder: (context, index) {
+                                    final bid = bids[index];
+
+                                    final dealerName = (bid['userName'] ??
+                                        'Unknown dealer') as String;
+                                    final dealershipName =
+                                        (bid['dealershipName'] ?? '') as String;
+                                    final bidAmount =
+                                        (bid['highestBid'] ?? 0) as num;
+                                    final bidTimeRaw =
+                                        bid['bidTime']?.toString() ?? '';
+
+                                    String formattedTime = '';
+                                    if (bidTimeRaw.isNotEmpty) {
+                                      try {
+                                        final dt = DateTime.parse(bidTimeRaw)
+                                            .toLocal();
+                                        formattedTime =
+                                            DateFormat('dd MMM yyyy, hh:mm a')
+                                                .format(dt);
+                                      } catch (_) {}
+                                    }
+
+                                    return ListTile(
+                                      dense: true,
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Text(
+                                        dealerName,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          if (dealershipName.isNotEmpty)
+                                            Text(dealershipName),
+                                          if (formattedTime.isNotEmpty)
+                                            Text('Bid time: $formattedTime'),
+                                        ],
+                                      ),
+                                      trailing: Text(
+                                        'Rs. ${NumberFormat.decimalPattern('en_IN').format(bidAmount)}/-',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+
+              Align(
+                alignment: Alignment.centerRight,
+                child: ButtonWidget(
+                    text: 'Close', isLoading: false.obs, onTap: Get.back),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCarDetails1(BuildContext context, CarsListModelForCrm car) {
     Get.dialog(
       Dialog(
         constraints: BoxConstraints(
@@ -369,28 +566,36 @@ class DesktopCarsPage extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              if (car.thumbnailUrl.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(car.thumbnailUrl, height: 180),
-                ),
-              const SizedBox(height: 10),
-              Text(car.title,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              _detailRow('Appointment ID', car.appointmentId),
-              _detailRow('City', car.city),
-              _detailRow('Odometer',
-                  '${NumberFormat.decimalPattern('en_IN').format(car.odometerKm)} km'),
-              _detailRow('Highest Bid',
-                  'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-'),
-              _detailRow('Status',
-                  DesktopCarsController.filterLabel(car.auctionStatus)),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (car.thumbnailUrl.isNotEmpty)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(car.thumbnailUrl, height: 180),
+                    ),
+                  const SizedBox(height: 10),
+                  Text(car.title,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  _detailRow('Appointment ID', car.appointmentId),
+                  _detailRow('City', car.city),
+                  _detailRow('Odometer',
+                      '${NumberFormat.decimalPattern('en_IN').format(car.odometerKm)} km'),
+                  _detailRow('Highest Bid',
+                      'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-'),
+                  _detailRow('Status',
+                      DesktopCarsController.filterLabel(car.auctionStatus)),
+                ],
+              ),
+              Column(
+                children: [],
+              ),
               const SizedBox(height: 10),
               Align(
                 alignment: Alignment.centerRight,
