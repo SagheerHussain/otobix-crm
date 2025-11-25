@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/admin_customers_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_customers_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_home_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_profile_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_kam_page.dart';
@@ -22,6 +24,8 @@ class _AdminDesktopDashboardState extends State<AdminDesktopDashboard> {
   final List<Widget> pages = [
     ResponsiveLayout(mobile: AdminHome(), desktop: AdminDesktopHomePage()),
     ResponsiveLayout(
+        mobile: AdminCustomersPage(), desktop: AdminDesktopCustomersPage()),
+    ResponsiveLayout(
         mobile: AdminProfilePage(), desktop: AdminDesktopProfilePage()),
     ResponsiveLayout(mobile: AdminKamPage(), desktop: AdminDesktopKamPage()),
   ];
@@ -35,16 +39,22 @@ class _AdminDesktopDashboardState extends State<AdminDesktopDashboard> {
       index: 0,
     ),
     NavigationItem(
+      icon: Icons.person_3_outlined,
+      activeIcon: Icons.person_3,
+      label: "Customers",
+      index: 1,
+    ),
+    NavigationItem(
       icon: Icons.person_outline,
       activeIcon: Icons.person,
       label: "Profile",
-      index: 1,
+      index: 2,
     ),
     NavigationItem(
       icon: Icons.manage_accounts_outlined,
       activeIcon: Icons.manage_accounts,
       label: "KAM Management",
-      index: 2,
+      index: 3,
     ),
   ];
 

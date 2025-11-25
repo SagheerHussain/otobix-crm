@@ -50,6 +50,18 @@ class ApiService {
     return _send(() => http.put(url, headers: h, body: jsonEncode(body ?? {})));
   }
 
+  static Future<http.Response> delete({
+    required String endpoint,
+    Map<String, dynamic>? body,
+    Map<String, String>? headers,
+  }) async {
+    final url = Uri.parse(endpoint);
+    final h = await _headers(headers);
+    return _send(
+      () => http.delete(url, headers: h, body: jsonEncode(body ?? {})),
+    );
+  }
+
   // ---- internals ----
 
   static Future<Map<String, String>> _headers([

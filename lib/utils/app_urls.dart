@@ -1,10 +1,11 @@
 class AppUrls {
   //   static const String baseUrl = "http://localhost:4000/api/"; // For Localhost
-  // static const String baseUrlOld = "https://otobix-app-backend.onrender.com/api/"; // For Development
+  // static const String baseUrl =
+  //     "https://otobix-app-backend-development.onrender.com/api/"; // For Development
   static const String baseUrl =
       "https://ob-dealerapp-kong.onrender.com/api/"; // For Production
-//   static const String baseUrl =
-//       "http://192.168.100.99:4000/api/"; // For Mobile Testing
+  // static const String baseUrl =
+  //     "http://192.168.100.99:4000/api/"; // For Mobile Testing
 
   static String get login => "${baseUrl}user/login";
 
@@ -38,8 +39,25 @@ class AppUrls {
   static String get assignKamToDealer =>
       "${baseUrl}admin/kams/assign-to-dealer";
 
-  // New routes
+  static String get getCustomersSummary =>
+      "${baseUrl}admin/customers/get-summary-counts";
 
+  static String get getCarDropdownsList =>
+      "${baseUrl}admin/customers/car-dropdowns/get-list";
+
+  static String get addCarDropdown =>
+      "${baseUrl}admin/customers/car-dropdowns/add";
+
+  static String get editCarDropdown =>
+      "${baseUrl}admin/customers/car-dropdowns/edit";
+
+  static String get deleteCarDropdown =>
+      "${baseUrl}admin/customers/car-dropdowns/delete";
+
+  static String get toggleCarDropdownStatus =>
+      "${baseUrl}admin/customers/car-dropdowns/toggle-status";
+
+  // New routes
   static String get sendOtp => "${baseUrl}otp/send-otp";
 
   static String get verifyOtp => "${baseUrl}otp/verify-otp";

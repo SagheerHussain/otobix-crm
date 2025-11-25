@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/admin_customers_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_customers_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_kam_page.dart';
 import 'package:otobix_crm/admin/admin_kam_page.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
@@ -23,6 +25,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   final List<Widget> pages = [
     AdminHome(),
+    ResponsiveLayout(
+        mobile: AdminCustomersPage(), desktop: AdminDesktopCustomersPage()),
     const AdminProfilePage(),
     ResponsiveLayout(mobile: AdminKamPage(), desktop: AdminDesktopKamPage()),
   ];
@@ -43,7 +47,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
               selectedColor: AppColors.green,
             ),
             SalomonBottomBarItem(
-              icon: Icon(CupertinoIcons.person, size: 20),
+              icon: Icon(CupertinoIcons.person_3, size: 20),
+              title: Text("Customers", style: TextStyle(fontSize: 14)),
+              selectedColor: AppColors.grey,
+            ),
+            SalomonBottomBarItem(
+              icon: Icon(CupertinoIcons.person_crop_circle, size: 20),
               title: Text("Profile", style: TextStyle(fontSize: 14)),
               selectedColor: AppColors.blue,
             ),
