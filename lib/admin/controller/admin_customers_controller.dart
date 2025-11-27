@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/admin_car_banners_page.dart';
 import 'package:otobix_crm/admin/admin_car_dropdown_management_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_car_banners_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_car_dropdown_management_page.dart';
 import 'package:otobix_crm/network/api_service.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
@@ -52,14 +54,18 @@ class AdminCustomersController extends GetxController {
             count: carMakeModelVariantDropdownsLength.value,
             countLable: 'dropdowns',
           ),
-          // CustomerCard(
-          //   title: 'Total Customers',
-          //   description: 'View total customers count',
-          //   icon: Icons.people_outline,
-          //   route: AdminCarDropdownManagementPage(),
-          //   color: AppColors.blue,
-          //   count: totalCustomersLength.value,
-          // ),
+          CustomerCard(
+            title: 'Banners',
+            description: 'View and manage Car Banners',
+            icon: Icons.photo_library_outlined,
+            route: ResponsiveLayout(
+              mobile: AdminCarBannersPage(),
+              desktop: AdminDesktopCarBannersPage(),
+            ),
+            color: AppColors.red,
+            count: totalCustomersLength.value,
+            countLable: 'banner images',
+          ),
           // CustomerCard(
           //   title: 'Active Customers',
           //   description: 'Customers who are active',

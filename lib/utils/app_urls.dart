@@ -57,6 +57,17 @@ class AppUrls {
   static String get toggleCarDropdownStatus =>
       "${baseUrl}admin/customers/car-dropdowns/toggle-status";
 
+  static String get addBanner => "${baseUrl}admin/banners/add";
+
+  static String get fetchBannersList => "${baseUrl}admin/banners/get-list";
+
+  static String get deleteBanner => "${baseUrl}admin/banners/delete";
+
+  static String get fetchBannersCount => "${baseUrl}admin/banners/get-count";
+
+  static String get updateBannerStatus =>
+      "${baseUrl}admin/banners/update-status";
+
   // New routes
   static String get sendOtp => "${baseUrl}otp/send-otp";
 
