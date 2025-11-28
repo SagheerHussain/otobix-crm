@@ -273,185 +273,197 @@ class AdminDesktopCarBannersPage extends StatelessWidget {
 
   // Banner Card with Hover Effects
   Widget _buildBannerCard(SellMyCarBannersModel banner) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: Stack(
-        children: [
-          Container(
-            width: 600,
-            height: 300,
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-              image: DecorationImage(
-                image: CachedNetworkImageProvider(
-                  banner.imageUrl,
-                ),
-                fit: BoxFit.cover,
+    return Obx(() {
+      final isHovered = getxController.isBannerHovered(banner.id!);
+
+      return MouseRegion(
+        onEnter: (_) => getxController.setHoveredBanner(banner.id!),
+        onExit: (_) => getxController.clearHover(),
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          width: 600,
+          height: 300,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6,
+                offset: const Offset(0, 2),
               ),
-            ),
-            child: Stack(
-              children: [
-                // Screen Name
-                Positioned(
-                  top: 16,
-                  left: 16,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      banner.screenName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Status Toggle
-                Positioned(
-                  top: 16,
-                  right: 16,
-                  child: GestureDetector(
-                    onTap: () {
-                      getxController.toggleBannerStatus(banner);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            banner.status == AppConstants.banners.active
-                                ? 'Active'
-                                : 'Inactive',
-                            style: TextStyle(
-                              color:
-                                  banner.status == AppConstants.banners.active
-                                      ? AppColors.green
-                                      : AppColors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Transform.scale(
-                            scale: 0.8,
-                            child: Switch(
-                              value:
-                                  banner.status == AppConstants.banners.active,
-                              onChanged: (value) {
-                                getxController.toggleBannerStatus(banner);
-                              },
-                              activeColor: AppColors.green,
-                              activeTrackColor:
-                                  AppColors.green.withOpacity(0.3),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
-
-          // Hover Delete Button
-          Positioned.fill(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
+          child: Stack(
+            children: [
+              // Banner Image Background - Make sure it fills the entire container
+              ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () {},
-                child: Stack(
-                  children: [
-                    // Hover Overlay
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Obx(() {
-                          return MouseRegion(
-                            onEnter: (_) =>
-                                getxController.selectedImage.value = null,
-                            onExit: (_) =>
-                                getxController.selectedImage.value = null,
-                            child: AnimatedOpacity(
-                              duration: const Duration(milliseconds: 200),
-                              opacity:
-                                  getxController.selectedImage.value == null
-                                      ? 0
-                                      : 1,
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.7),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {
-                                        _showDeleteConfirmationDialog(banner);
-                                      },
-                                      icon: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                        size: 32,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    const Text(
-                                      'Delete Banner',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                child: CachedNetworkImage(
+                  imageUrl: banner.imageUrl,
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey[300],
+                    child: Center(
+                      child: CircularProgressIndicator(color: AppColors.green),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[300],
+                    child: Icon(Icons.error, color: Colors.grey[600]),
+                  ),
+                ),
+              ),
+
+              // Screen Name - Always visible
+              Positioned(
+                top: 16,
+                left: 16,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    banner.screenName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+
+              // Show on hover
+              if (isHovered)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Stack(
+                      children: [
+                        // Screen Name - White version on hover
+                        Positioned(
+                          top: 16,
+                          left: 16,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              banner.screenName,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
                               ),
                             ),
-                          );
-                        }),
-                      ),
+                          ),
+                        ),
+
+                        // Status Toggle - Only show on hover
+                        Positioned(
+                          top: 16,
+                          right: 16,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  banner.status == AppConstants.banners.active
+                                      ? 'Active'
+                                      : 'Inactive',
+                                  style: TextStyle(
+                                    color: banner.status ==
+                                            AppConstants.banners.active
+                                        ? AppColors.green
+                                        : AppColors.red,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Transform.scale(
+                                  scale: 0.6,
+                                  child: Switch(
+                                    value: banner.status ==
+                                        AppConstants.banners.active,
+                                    onChanged: (value) {
+                                      getxController.toggleBannerStatus(banner);
+                                    },
+                                    activeColor: AppColors.green,
+                                    activeTrackColor:
+                                        AppColors.green.withOpacity(0.3),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Delete Button - Show on hover
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  _showDeleteConfirmationDialog(banner);
+                                },
+                                icon: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                    size: 32,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Delete Banner',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 
   // Add Banner Dialog
@@ -635,7 +647,7 @@ class AdminDesktopCarBannersPage extends StatelessWidget {
       Dialog(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        constraints: BoxConstraints(maxWidth: Get.size.width * 0.4),
+        constraints: BoxConstraints(maxWidth: Get.size.width * 0.3),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(

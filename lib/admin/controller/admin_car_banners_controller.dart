@@ -22,6 +22,21 @@ class AdminCarBannersController extends GetxController {
   // For file picking
   Rx<PlatformFile?> selectedImage = Rx<PlatformFile?>(null);
 
+  // Add hover state management
+  RxString hoveredBannerId = RxString('');
+
+  void setHoveredBanner(String bannerId) {
+    hoveredBannerId.value = bannerId;
+  }
+
+  void clearHover() {
+    hoveredBannerId.value = '';
+  }
+
+  bool isBannerHovered(String bannerId) {
+    return hoveredBannerId.value == bannerId;
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -106,6 +121,16 @@ class AdminCarBannersController extends GetxController {
         context: Get.context!,
         title: 'Error',
         subtitle: 'Please select an image',
+        type: ToastType.error,
+      );
+      return;
+    }
+    if (screenName.isEmpty) {
+      ToastWidget.show(
+        context: Get.context!,
+        title: 'Error',
+        subtitle:
+            'Please provide a ${type == AppConstants.banners.header ? 'title' : 'screen name'}',
         type: ToastType.error,
       );
       return;

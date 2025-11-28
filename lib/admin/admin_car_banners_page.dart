@@ -16,6 +16,15 @@ class AdminCarBannersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        title: const Text(
+          'Car Banners',
+          style: TextStyle(fontSize: 16, color: AppColors.green),
+        ),
+        backgroundColor: AppColors.grey.withValues(alpha: .1),
+        iconTheme: const IconThemeData(color: AppColors.green),
+      ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Obx(() {
@@ -29,7 +38,6 @@ class AdminCarBannersPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildScreenTitle(),
                   const SizedBox(height: 20),
                   _buildHeaderBanner(),
                   const SizedBox(height: 30),
@@ -43,63 +51,11 @@ class AdminCarBannersPage extends StatelessWidget {
     );
   }
 
-  // Title
-  Widget _buildScreenTitle() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () => Get.back(),
-            icon: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Icon(Icons.arrow_back, color: Colors.grey[600]),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Car Banners",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Manage car banners",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Header Banner Section
+// Header Banner Section
   Widget _buildHeaderBanner() {
     return Obx(() {
       return Padding(
-        padding: const EdgeInsets.only(left: 50),
+        padding: const EdgeInsets.only(left: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -111,7 +67,7 @@ class AdminCarBannersPage extends StatelessWidget {
                     Text(
                       "Header Banner",
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey[800],
                       ),
@@ -141,6 +97,8 @@ class AdminCarBannersPage extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 20),
                   child: ButtonWidget(
                     text: 'Add Banner',
+                    height: 35,
+                    fontSize: 12,
                     isLoading: false.obs,
                     onTap: () =>
                         _showAddBannerDialog(type: AppConstants.banners.header),
@@ -150,7 +108,8 @@ class AdminCarBannersPage extends StatelessWidget {
             ),
             const SizedBox(height: 15),
             SizedBox(
-              height: 320,
+              height:
+                  170, // Reduced from 320 to match banner card height + some padding
               child: getxController.headerBannersList.isEmpty
                   ? _buildEmptyState('No header banners added yet')
                   : ListView.separated(
@@ -158,7 +117,7 @@ class AdminCarBannersPage extends StatelessWidget {
                       itemCount: getxController.headerBannersList.length,
                       padding: const EdgeInsets.only(right: 50),
                       separatorBuilder: (context, index) =>
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 10),
                       itemBuilder: (context, index) {
                         final banner = getxController.headerBannersList[index];
                         return _buildBannerCard(banner);
@@ -171,11 +130,11 @@ class AdminCarBannersPage extends StatelessWidget {
     });
   }
 
-  // Footer Banner Section
+// Footer Banner Section
   Widget _buildFooterBanner() {
     return Obx(() {
       return Padding(
-        padding: const EdgeInsets.only(left: 50),
+        padding: const EdgeInsets.only(left: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -187,7 +146,7 @@ class AdminCarBannersPage extends StatelessWidget {
                     Text(
                       "Footer Banner",
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey[800],
                       ),
@@ -217,6 +176,8 @@ class AdminCarBannersPage extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 20),
                   child: ButtonWidget(
                     text: 'Add Banner',
+                    height: 35,
+                    fontSize: 12,
                     isLoading: false.obs,
                     onTap: () =>
                         _showAddBannerDialog(type: AppConstants.banners.footer),
@@ -226,7 +187,8 @@ class AdminCarBannersPage extends StatelessWidget {
             ),
             const SizedBox(height: 15),
             SizedBox(
-              height: 320,
+              height:
+                  170, // Reduced from 320 to match banner card height + some padding
               child: getxController.footerBannersList.isEmpty
                   ? _buildEmptyState('No footer banners added yet')
                   : ListView.separated(
@@ -273,185 +235,196 @@ class AdminCarBannersPage extends StatelessWidget {
 
   // Banner Card with Hover Effects
   Widget _buildBannerCard(SellMyCarBannersModel banner) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: Stack(
-        children: [
-          Container(
-            width: 600,
-            height: 300,
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-              image: DecorationImage(
-                image: CachedNetworkImageProvider(
-                  banner.imageUrl,
-                ),
-                fit: BoxFit.cover,
+    return Obx(() {
+      final isHovered = getxController.isBannerHovered(banner.id!);
+
+      return MouseRegion(
+        onEnter: (_) => getxController.setHoveredBanner(banner.id!),
+        onExit: (_) => getxController.clearHover(),
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          height: 160, // Banner card height
+          width: 340, // Banner card width
+          margin: const EdgeInsets.symmetric(
+              vertical: 10), // Add some vertical margin
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6,
+                offset: const Offset(0, 2),
               ),
-            ),
-            child: Stack(
-              children: [
-                // Screen Name
-                Positioned(
-                  top: 16,
-                  left: 16,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      banner.screenName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Status Toggle
-                Positioned(
-                  top: 16,
-                  right: 16,
-                  child: GestureDetector(
-                    onTap: () {
-                      getxController.toggleBannerStatus(banner);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            banner.status == AppConstants.banners.active
-                                ? 'Active'
-                                : 'Inactive',
-                            style: TextStyle(
-                              color:
-                                  banner.status == AppConstants.banners.active
-                                      ? AppColors.green
-                                      : AppColors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Transform.scale(
-                            scale: 0.8,
-                            child: Switch(
-                              value:
-                                  banner.status == AppConstants.banners.active,
-                              onChanged: (value) {
-                                getxController.toggleBannerStatus(banner);
-                              },
-                              activeColor: AppColors.green,
-                              activeTrackColor:
-                                  AppColors.green.withOpacity(0.3),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
-
-          // Hover Delete Button
-          Positioned.fill(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
+          child: Stack(
+            children: [
+              // Banner Image Background - Make sure it fills the entire container
+              ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () {},
-                child: Stack(
-                  children: [
-                    // Hover Overlay
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Obx(() {
-                          return MouseRegion(
-                            onEnter: (_) =>
-                                getxController.selectedImage.value = null,
-                            onExit: (_) =>
-                                getxController.selectedImage.value = null,
-                            child: AnimatedOpacity(
-                              duration: const Duration(milliseconds: 200),
-                              opacity:
-                                  getxController.selectedImage.value == null
-                                      ? 0
-                                      : 1,
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.7),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      onPressed: () {
-                                        _showDeleteConfirmationDialog(banner);
-                                      },
-                                      icon: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                        size: 32,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    const Text(
-                                      'Delete Banner',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                child: CachedNetworkImage(
+                  imageUrl: banner.imageUrl,
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color: Colors.grey[300],
+                    child: Center(
+                      child: CircularProgressIndicator(color: AppColors.green),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[300],
+                    child: Icon(Icons.error, color: Colors.grey[600]),
+                  ),
+                ),
+              ),
+
+              // Screen Name - Always visible
+              Positioned(
+                top: 10,
+                left: 10,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    banner.screenName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
+
+              // Show on hover
+              if (isHovered)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Stack(
+                      children: [
+                        // Screen Name - White version on hover
+                        Positioned(
+                          top: 10,
+                          left: 10,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Text(
+                              banner.screenName,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
                               ),
                             ),
-                          );
-                        }),
-                      ),
+                          ),
+                        ),
+
+                        // Status Toggle - Only show on hover
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Container(
+                            padding: const EdgeInsets.only(left: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  banner.status == AppConstants.banners.active
+                                      ? 'Active'
+                                      : 'Inactive',
+                                  style: TextStyle(
+                                    color: banner.status ==
+                                            AppConstants.banners.active
+                                        ? AppColors.green
+                                        : AppColors.red,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Transform.scale(
+                                  scale: 0.4,
+                                  child: Switch(
+                                    value: banner.status ==
+                                        AppConstants.banners.active,
+                                    onChanged: (value) {
+                                      getxController.toggleBannerStatus(banner);
+                                    },
+                                    activeColor: AppColors.green,
+                                    activeTrackColor:
+                                        AppColors.green.withOpacity(0.3),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Delete Button - Show on hover
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  _showDeleteConfirmationDialog(banner);
+                                },
+                                icon: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                              // const SizedBox(height: 5),
+                              Text(
+                                'Delete Banner',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 
   // Add Banner Dialog
@@ -604,6 +577,8 @@ class AdminCarBannersPage extends StatelessWidget {
                       child: Obx(() {
                         return ButtonWidget(
                           text: 'Add Banner',
+                          height: 35,
+                          fontSize: 12,
                           isLoading: getxController.isAddBannerLoading,
                           onTap: getxController.isAddBannerLoading.value
                               ? () {}

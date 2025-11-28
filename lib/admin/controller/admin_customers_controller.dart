@@ -16,6 +16,7 @@ class AdminCustomersController extends GetxController {
   final RxInt activeCustomersLength = 0.obs;
   final RxInt thisMonthCustomersLength = 0.obs;
   final RxInt carMakeModelVariantDropdownsLength = 0.obs;
+  final RxInt bannersLength = 0.obs;
 
   // Customer cards data
   final RxList<CustomerCard> customerCards = <CustomerCard>[].obs;
@@ -38,6 +39,7 @@ class AdminCustomersController extends GetxController {
         thisMonthCustomersLength.value = data['thisMonthCustomersLength'] ?? 0;
         carMakeModelVariantDropdownsLength.value =
             data['carMakeModelVariantDropdownsLength'] ?? 0;
+        bannersLength.value = data['bannersLength'] ?? 0;
 
         // Update customer cards after fetching data
         customerCards.clear(); // Clear existing cards before adding new ones
@@ -63,7 +65,7 @@ class AdminCustomersController extends GetxController {
               desktop: AdminDesktopCarBannersPage(),
             ),
             color: AppColors.red,
-            count: totalCustomersLength.value,
+            count: bannersLength.value,
             countLable: 'banner images',
           ),
           // CustomerCard(
