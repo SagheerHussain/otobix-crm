@@ -7,6 +7,8 @@ class BidsListModel {
   final num bidAmount;
   final DateTime time;
   final bool isActive;
+  final double soldAt;
+  final String soldToName;
 
   BidsListModel({
     required this.userName,
@@ -17,6 +19,8 @@ class BidsListModel {
     required this.bidAmount,
     required this.time,
     required this.isActive,
+    required this.soldAt,
+    required this.soldToName,
   });
 
   factory BidsListModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +36,8 @@ class BidsListModel {
       time: DateTime.tryParse(json['time']?.toString() ?? '') ??
           DateTime.now().toUtc(),
       isActive: (json['isActive'] ?? false) as bool,
+      soldAt: (json['soldAt'] as num?)?.toDouble() ?? 0,
+      soldToName: json['soldToName'] as String? ?? '',
     );
   }
 }

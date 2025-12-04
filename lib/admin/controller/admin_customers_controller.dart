@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:otobix_crm/admin/admin_car_banners_page.dart';
-import 'package:otobix_crm/admin/admin_car_dropdown_management_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_car_banners_page.dart';
+import 'package:otobix_crm/admin/admin_car_dropdown_management_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_car_dropdown_management_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_sell_my_car_banners_page.dart';
+import 'package:otobix_crm/admin/admin_sell_my_car_banners_page.dart';
 import 'package:otobix_crm/network/api_service.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
@@ -61,12 +63,13 @@ class AdminCustomersController extends GetxController {
             description: 'View and manage Car Banners',
             icon: Icons.photo_library_outlined,
             route: ResponsiveLayout(
-              mobile: AdminCarBannersPage(),
-              desktop: AdminDesktopCarBannersPage(),
+              mobile: AdminSellMyCarBannersPage(),
+              desktop: AdminDesktopSellMyCarBannersPage(),
             ),
             color: AppColors.red,
-            count: bannersLength.value,
-            countLable: 'banner images',
+            // count: bannersLength.value,
+            count: 2,
+            countLable: 'banners',
           ),
           // CustomerCard(
           //   title: 'Active Customers',

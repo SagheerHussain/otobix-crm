@@ -41,10 +41,20 @@ class AdminOtoBuyCarsListController extends GetxController {
   final RxMap<String, double> _soldAtValues = <String, double>{}.obs;
   double soldAtFor(String carId, double fallback) =>
       _soldAtValues[carId] ?? fallback;
+
+// 👇 NEW: store sold-to name per car
+  final RxMap<String, String> _soldToNames = <String, String>{}.obs;
+  String soldToNameFor(String carId, String fallback) =>
+      _soldToNames[carId] ?? fallback;
+
   void _seedSoldAts(Iterable<CarsListModel> cars) {
     for (final c in cars) {
-      if (c.soldAt != null && c.soldAt > 0) {
+      if (c.soldAt > 0) {
         _soldAtValues.putIfAbsent(c.id, () => c.soldAt.toDouble());
+      }
+      // 👇 NEW: seed soldToName if already present
+      if ((c.soldToName).isNotEmpty) {
+        _soldToNames.putIfAbsent(c.id, () => c.soldToName);
       }
     }
   }
@@ -123,22 +133,6 @@ class AdminOtoBuyCarsListController extends GetxController {
     ) async {
       final String action = '${data['action']}';
 
-      // if (action == 'removed') {
-      //   final String id = '${data['id']}';
-
-      //   // Mark as sold
-      //   _markSold(id);
-
-      //   // remove from list
-      //   filteredOtoBuyCarsList.removeWhere((c) => c.id == id);
-
-      //   _otobuyOfferValues.remove(id); // remove otobuy offer value for that car
-
-      //   // update count
-      //   otoBuyCarsCount.value = filteredOtoBuyCarsList.length;
-      //   return;
-      // }
-
       if (action == 'added') {
         final String id = '${data['id']}';
         final Map<String, dynamic> carJson = Map<String, dynamic>.from(
@@ -168,7 +162,14 @@ class AdminOtoBuyCarsListController extends GetxController {
             ? (data['soldAt'] as num).toDouble()
             : double.tryParse('${data['soldAt']}') ?? 0.0;
 
-        _soldAtValues[id] = soldAt; // <-- store it for UI
+        // 👇 NEW: read name from socket payload (backend now sends soldToName)
+        final String soldToName = (data['soldToName'] ?? '').toString();
+
+        _soldAtValues[id] = soldAt; // <-- store price for UI
+        if (soldToName.isNotEmpty) {
+          _soldToNames[id] = soldToName; // 👈 store name for UI
+        }
+
         _markSold(id);
         return;
       }
@@ -239,12 +240,23 @@ class AdminOtoBuyCarsListController extends GetxController {
   // }
 
   // Mark car as sold
-  Future<void> markCarAsSold({required String carId}) async {
+  Future<void> markCarAsSold({
+    required String carId,
+    required String soldTo,
+    required double soldAt,
+  }) async {
     isMarkCarAsSoldButtonLoading.value = true;
     try {
+      final String userId =
+          await SharedPrefsHelper.getString(SharedPrefsHelper.userIdKey) ?? '';
       final response = await ApiService.post(
         endpoint: AppUrls.markCarAsSold,
-        body: {'carId': carId},
+        body: {
+          'carId': carId,
+          'soldTo': soldTo,
+          'soldBy': userId,
+          'soldAt': soldAt
+        },
       );
 
       if (response.statusCode == 200) {
@@ -314,6 +326,27 @@ class AdminOtoBuyCarsListController extends GetxController {
       reasonText.value = '';
       isRemoveButtonLoading.value = false;
     }
+  }
+
+  // local helper to fetch dealers list from API (returns a List of maps)
+  Future<List<Map<String, dynamic>>> fetchDealers() async {
+    try {
+      final response =
+          await ApiService.get(endpoint: AppUrls.getApprovedDealersList);
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        // ✅ body is a Map like { success: true, data: [...] }
+        if (body is Map && body['data'] is List) {
+          return List<Map<String, dynamic>>.from(body['data']);
+        }
+      } else {
+        debugPrint('Failed to load dealers: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint('Error loading dealers: $e');
+    }
+    return <Map<String, dynamic>>[];
   }
 
   @override

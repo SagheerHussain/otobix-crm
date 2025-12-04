@@ -68,6 +68,9 @@ class AppUrls {
   static String get updateBannerStatus =>
       "${baseUrl}admin/banners/update-status";
 
+  static String get getApprovedDealersList =>
+      "${baseUrl}admin/dealers/get-approved-dealers-list";
+
   // New routes
   static String get sendOtp => "${baseUrl}otp/send-otp";
 

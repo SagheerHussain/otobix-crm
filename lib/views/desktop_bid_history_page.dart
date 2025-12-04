@@ -179,43 +179,115 @@ class DesktopBidHistoryPage extends StatelessWidget {
       // final query = homeController.searchText.value;
       // final bidsList = bidHistoryController.filterByAppointmentId(query);
       final bidsList = bidHistoryController.bids; // ✅ use API result directly
+      final isOtobuy = bidHistoryController.selectedFilter.value ==
+          DesktopBidHistoryController.otobuyOffersFilter;
 
       final rows = bidsList.map((bid) {
-        return DataRow(
-          cells: [
-            DataCell(Text(bid.userName)),
-            DataCell(Text(bid.dealershipName)),
-            DataCell(Text(bid.assignedKam)),
-            DataCell(Text(bid.car)),
-            DataCell(Text(bid.appointmentId)),
-            DataCell(Text("Rs. ${bid.bidAmount}/-")),
-            DataCell(Text(timeFormat.format(bid.time.toLocal()))),
-            DataCell(
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
+        final cells = <DataCell>[
+          DataCell(Text(bid.userName)),
+          DataCell(Text(bid.dealershipName)),
+          DataCell(Text(bid.assignedKam)),
+          DataCell(Text(bid.car)),
+          DataCell(Text(bid.appointmentId)),
+          DataCell(
+            Text(
+              "Rs. ${NumberFormat.decimalPattern().format(bid.bidAmount)}/-",
+            ),
+          ),
+          DataCell(Text(timeFormat.format(bid.time.toLocal()))),
+          DataCell(
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: bid.isActive
+                    ? AppColors.green.withValues(alpha: 0.15)
+                    : AppColors.red.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                bid.isActive ? "Active" : "Closed",
+                textAlign: TextAlign.center,
+                style: TextStyle(
                   color: bid.isActive
-                      ? AppColors.green.withValues(alpha: 0.15)
-                      : AppColors.red.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  bid.isActive ? "Active" : "Closed",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: bid.isActive
-                        ? AppColors.green.withValues(alpha: 0.7)
-                        : AppColors.red.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
+                      ? AppColors.green.withValues(alpha: 0.7)
+                      : AppColors.red.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
                 ),
               ),
             ),
-          ],
-        );
+          ),
+        ];
+
+        // 👇 Extra cells only for Otobuy Offers
+        if (isOtobuy) {
+          cells.add(
+            DataCell(
+              Text(
+                bid.soldAt > 0
+                    ? "Rs. ${NumberFormat.decimalPattern().format(bid.soldAt)}/-"
+                    : "-",
+              ),
+            ),
+          );
+          cells.add(
+            DataCell(
+              Text(
+                (bid.soldAt > 0 && bid.soldToName.isNotEmpty)
+                    ? bid.soldToName
+                    : "-",
+              ),
+            ),
+          );
+        }
+
+        return DataRow(cells: cells);
       }).toList();
+
+      final columns = <DataColumn>[
+        const DataColumn(
+            label:
+                Text("Bidder", style: TextStyle(fontWeight: FontWeight.bold))),
+        const DataColumn(
+            label: Text("Dealership Name",
+                style: TextStyle(fontWeight: FontWeight.bold))),
+        const DataColumn(
+            label: Text("Assigned KAM",
+                style: TextStyle(fontWeight: FontWeight.bold))),
+        const DataColumn(
+            label: Text("Car Name",
+                style: TextStyle(fontWeight: FontWeight.bold))),
+        const DataColumn(
+            label: Text("Appointment ID",
+                style: TextStyle(fontWeight: FontWeight.bold))),
+        DataColumn(
+            label: Text(
+                bidHistoryController.selectedFilter.value ==
+                        DesktopBidHistoryController.otobuyOffersFilter
+                    ? "Offer Amount"
+                    : "Bid Amount",
+                style: const TextStyle(fontWeight: FontWeight.bold))),
+        const DataColumn(
+            label: Text("Time", style: TextStyle(fontWeight: FontWeight.bold))),
+        const DataColumn(
+            label:
+                Text("Status", style: TextStyle(fontWeight: FontWeight.bold))),
+      ];
+
+      if (isOtobuy) {
+        columns.addAll([
+          const DataColumn(
+              label: Text("Sold At",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          const DataColumn(
+              label: Text("Sold To",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+        ]);
+      }
+
+      final columnWidths = isOtobuy
+          ? const [100, 150, 150, 250, 150, 100, 200, 80, 100, 150]
+          : const [100, 150, 150, 250, 150, 100, 200, 80];
 
       // Table Widget
       return TableWidget(
@@ -225,38 +297,8 @@ class DesktopBidHistoryPage extends StatelessWidget {
         minTableWidth: MediaQuery.of(Get.context!).size.width - 250,
         isLoading: bidHistoryController.isBidsLoading.value,
         rows: rows,
-        columns: [
-          DataColumn(
-              label: Text("Bidder",
-                  style: TextStyle(fontWeight: FontWeight.bold))),
-          DataColumn(
-              label: Text("Dealership Name",
-                  style: TextStyle(fontWeight: FontWeight.bold))),
-          DataColumn(
-              label: Text("Assigned KAM",
-                  style: TextStyle(fontWeight: FontWeight.bold))),
-          DataColumn(
-              label: Text("Car Name",
-                  style: TextStyle(fontWeight: FontWeight.bold))),
-          DataColumn(
-              label: Text("Appointment ID",
-                  style: TextStyle(fontWeight: FontWeight.bold))),
-          DataColumn(
-              label: Text(
-                  bidHistoryController.selectedFilter.value ==
-                          DesktopBidHistoryController.otobuyOffersFilter
-                      ? "Offer Amount"
-                      : "Bid Amount",
-                  style: TextStyle(fontWeight: FontWeight.bold))),
-          DataColumn(
-              label:
-                  Text("Time", style: TextStyle(fontWeight: FontWeight.bold))),
-          DataColumn(
-              label: Text("Status",
-                  style: TextStyle(fontWeight: FontWeight.bold))),
-        ],
-        // Ensure length == columns.length
-        columnWidths: const [100, 150, 150, 250, 150, 100, 200, 80],
+        columns: columns,
+        columnWidths: columnWidths.map((w) => w.toDouble()).toList(),
         titleWidget: _buildTitleWidget(),
         actionsWidget: _buildActionWidget(),
         emptyDataWidget: Text(

@@ -12,6 +12,7 @@ import 'package:otobix_crm/widgets/empty_data_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
 import 'package:otobix_crm/widgets/tab_bar_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_oto_buy_cars_list_controller.dart';
+import 'package:otobix_crm/widgets/toast_widget.dart';
 
 class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
   AdminDesktopOtoBuyCarsListPage({super.key});
@@ -224,9 +225,18 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
                                   ),
                                   Text(
                                     sold
-                                        ? 'Sold At: ${NumberFormat.decimalPattern('en_IN').format(otoBuyController.soldAtFor(car.id, car.soldAt.toDouble()))}/-'
-                                        : 'Current Offer: ${NumberFormat.decimalPattern('en_IN').format(otoBuyController.offerFor(car.id, car.otobuyOffer))}/-',
-                                    maxLines: 1,
+                                        ? 'Sold At: ${NumberFormat.decimalPattern('en_IN').format(
+                                            otoBuyController.soldAtFor(
+                                                car.id, car.soldAt.toDouble()),
+                                          )}/-\nTo: ${otoBuyController.soldToNameFor(car.id, car.soldToName)}'
+                                        : 'Current Offer: ${NumberFormat.decimalPattern('en_IN').format(
+                                            otoBuyController.offerFor(
+                                                car.id, car.otobuyOffer),
+                                          )}/-',
+                                    // sold
+                                    //     ? 'Sold At: ${NumberFormat.decimalPattern('en_IN').format(otoBuyController.soldAtFor(car.id, car.soldAt.toDouble()))}/-\nTo: ${car.soldToName}'
+                                    //     : 'Current Offer: ${NumberFormat.decimalPattern('en_IN').format(otoBuyController.offerFor(car.id, car.otobuyOffer))}/-',
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       fontSize: 12,
@@ -423,42 +433,156 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
   Widget _buildMarkSoldScreen(final CarsListModel car) {
     final AdminOtoBuyCarsListController otoBuyController =
         Get.find<AdminOtoBuyCarsListController>();
-    return Column(
-      children: [
-        // SizedBox(height: 20),
-        // // Grab handle
-        // Center(
-        //   child: Container(
-        //     width: 48,
-        //     height: 5,
-        //     decoration: BoxDecoration(
-        //       color: Colors.black12,
-        //       borderRadius: BorderRadius.circular(999),
-        //     ),
-        //   ),
-        // ),
-        const SizedBox(height: 15),
 
-        Padding(
+    // pre-fill soldAt with current offer
+    final double currentOffer =
+        otoBuyController.offerFor(car.id, car.otobuyOffer);
+    final TextEditingController soldAtController = TextEditingController(
+      text: currentOffer.round().toString(),
+    );
+
+    String? selectedDealerId; // will be set when user selects
+
+    Future<void> onMarkAsSold() async {
+      if (selectedDealerId == null || selectedDealerId!.isEmpty) {
+        ToastWidget.show(
+          context: Get.context!,
+          title: 'Please select a dealer',
+          type: ToastType.error,
+        );
+        return;
+      }
+
+      final rawText = soldAtController.text.trim();
+      if (rawText.isEmpty) {
+        ToastWidget.show(
+          context: Get.context!,
+          title: 'Please enter sold amount',
+          type: ToastType.error,
+        );
+        return;
+      }
+
+      final double? soldAt = double.tryParse(
+        rawText.replaceAll(',', ''),
+      );
+      if (soldAt == null || soldAt <= 0) {
+        ToastWidget.show(
+          context: Get.context!,
+          title: 'Enter a valid sold amount',
+          type: ToastType.error,
+        );
+        return;
+      }
+
+      await otoBuyController.markCarAsSold(
+        carId: car.id,
+        soldTo: selectedDealerId!,
+        soldAt: soldAt,
+      );
+
+      // controller shows toast; just close sheet
+      Get.back();
+    }
+
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: otoBuyController.fetchDealers(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 40),
+            child: Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.green,
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Text(
+                'Failed to load dealers.',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          );
+        }
+
+        final dealers = snapshot.data ?? <Map<String, dynamic>>[];
+
+        return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 30),
               Text(
-                'Current Offer: Rs. ${NumberFormat.decimalPattern("en_IN").format(otoBuyController.offerFor(car.id, car.otobuyOffer))}/-',
+                'Current Offer: Rs. ${NumberFormat.decimalPattern("en_IN").format(currentOffer)}/-',
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.green,
                 ),
               ),
-              const SizedBox(height: 10),
-              Text(
-                'Are you sure you want to mark this car as SOLD for Rs. ${NumberFormat.decimalPattern("en_IN").format(otoBuyController.offerFor(car.id, car.otobuyOffer))}/-',
-                style: TextStyle(fontSize: 14),
+              const SizedBox(height: 20),
+
+              // 🔹 Dealer dropdown
+              const Text(
+                'Select Dealer',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: selectedDealerId, // starts as null -> shows hint
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                ),
+                items: dealers.map((dealer) {
+                  final id = '${dealer['id']}';
+                  final name =
+                      '${dealer['name'] ?? dealer['dealerName'] ?? 'Dealer'}';
+                  return DropdownMenuItem<String>(
+                    value: id,
+                    child: Text(
+                      name,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  selectedDealerId = value;
+                },
+                hint: const Text('Select dealer'),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 🔹 Sold amount textfield
+              const Text(
+                'Sold Amount (Rs.)',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: soldAtController,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  hintText: 'Enter sold amount',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // 🔹 Mark as sold button
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -466,11 +590,7 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
                     child: ButtonWidget(
                       text: 'Mark As Sold',
                       isLoading: otoBuyController.isMarkCarAsSoldButtonLoading,
-                      onTap: () {
-                        // call your API to mark car as sold
-                        otoBuyController.markCarAsSold(carId: car.id);
-                        Get.back();
-                      },
+                      onTap: onMarkAsSold,
                       height: 40,
                       fontSize: 12,
                     ),
@@ -479,8 +599,8 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 

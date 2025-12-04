@@ -191,8 +191,104 @@ class DesktopCarsPage extends StatelessWidget {
       // ✅ Use only what the API returned (already filtered by search + pagination)
       final carsList = carsController.carsList;
 
+      final rowsForSoldCarsColumns = carsList.map((car) {
+        final statusText = DesktopCarsController.filterLabel(car.auctionStatus);
+
+        // Make first letter of status capital
+        String capitalize(String value) {
+          if (value.isEmpty) return value;
+          return value[0].toUpperCase() + value.substring(1);
+        }
+
+        final isSold = car.auctionStatus.toLowerCase() == 'sold' ||
+            car.auctionStatus.toLowerCase() == 'otobuyended';
+
+        return DataRow(
+          onSelectChanged: (selected) {
+            if (selected ?? false) {
+              _showCarDetails(context, car);
+            }
+          },
+          cells: [
+            // Image
+            DataCell(
+              (car.thumbnailUrl.isEmpty)
+                  ? const SizedBox.shrink()
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: Image.network(
+                        car.thumbnailUrl,
+                        height: 30,
+                        width: 30,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+            ),
+            // Name
+            DataCell(Text(car.title)),
+            // Appointment
+            DataCell(Text(car.appointmentId)),
+            // City
+            DataCell(Text(car.city)),
+            // Odometer
+            DataCell(
+              Text(
+                '${NumberFormat.decimalPattern('en_IN').format(car.odometerKm)} km',
+              ),
+            ),
+            // Highest Bid
+            DataCell(
+              Text(
+                'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-',
+              ),
+            ),
+            // Status
+            DataCell(
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.green.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  capitalize(statusText),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.green.withValues(alpha: 0.8),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ),
+
+            // 👇 NEW: Sold At
+            DataCell(
+              Text(
+                isSold && car.soldAt > 0
+                    ? 'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.soldAt)}/-'
+                    : '-',
+              ),
+            ),
+
+            // 👇 NEW: Sold To
+            DataCell(
+              Text(
+                isSold && car.soldToName.isNotEmpty ? car.soldToName : '-',
+              ),
+            ),
+          ],
+        );
+      }).toList();
+
       final rows = carsList.map((car) {
         final statusText = DesktopCarsController.filterLabel(car.auctionStatus);
+        // Make first letter of status capital
+        String capitalize(String value) {
+          if (value.isEmpty) return value;
+          return value[0].toUpperCase() + value.substring(1);
+        }
 
         return DataRow(
           onSelectChanged: (selected) {
@@ -237,7 +333,7 @@ class DesktopCarsPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  statusText,
+                  capitalize(statusText),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: AppColors.green.withValues(alpha: 0.8),
@@ -251,13 +347,72 @@ class DesktopCarsPage extends StatelessWidget {
         );
       }).toList();
 
+      // Decide whether to show Sold columns
+      final filter = carsController.selectedFilter.value;
+      final showSoldColumns = filter == DesktopCarsController.filterAll ||
+          filter == DesktopCarsController.filterOtobuy;
+
+      if (!showSoldColumns) {
+        // 🔹 For Upcoming / Live / Auction Ended → old 7-column table
+        return TableWidget(
+          title: "Cars List",
+          titleSize: 20,
+          height: 500,
+          minTableWidth: MediaQuery.of(context).size.width - 250,
+          isLoading: carsController.isCarsListLoading.value,
+          rows: rows, // <-- rows WITHOUT soldAt / soldTo
+          columns: const [
+            DataColumn(
+                label: Text("Image",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(
+                label: Text("Name",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(
+                label: Text("Appointment ID",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(
+                label: Text("City",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(
+                label: Text("Odometer",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(
+                label: Text("Highest Bid",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(
+                label: Text("Status",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
+          ],
+          columnWidths: const [
+            50,
+            250,
+            160,
+            120,
+            120,
+            140,
+            140,
+          ],
+          titleWidget: _buildTitleWidget(),
+          actionsWidget: const SizedBox.shrink(),
+          emptyDataWidget: const Text(
+            'No Cars',
+            style: TextStyle(
+              color: AppColors.green,
+              fontSize: 18,
+            ),
+          ),
+        );
+      }
+
+      // 🔹 For All + Otobuy → 9-column table WITH Sold At / Sold To
       return TableWidget(
         title: "Cars List",
         titleSize: 20,
         height: 500,
         minTableWidth: MediaQuery.of(context).size.width - 250,
         isLoading: carsController.isCarsListLoading.value,
-        rows: rows,
+        rows: rowsForSoldCarsColumns, // <-- rows WITH soldAt / soldTo
         columns: const [
           DataColumn(
               label:
@@ -280,19 +435,25 @@ class DesktopCarsPage extends StatelessWidget {
           DataColumn(
               label: Text("Status",
                   style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text("Sold At",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
+          DataColumn(
+              label: Text("Sold To",
+                  style: TextStyle(fontWeight: FontWeight.bold))),
         ],
-        // Ensure length == columns.length
         columnWidths: const [
-          50,
-          250,
-          160,
-          120,
-          120,
-          140,
-          140,
+          50, // Image
+          250, // Name
+          160, // Appointment ID
+          120, // City
+          120, // Odometer
+          140, // Highest Bid
+          140, // Status
+          140, // Sold At
+          200, // Sold To
         ],
         titleWidget: _buildTitleWidget(),
-        // no range actions for cars list
         actionsWidget: const SizedBox.shrink(),
         emptyDataWidget: const Text(
           'No Cars',
@@ -549,60 +710,6 @@ class DesktopCarsPage extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: ButtonWidget(
                     text: 'Close', isLoading: false.obs, onTap: Get.back),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showCarDetails1(BuildContext context, CarsListModelForCrm car) {
-    Get.dialog(
-      Dialog(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.5,
-          maxHeight: MediaQuery.of(context).size.height * 0.5,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (car.thumbnailUrl.isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(car.thumbnailUrl, height: 180),
-                    ),
-                  const SizedBox(height: 10),
-                  Text(car.title,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  _detailRow('Appointment ID', car.appointmentId),
-                  _detailRow('City', car.city),
-                  _detailRow('Odometer',
-                      '${NumberFormat.decimalPattern('en_IN').format(car.odometerKm)} km'),
-                  _detailRow('Highest Bid',
-                      'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-'),
-                  _detailRow('Status',
-                      DesktopCarsController.filterLabel(car.auctionStatus)),
-                ],
-              ),
-              Column(
-                children: [],
-              ),
-              const SizedBox(height: 10),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                  onPressed: Get.back,
-                  child: const Text('Close'),
-                ),
               ),
             ],
           ),

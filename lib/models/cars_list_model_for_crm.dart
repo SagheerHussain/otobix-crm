@@ -6,6 +6,8 @@ class CarsListModelForCrm {
   final int odometerKm;
   final int highestBid;
   final String auctionStatus;
+  final double soldAt;
+  final String soldToName;
   final String thumbnailUrl;
 
   CarsListModelForCrm({
@@ -16,6 +18,8 @@ class CarsListModelForCrm {
     required this.odometerKm,
     required this.highestBid,
     required this.auctionStatus,
+    required this.soldAt,
+    required this.soldToName,
     required this.thumbnailUrl,
   });
 
@@ -30,6 +34,8 @@ class CarsListModelForCrm {
       highestBid:
           (json['highestBid'] is num) ? (json['highestBid'] as num).toInt() : 0,
       auctionStatus: json['auctionStatus']?.toString() ?? '',
+      soldAt: (json['soldAt'] as num?)?.toDouble() ?? 0,
+      soldToName: json['soldToName'] as String? ?? '',
       thumbnailUrl: json['thumbnailUrl']?.toString() ?? '',
     );
   }
@@ -43,6 +49,8 @@ class CarsListModelForCrm {
       'odometerKm': odometerKm,
       'highestBid': highestBid,
       'auctionStatus': auctionStatus,
+      'soldAt': soldAt,
+      'soldToName': soldToName,
       'thumbnailUrl': thumbnailUrl,
     };
   }
