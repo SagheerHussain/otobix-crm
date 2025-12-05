@@ -15,9 +15,10 @@ class AdminCarBannersController extends GetxController {
       description: 'Manage homepage banners',
       icon: Icons.home,
       color: AppColors.green,
-      route: ResponsiveLayout(
-          mobile: AdminHomepageBannersPage(),
-          desktop: AdminDesktopHomepageBannersPage()),
+      route: () => ResponsiveLayout(
+        mobile: AdminHomepageBannersPage(),
+        desktop: AdminDesktopHomepageBannersPage(),
+      ),
     ),
     BannerCardModel(
       id: 2,
@@ -25,9 +26,10 @@ class AdminCarBannersController extends GetxController {
       description: 'Manage sell my car banners',
       icon: Icons.sell,
       color: AppColors.red,
-      route: ResponsiveLayout(
-          mobile: AdminSellMyCarBannersPage(),
-          desktop: AdminDesktopSellMyCarBannersPage()),
+      route: () => ResponsiveLayout(
+        mobile: AdminSellMyCarBannersPage(),
+        desktop: AdminDesktopSellMyCarBannersPage(),
+      ),
     ),
   ].obs;
 }
@@ -38,7 +40,7 @@ class BannerCardModel {
   final String description;
   final IconData icon;
   final Color color;
-  final Widget route;
+  final Widget Function() route;
 
   BannerCardModel({
     required this.id,

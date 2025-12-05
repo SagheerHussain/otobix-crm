@@ -73,7 +73,7 @@ class AdminDesktopSellMyCarBannersPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Car Banners",
+                "Sell My Car Banners",
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,

@@ -19,7 +19,7 @@ class AdminSellMyCarBannersPage extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         title: const Text(
-          'Car Banners',
+          'Sell My Car Banners',
           style: TextStyle(fontSize: 16, color: AppColors.green),
         ),
         backgroundColor: AppColors.grey.withValues(alpha: .1),

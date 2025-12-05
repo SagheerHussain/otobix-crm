@@ -106,7 +106,7 @@ class AdminDesktopCarBannersPage extends StatelessWidget {
   // Desktop Card
   Widget _buildDesktopCard(BannerCardModel category) {
     return InkWell(
-      onTap: () => Get.to(category.route),
+      onTap: () => Get.to(() => category.route()),
       borderRadius: BorderRadius.circular(20),
       child: Container(
         decoration: BoxDecoration(

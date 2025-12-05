@@ -12,71 +12,27 @@ class AdminCarBannersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        title: const Text(
+          'Car Banners',
+          style: TextStyle(fontSize: 16, color: AppColors.green),
+        ),
+        backgroundColor: AppColors.grey.withValues(alpha: .1),
+        iconTheme: const IconThemeData(color: AppColors.green),
+      ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildScreenTitle(),
                 const SizedBox(height: 20),
                 _buildBannerScreenCards(),
               ],
             ),
           );
         },
-      ),
-    );
-  }
-
-  // Title
-  Widget _buildScreenTitle() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () => Get.back(),
-            icon: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Icon(Icons.arrow_back, color: Colors.grey[600]),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Car Banners",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Manage car banners",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -100,8 +56,9 @@ class AdminCarBannersPage extends StatelessWidget {
 
   // Mobile Card
   Widget _buildMobileCard(BannerCardModel category) {
-    return GestureDetector(
-      onTap: () => Get.to(category.route),
+    return InkWell(
+      onTap: () => Get.to(() => category.route()),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
@@ -129,6 +86,7 @@ class AdminCarBannersPage extends StatelessWidget {
                 child: Icon(
                   category.icon,
                   size: 30,
+                  color: category.color,
                 ),
               ),
               const SizedBox(width: 16),
