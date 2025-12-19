@@ -41,6 +41,8 @@ class CarsListModel {
   final double soldAt;
   final String soldTo;
   final String soldToName;
+  final RxDouble customerExpectedPrice;
+  final RxDouble variableMargin;
   final List<CarsListTitleAndImage>? imageUrls;
 
   final RxBool isFavorite;
@@ -80,6 +82,8 @@ class CarsListModel {
     required this.soldAt,
     required this.soldTo,
     required this.soldToName,
+    required this.customerExpectedPrice,
+    required this.variableMargin,
     required this.imageUrls,
     bool isFavorite = false,
   }) : isFavorite = isFavorite.obs;
@@ -134,6 +138,11 @@ class CarsListModel {
       soldAt: double.tryParse(data['soldAt']?.toString() ?? '0') ?? 0.0,
       soldTo: data['soldTo'] ?? '',
       soldToName: data['soldToName'] ?? '',
+      customerExpectedPrice: RxDouble(
+          double.tryParse(data['customerExpectedPrice']?.toString() ?? '0') ??
+              0.0),
+      variableMargin: RxDouble(
+          double.tryParse(data['variableMargin']?.toString() ?? '0') ?? 0.0),
       imageUrls: (data['imageUrls'] as List<dynamic>?)
           ?.map((e) => CarsListTitleAndImage.fromJson(e))
           .toList(),
@@ -176,6 +185,8 @@ class CarsListModel {
       'soldAt': soldAt,
       'soldTo': soldTo,
       'soldToName': soldToName,
+      'customerExpectedPrice': customerExpectedPrice,
+      'variableMargin': variableMargin,
       'imageUrls': imageUrls?.map((e) => e.toJson()).toList(),
     };
   }

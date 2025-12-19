@@ -6,6 +6,7 @@ import 'package:otobix_crm/utils/app_images.dart';
 import 'package:otobix_crm/views/desktop_bid_history_page.dart';
 import 'package:otobix_crm/views/desktop_cars_page.dart';
 import 'package:otobix_crm/views/desktop_dashboard_page.dart';
+import 'package:otobix_crm/views/desktop_inspection_requests_page.dart';
 import 'package:otobix_crm/views/page_not_found_page.dart';
 import 'package:otobix_crm/widgets/sidebar_widget.dart';
 
@@ -244,6 +245,8 @@ class DesktopHomepage extends StatelessWidget {
               return DesktopBidHistoryPage();
             case 2:
               return DesktopCarsPage();
+            case 3:
+              return DesktopInspectionRequestsPage();
             default:
               return const Center(child: PageNotFoundPage());
           }

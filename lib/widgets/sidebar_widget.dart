@@ -51,6 +51,7 @@ class SidebarWidget extends StatelessWidget {
           SidebarXItem(icon: Icons.dashboard_outlined, label: 'Dashboard'),
           SidebarXItem(icon: Icons.history, label: 'Bid History'),
           SidebarXItem(icon: Icons.car_rental, label: 'Cars Overview'),
+          SidebarXItem(icon: Icons.car_crash, label: 'Inspection Requests'),
         ],
         headerBuilder: (context, extended) {
           return Padding(
