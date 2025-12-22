@@ -8,11 +8,10 @@ class SetVariableMarginWidgetController extends GetxController {
   RxDouble variableMargin = 0.0.obs;
   RxDouble priceDiscovery = 0.0.obs;
 
-  RxDouble adjustedHighestBidShownToDealer = 0.0.obs;
   RxDouble adjustedHighestBidShownToCustomer = 0.0.obs;
 
   RxDouble newBidPrice = 0.0.obs;
-  RxDouble newBidPriceAfterAdjustmentShownToDealer = 0.0.obs;
+
   RxDouble newBidPriceAfterAdjustmentShownToCustomer = 0.0.obs;
 
   // ✅ store the ORIGINAL variable margin (baseline)
@@ -35,18 +34,9 @@ class SetVariableMarginWidgetController extends GetxController {
     // optional rounding to nearest 1000 (if you want bidding neat)
     newBidPrice.value = CarMarginHelpers.roundUpToNearest1000(base).toDouble();
 
-    // After margin adjustment, apply margins on the new base bid
-    newBidPriceAfterAdjustmentShownToDealer.value =
-        CarMarginHelpers.netAfterMarginsFlexible(
-      originalPrice: newBidPrice.value,
-      priceDiscovery: priceDiscovery.value,
-      variableMargin: variableMargin.value,
-      roundToNext1000: true,
-    );
-
     newBidPriceAfterAdjustmentShownToCustomer.value =
         CarMarginHelpers.netAfterMarginsFlexible(
-      originalPrice: newBidPrice.value,
+      originalPrice: highestBid.value,
       priceDiscovery: priceDiscovery.value,
       variableMargin: variableMargin.value,
       roundToPrevious1000: true,
