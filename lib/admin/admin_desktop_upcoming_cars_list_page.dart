@@ -80,8 +80,9 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
   Widget _buildCarCard(CarsListModel car) {
     final String yearMonthOfManufacture =
         '${GlobalFunctions.getFormattedDate(date: car.yearMonthOfManufacture, type: GlobalFunctions.year)} ';
-    return GestureDetector(
+    return InkWell(
       onTap: () => _showAuctionBottomSheet(car),
+      borderRadius: BorderRadius.circular(12),
       child: Card(
         elevation: 4,
         color: AppColors.white,
