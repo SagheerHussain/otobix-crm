@@ -30,9 +30,12 @@ class SetVariableMarginWidget extends StatelessWidget {
     controller.highestBid.value = highestBid;
     controller.customerExpectedPrice.value = customerExpectedPrice;
     controller.variableMargin.value = variableMargin;
+    // controller.newBidPrice.value = highestBid;
+    controller.priceDiscovery.value = priceDiscovery;
 
     // Store the original variable margin value
-    final double originalVariableMargin = variableMargin;
+    controller.setOriginalVariableMargin(variableMargin);
+    controller.calculateNewBidPrice();
 
     // Calculate the highest bid after margin adjustment based on CarMarginHelpers
     double dealerAdjustedBid = CarMarginHelpers.netAfterMarginsFlexible(
@@ -51,9 +54,6 @@ class SetVariableMarginWidget extends StatelessWidget {
 
     controller.adjustedHighestBidShownToDealer.value = dealerAdjustedBid;
     controller.adjustedHighestBidShownToCustomer.value = customerAdjustedBid;
-
-    controller.newBidPrice.value = highestBid;
-    controller.priceDiscovery.value = priceDiscovery;
 
     controller.newBidPriceAfterAdjustmentShownToDealer.value =
         dealerAdjustedBid;
@@ -74,7 +74,7 @@ class SetVariableMarginWidget extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Variable Margin Control
-          _buildMarginControlSection(originalVariableMargin),
+          _buildMarginControlSection(variableMargin),
           const SizedBox(height: 24),
 
           // New Bid Results Section
@@ -215,7 +215,7 @@ class SetVariableMarginWidget extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Current Margin: ${controller.variableMargin.value.toStringAsFixed(1)}%',
+            'Current Margin: (Fixed: ${CarMarginHelpers.fixedMargin} + Variable: ${controller.variableMargin.value.toStringAsFixed(1)} = ${CarMarginHelpers.fixedMargin + controller.variableMargin.value}%)',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
