@@ -11,6 +11,7 @@ import 'package:otobix_crm/utils/app_urls.dart';
 import 'package:otobix_crm/utils/global_functions.dart';
 import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/empty_data_widget.dart';
+import 'package:otobix_crm/widgets/set_variable_margin_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
 import 'package:otobix_crm/widgets/toast_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_upcoming_cars_list_controller.dart';
@@ -619,122 +620,138 @@ class AdminUpcomingCarsListPage extends StatelessWidget {
                             Expanded(child: _chip('Go live now', 0)),
                             const SizedBox(width: 10), // space between
                             Expanded(child: _chip('Schedule', 1)),
+                            const SizedBox(width: 10), // space between
+                            Expanded(child: _chip('Set Margin', 2)),
                           ],
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+// Add this conditional rendering
+                      if (goLiveNowOrScheduleIndex == 2)
+                        SetVariableMarginWidget(
+                          carId: car.id,
+                          userId: car.highestBidder,
+                          highestBid: car.highestBid.value,
+                          priceDiscovery: car.priceDiscovery,
+                          customerExpectedPrice:
+                              car.customerExpectedPrice.value,
+                          variableMargin: car.variableMargin?.value,
+                          isMobile: true,
+                        )
+                      else ...[
+                        const SizedBox(height: 16),
 
-                      // Start time
-                      _tile(
-                        icon: Icons.access_time,
-                        title: goLiveNowOrScheduleIndex == 0
-                            ? 'Live start'
-                            : 'Scheduled start',
-                        subtitle: fmt(effectiveStart),
-                        onTap: goLiveNowOrScheduleIndex == 1
-                            ? () async {
-                                await _pickDateTime();
-                                setState(() {});
-                              }
-                            : null,
-                        enabled: goLiveNowOrScheduleIndex == 1,
-                        trailing: Icon(
-                          goLiveNowOrScheduleIndex == 1
-                              ? Icons.edit_calendar
-                              : Icons.lock_clock,
-                          color: AppColors.grey,
+                        // Start time
+                        _tile(
+                          icon: Icons.access_time,
+                          title: goLiveNowOrScheduleIndex == 0
+                              ? 'Live start'
+                              : 'Scheduled start',
+                          subtitle: fmt(effectiveStart),
+                          onTap: goLiveNowOrScheduleIndex == 1
+                              ? () async {
+                                  await _pickDateTime();
+                                  setState(() {});
+                                }
+                              : null,
+                          enabled: goLiveNowOrScheduleIndex == 1,
+                          trailing: Icon(
+                            goLiveNowOrScheduleIndex == 1
+                                ? Icons.edit_calendar
+                                : Icons.lock_clock,
+                            color: AppColors.grey,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 12),
+                        const SizedBox(height: 12),
 
-                      // Duration picker
-                      _tile(
-                        icon: Icons.timer,
-                        title: 'Duration (hours)',
-                        subtitle:
-                            '$durationHrs hour${durationHrs == 1 ? '' : 's'}',
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
+                        // Duration picker
+                        _tile(
+                          icon: Icons.timer,
+                          title: 'Duration (hours)',
+                          subtitle:
+                              '$durationHrs hour${durationHrs == 1 ? '' : 's'}',
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () => setState(() {
+                                  if (durationHrs > 1) durationHrs--;
+                                }),
+                                icon: const Icon(Icons.remove),
+                                splashRadius: 18,
+                              ),
+                              Text(
+                                '$durationHrs',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () => setState(() => durationHrs++),
+                                icon: const Icon(Icons.add),
+                                splashRadius: 18,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // End time (computed)
+                        _tile(
+                          icon: Icons.flag,
+                          title: 'Ends at',
+                          subtitle: fmt(endAt),
+                          trailing: const Icon(
+                            Icons.info_outline,
+                            color: AppColors.grey,
+                          ),
+                          enabled: false,
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        const SizedBox(height: 10),
+
+                        // Buttons
+                        Row(
                           children: [
-                            IconButton(
-                              onPressed: () => setState(() {
-                                if (durationHrs > 1) durationHrs--;
-                              }),
-                              icon: const Icon(Icons.remove),
-                              splashRadius: 18,
-                            ),
-                            Text(
-                              '$durationHrs',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16,
+                            Expanded(
+                              child: ButtonWidget(
+                                text: 'Cancel',
+                                isLoading: false.obs,
+                                backgroundColor: AppColors.grey.withValues(
+                                  alpha: .1,
+                                ),
+                                textColor: AppColors.black,
+                                fontSize: 13,
+                                onTap: () => Get.back(),
                               ),
                             ),
-                            IconButton(
-                              onPressed: () => setState(() => durationHrs++),
-                              icon: const Icon(Icons.add),
-                              splashRadius: 18,
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ButtonWidget(
+                                text: goLiveNowOrScheduleIndex == 0
+                                    ? 'Make Live Now'
+                                    : 'Save Schedule',
+                                isLoading: false.obs,
+                                fontSize: 13,
+                                onTap: () => _submit(
+                                  carId: car.id,
+                                  auctionStartTime: startAt,
+                                  auctionDuration: durationHrs,
+                                  goLiveNowOrScheduleIndex:
+                                      goLiveNowOrScheduleIndex,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
 
-                      const SizedBox(height: 12),
-
-                      // End time (computed)
-                      _tile(
-                        icon: Icons.flag,
-                        title: 'Ends at',
-                        subtitle: fmt(endAt),
-                        trailing: const Icon(
-                          Icons.info_outline,
-                          color: AppColors.grey,
-                        ),
-                        enabled: false,
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      const SizedBox(height: 10),
-
-                      // Buttons
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ButtonWidget(
-                              text: 'Cancel',
-                              isLoading: false.obs,
-                              backgroundColor: AppColors.grey.withValues(
-                                alpha: .1,
-                              ),
-                              textColor: AppColors.black,
-                              fontSize: 13,
-                              onTap: () => Get.back(),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ButtonWidget(
-                              text: goLiveNowOrScheduleIndex == 0
-                                  ? 'Make Live Now'
-                                  : 'Save Schedule',
-                              isLoading: false.obs,
-                              fontSize: 13,
-                              onTap: () => _submit(
-                                carId: car.id,
-                                auctionStartTime: startAt,
-                                auctionDuration: durationHrs,
-                                goLiveNowOrScheduleIndex:
-                                    goLiveNowOrScheduleIndex,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 12),
+                        const SizedBox(height: 12),
+                      ]
                     ],
                   ),
                 );

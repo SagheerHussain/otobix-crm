@@ -31,4 +31,3 @@ flutter pub get
 # Build for web
 flutter build web --release --dart-define=BASE_URL="${BASE_URL}"
 
-echo "BASE_URL during build = ${BASE_URL}"

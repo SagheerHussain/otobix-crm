@@ -15,7 +15,8 @@ class SetVariableMarginWidget extends StatelessWidget {
   final double highestBid;
   final double priceDiscovery;
   final double customerExpectedPrice;
-  final double variableMargin;
+  final double? variableMargin;
+  final bool isMobile;
 
   SetVariableMarginWidget({
     super.key,
@@ -25,6 +26,7 @@ class SetVariableMarginWidget extends StatelessWidget {
     required this.priceDiscovery,
     required this.customerExpectedPrice,
     required this.variableMargin,
+    this.isMobile = false,
   });
 
   @override
@@ -32,7 +34,8 @@ class SetVariableMarginWidget extends StatelessWidget {
     // Initialize the controller with the provided values
     controller.highestBid.value = highestBid;
     controller.customerExpectedPrice.value = customerExpectedPrice;
-    controller.variableMargin.value = variableMargin;
+    controller.variableMargin.value =
+        variableMargin ?? CarMarginHelpers.getVariableMargin(priceDiscovery);
     controller.priceDiscovery.value = priceDiscovery;
 
     controller.calculateHighestBidShownToCustomerInitially();
@@ -48,7 +51,8 @@ class SetVariableMarginWidget extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Variable Margin Control
-          _buildMarginControlSection(variableMargin),
+          _buildMarginControlSection(variableMargin ??
+              CarMarginHelpers.getVariableMargin(priceDiscovery)),
           const SizedBox(height: 24),
 
           // New Bid Results Section
@@ -85,10 +89,10 @@ class SetVariableMarginWidget extends StatelessWidget {
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 3,
+            crossAxisCount: isMobile ? 1 : 3,
             crossAxisSpacing: 16,
             mainAxisSpacing: 12,
-            childAspectRatio: 3.35,
+            childAspectRatio: isMobile ? 4.7 : 3.35,
             children: [
               _buildInfoCard(
                 title: 'Highest Bid',
