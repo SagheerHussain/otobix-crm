@@ -29,6 +29,7 @@ class CarsListModel {
   final bool isInspected;
   final int cubicCapacity;
   final RxDouble highestBid;
+  final String highestBidder;
   DateTime? auctionStartTime;
   DateTime? auctionEndTime;
   int auctionDuration;
@@ -42,7 +43,7 @@ class CarsListModel {
   final String soldTo;
   final String soldToName;
   final RxDouble customerExpectedPrice;
-  final RxDouble variableMargin;
+  final RxDouble? variableMargin;
   final List<CarsListTitleAndImage>? imageUrls;
 
   final RxBool isFavorite;
@@ -70,6 +71,7 @@ class CarsListModel {
     required this.isInspected,
     required this.cubicCapacity,
     required this.highestBid,
+    required this.highestBidder,
     required this.auctionStartTime,
     required this.auctionEndTime,
     required this.auctionDuration,
@@ -83,7 +85,7 @@ class CarsListModel {
     required this.soldTo,
     required this.soldToName,
     required this.customerExpectedPrice,
-    required this.variableMargin,
+    this.variableMargin,
     required this.imageUrls,
     bool isFavorite = false,
   }) : isFavorite = isFavorite.obs;
@@ -124,6 +126,7 @@ class CarsListModel {
       highestBid: RxDouble(
         double.tryParse(data['highestBid']?.toString() ?? '0') ?? 0.0,
       ),
+      highestBidder: data['highestBidder'] ?? '',
       auctionStartTime: parseMongoDbDate(data["auctionStartTime"]),
       auctionEndTime: parseMongoDbDate(data["auctionEndTime"]),
       auctionDuration: data['auctionDuration'] ?? 0,
@@ -141,8 +144,13 @@ class CarsListModel {
       customerExpectedPrice: RxDouble(
           double.tryParse(data['customerExpectedPrice']?.toString() ?? '0') ??
               0.0),
-      variableMargin: RxDouble(
-          double.tryParse(data['variableMargin']?.toString() ?? '0') ?? 0.0),
+      // variableMargin: RxDouble(
+      //     double.tryParse(data['variableMargin']?.toString() ?? '0') ?? 0.0),
+
+      variableMargin: (data['variableMargin'] == null)
+          ? null
+          : (double.tryParse(data['variableMargin'].toString()) ?? 0.0).obs,
+
       imageUrls: (data['imageUrls'] as List<dynamic>?)
           ?.map((e) => CarsListTitleAndImage.fromJson(e))
           .toList(),
@@ -173,6 +181,7 @@ class CarsListModel {
       'isInspected': isInspected,
       'cubicCapacity': cubicCapacity,
       'highestBid': highestBid,
+      'highestBidder': highestBidder,
       'auctionStartTime': auctionStartTime,
       'auctionEndTime': auctionEndTime,
       'auctionDuration': auctionDuration,

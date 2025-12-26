@@ -9,6 +9,7 @@ import 'package:otobix_crm/utils/app_images.dart';
 import 'package:otobix_crm/utils/global_functions.dart';
 import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/empty_data_widget.dart';
+import 'package:otobix_crm/widgets/set_variable_margin_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
 import 'package:otobix_crm/widgets/tab_bar_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_oto_buy_cars_list_controller.dart';
@@ -418,14 +419,33 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
         const SizedBox(height: 20),
         Expanded(
           child: TabBarWidget(
-            titles: ['Mark Sold', 'Remove Car'],
+            titles: ['Mark Sold', 'Set Variable Margin', 'Remove Car'],
             showCount: false,
             tabsHeight: 30,
-            counts: [0, 0],
-            screens: [_buildMarkSoldScreen(car), _buildRemoveScreen(car)],
+            counts: [0, 0, 0],
+            screens: [
+              _buildMarkSoldScreen(car),
+              _buildSetVariableMargin(car),
+              _buildRemoveScreen(car)
+            ],
           ),
         ),
       ],
+    );
+  }
+
+// Set variable margin
+  Widget _buildSetVariableMargin(CarsListModel car) {
+    debugPrint('Variable margin: ${car.variableMargin!.value.toString()}');
+    return SingleChildScrollView(
+      child: SetVariableMarginWidget(
+        carId: car.id,
+        userId: car.highestBidder,
+        highestBid: car.highestBid.value,
+        priceDiscovery: car.priceDiscovery,
+        customerExpectedPrice: car.customerExpectedPrice.value,
+        variableMargin: car.variableMargin!.value,
+      ),
     );
   }
 

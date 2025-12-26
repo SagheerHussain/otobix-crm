@@ -5,12 +5,13 @@ import 'package:otobix_crm/admin/controller/set_variable_margin_widget_controlle
 import 'package:otobix_crm/services/car_margin_helpers.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/widgets/button_widget.dart';
-import 'package:otobix_crm/widgets/toast_widget.dart';
 
 class SetVariableMarginWidget extends StatelessWidget {
   final SetVariableMarginWidgetController controller =
       Get.put(SetVariableMarginWidgetController());
 
+  final String carId;
+  final String userId;
   final double highestBid;
   final double priceDiscovery;
   final double customerExpectedPrice;
@@ -18,6 +19,8 @@ class SetVariableMarginWidget extends StatelessWidget {
 
   SetVariableMarginWidget({
     super.key,
+    required this.carId,
+    required this.userId,
     required this.highestBid,
     required this.priceDiscovery,
     required this.customerExpectedPrice,
@@ -32,21 +35,8 @@ class SetVariableMarginWidget extends StatelessWidget {
     controller.variableMargin.value = variableMargin;
     controller.priceDiscovery.value = priceDiscovery;
 
-    // Store the original variable margin value
-    controller.setOriginalVariableMargin(variableMargin);
-    controller.calculateNewBidPrice();
-
-    double customerAdjustedBid = CarMarginHelpers.netAfterMarginsFlexible(
-      originalPrice: highestBid,
-      priceDiscovery: priceDiscovery,
-      variableMargin: variableMargin,
-      roundToPrevious1000: true,
-    );
-
-    controller.adjustedHighestBidShownToCustomer.value = customerAdjustedBid;
-
-    controller.newBidPriceAfterAdjustmentShownToCustomer.value =
-        customerAdjustedBid;
+    controller.calculateHighestBidShownToCustomerInitially();
+    controller.calculateHighestBidShownToCustomerOnMarginChange();
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -98,7 +88,7 @@ class SetVariableMarginWidget extends StatelessWidget {
             crossAxisCount: 3,
             crossAxisSpacing: 16,
             mainAxisSpacing: 12,
-            childAspectRatio: 3.5,
+            childAspectRatio: 3.35,
             children: [
               _buildInfoCard(
                 title: 'Highest Bid',
@@ -110,7 +100,7 @@ class SetVariableMarginWidget extends StatelessWidget {
               _buildInfoCard(
                 title: 'Shown To Customer',
                 value:
-                    'Rs. ${_formatCurrency(controller.adjustedHighestBidShownToCustomer.value)}',
+                    'Rs. ${_formatCurrency(controller.initialAdjustedHighestBidShownToCustomer.value)}',
                 icon: Icons.person,
                 color: Colors.purple[50]!,
                 borderColor: Colors.purple[100]!,
@@ -140,7 +130,7 @@ class SetVariableMarginWidget extends StatelessWidget {
         border: Border.all(color: Colors.grey[300]!),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: .1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -173,25 +163,6 @@ class SetVariableMarginWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Obx(() {
-            // int totalItems = (originalVariableMargin * 2).toInt();
-            // var marginItems = List.generate(totalItems, (index) {
-            //   double value = (index + 1) / 2;
-            //   return DropdownMenuItem<double>(
-            //     value: value,
-            //     child: Container(
-            //       padding: const EdgeInsets.symmetric(vertical: 8),
-            //       child: Row(
-            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //         children: [
-            //           Text(value.toStringAsFixed(1)),
-            //           if (value == controller.variableMargin.value)
-            //             Icon(Icons.check, size: 16, color: AppColors.green),
-            //         ],
-            //       ),
-            //     ),
-            //   );
-            // });
-
             final max = originalVariableMargin;
             final steps = (max * 2).round(); // 0.5 steps
 
@@ -229,7 +200,8 @@ class SetVariableMarginWidget extends StatelessWidget {
                   onChanged: (newValue) {
                     if (newValue != null) {
                       controller.variableMargin.value = newValue;
-                      controller.calculateNewBidPrice();
+                      controller
+                          .calculateHighestBidShownToCustomerOnMarginChange();
                     }
                   },
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -262,9 +234,9 @@ class SetVariableMarginWidget extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.green.withOpacity(0.05),
+          color: AppColors.green.withValues(alpha: .05),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.green.withOpacity(0.3)),
+          border: Border.all(color: AppColors.green.withValues(alpha: .3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,16 +257,8 @@ class SetVariableMarginWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _buildBidResultCard(
-              title: 'Base New System Bid',
-              value: controller.newBidPrice.value,
-              icon: Icons.new_releases,
-              showChange: true,
-              originalValue: controller.highestBid.value,
-            ),
-            const SizedBox(height: 12),
-            _buildBidResultCard(
               title: 'Shown to Customer',
-              value: controller.newBidPriceAfterAdjustmentShownToCustomer.value,
+              value: controller.newAdjustedHighestBidShownToCustomer.value,
               icon: Icons.person_outline,
               subtitle: 'After margin adjustment',
             ),
@@ -329,7 +293,7 @@ class SetVariableMarginWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.green.withOpacity(0.1),
+              color: AppColors.green.withValues(alpha: .1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, size: 20, color: AppColors.green),
@@ -458,16 +422,10 @@ class SetVariableMarginWidget extends StatelessWidget {
       children: [
         ButtonWidget(
             text: 'Set Variable Margin',
-            isLoading: false.obs,
+            isLoading: controller.isSetVariableMarginLoading,
             width: 300,
             onTap: () {
-              _printDebugValues();
-              Get.back();
-              ToastWidget.show(
-                  context: Get.context!,
-                  title: 'Variable Margin Set',
-                  subtitle: 'Variable margin has been updated successfully',
-                  type: ToastType.success);
+              controller.setVariableMargin(carId: carId, userId: userId);
             }),
       ],
     );
@@ -475,16 +433,5 @@ class SetVariableMarginWidget extends StatelessWidget {
 
   String _formatCurrency(double value) {
     return NumberFormat.decimalPattern('en_IN').format(value);
-  }
-
-  void _printDebugValues() {
-    debugPrint('Highest Bid: Rs. ${controller.highestBid.value}');
-    debugPrint(
-        'Highest Bid after margin adjustment for customer: Rs. ${controller.adjustedHighestBidShownToCustomer.value}');
-    debugPrint('Variable Margin: ${controller.variableMargin.value}%');
-    debugPrint('Expected Price: Rs. ${controller.customerExpectedPrice.value}');
-    debugPrint('New System Bid: Rs. ${controller.newBidPrice.value}');
-    debugPrint(
-        'New System Bid after margin adjustment shown to customer: Rs. ${controller.newBidPriceAfterAdjustmentShownToCustomer.value}');
   }
 }

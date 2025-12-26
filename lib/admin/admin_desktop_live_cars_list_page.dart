@@ -709,10 +709,12 @@ class AdminDesktopLiveCarsListPage extends StatelessWidget {
   Widget _buildSetMarginScreen({required CarsListModel car}) {
     return SingleChildScrollView(
       child: SetVariableMarginWidget(
+        carId: car.id,
+        userId: car.highestBidder,
         highestBid: car.highestBid.value,
         priceDiscovery: car.priceDiscovery,
         customerExpectedPrice: car.customerExpectedPrice.value,
-        variableMargin: car.variableMargin.value,
+        variableMargin: car.variableMargin!.value,
       ),
     );
   }

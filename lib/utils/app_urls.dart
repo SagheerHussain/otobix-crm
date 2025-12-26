@@ -2,10 +2,16 @@ class AppUrls {
   //   static const String baseUrl = "http://localhost:4000/api/"; // For Localhost
   // static const String baseUrl =
   //     "https://otobix-app-backend-development.onrender.com/api/"; // For Development
-  static const String baseUrl =
-      "https://ob-dealerapp-kong.onrender.com/api/"; // For Production
+//   static const String baseUrl =
+//       "https://ob-dealerapp-kong.onrender.com/api/"; // For Production
   // static const String baseUrl =
   //     "http://192.168.100.99:4000/api/"; // For Mobile Testing
+
+//
+  static const String baseUrl = String.fromEnvironment(
+    'BASE_URL',
+    defaultValue: 'http://192.168.100.99:4000/api/',
+  );
 
   static String get login => "${baseUrl}user/login";
 
@@ -27,6 +33,9 @@ class AppUrls {
 
   static String get getHighestBidsPerCar =>
       "${baseUrl}admin/cars/get-highest-bids-on-car";
+
+  static String get setVariableMargin =>
+      "${baseUrl}admin/cars/set-variable-margin";
 
   static String get createKam => "${baseUrl}admin/kams/create";
 
