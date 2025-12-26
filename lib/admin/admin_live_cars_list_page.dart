@@ -9,8 +9,11 @@ import 'package:otobix_crm/utils/app_images.dart';
 import 'package:otobix_crm/utils/global_functions.dart';
 import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/empty_data_widget.dart';
+import 'package:otobix_crm/widgets/set_expected_price_dialog_widget.dart';
+import 'package:otobix_crm/widgets/set_variable_margin_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_live_cars_list_controller.dart';
+import 'package:otobix_crm/widgets/tab_bar_widget.dart';
 
 class AdminLiveCarsListPage extends StatelessWidget {
   AdminLiveCarsListPage({super.key});
@@ -505,9 +508,6 @@ class AdminLiveCarsListPage extends StatelessWidget {
     return GetX<AdminLiveCarsListController>(
       init: AdminLiveCarsListController(),
       builder: (liveController) {
-        final canRemove = liveController.reasonText.value.trim().isNotEmpty &&
-            !liveController.isRemoveButtonLoading.value;
-
         return Column(
           children: [
             const SizedBox(height: 20),
@@ -527,133 +527,204 @@ class AdminLiveCarsListPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: CachedNetworkImage(
-                      imageUrl: car.imageUrl,
-                      width: 64,
-                      height: 48,
-                      fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) =>
-                          const Icon(Icons.directions_car),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        Text(
-                          '${car.make} ${car.model} ${car.variant}',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: CachedNetworkImage(
+                            imageUrl: car.imageUrl,
+                            width: 64,
+                            height: 48,
+                            fit: BoxFit.cover,
+                            errorWidget: (_, __, ___) =>
+                                const Icon(Icons.directions_car),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${car.make} ${car.model} ${car.variant}',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
+                  _buildSetExpectedPriceButton(car),
                 ],
               ),
             ),
 
             const SizedBox(height: 15),
 
-            // Remove Car Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Divider(),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Reason of Removal',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: liveController.reasontextController,
-                    maxLines: 3,
-                    onChanged: (v) => liveController.reasonText.value = v,
-                    keyboardType: TextInputType.multiline,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter reason (required)',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AbsorbPointer(
-                          absorbing: !canRemove, // block taps when not allowed
-                          child: Opacity(
-                            opacity: canRemove ? 1 : 0.6,
-                            child: ButtonWidget(
-                              text: 'Remove Car',
-                              height: 40,
-                              fontSize: 12,
-                              isLoading: liveController.isRemoveButtonLoading,
-                              onTap: () async {
-                                final reason =
-                                    liveController.reasonText.value.trim();
-
-                                final ok = await Get.dialog<bool>(
-                                      AlertDialog(
-                                        title: const Text(
-                                          'Confirm removal',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                        content: Text('Reason:\n$reason'),
-                                        actions: [
-                                          ButtonWidget(
-                                            text: 'Cancel',
-                                            height: 35,
-                                            width: 80,
-                                            fontSize: 12,
-                                            backgroundColor: AppColors.grey,
-                                            isLoading: false.obs,
-                                            onTap: () =>
-                                                Get.back(result: false),
-                                          ),
-                                          ButtonWidget(
-                                            text: 'Remove',
-                                            height: 35,
-                                            width: 80,
-                                            fontSize: 12,
-                                            backgroundColor: AppColors.red,
-                                            isLoading: false.obs,
-                                            onTap: () => Get.back(result: true),
-                                          ),
-                                        ],
-                                      ),
-                                    ) ??
-                                    false;
-                                if (!ok) return;
-
-                                // 👇 call your API / controller method
-                                await liveController.removeCar(carId: car.id);
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
+            Expanded(
+              child: TabBarWidget(
+                titles: ['Set Margin', 'Remove Car'],
+                counts: [0, 0],
+                showCount: false,
+                screens: [
+                  _buildSetMarginScreen(car: car),
+                  _buildRemoveCarScreen(
+                      liveController: liveController, car: car),
                 ],
+                titleSize: 10,
+                countSize: 0,
+                spaceFromSides: 10,
+                tabsHeight: 30,
               ),
             ),
           ],
         );
       },
+    );
+  }
+
+// Set variable margin
+  Widget _buildSetMarginScreen({required CarsListModel car}) {
+    return SingleChildScrollView(
+      child: SetVariableMarginWidget(
+        carId: car.id,
+        userId: car.highestBidder,
+        highestBid: car.highestBid.value,
+        priceDiscovery: car.priceDiscovery,
+        customerExpectedPrice: car.customerExpectedPrice.value,
+        variableMargin: car.variableMargin?.value,
+        isMobile: true,
+      ),
+    );
+  }
+
+  // Remove Car Section
+  Widget _buildRemoveCarScreen(
+      {required AdminLiveCarsListController liveController,
+      required CarsListModel car}) {
+    final canRemove = liveController.reasonText.value.trim().isNotEmpty &&
+        !liveController.isRemoveButtonLoading.value;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Divider(),
+          const SizedBox(height: 12),
+          const Text(
+            'Reason of Removal',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: liveController.reasontextController,
+            maxLines: 3,
+            onChanged: (v) => liveController.reasonText.value = v,
+            keyboardType: TextInputType.multiline,
+            decoration: const InputDecoration(
+              hintText: 'Enter reason (required)',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: AbsorbPointer(
+                  absorbing: !canRemove, // block taps when not allowed
+                  child: Opacity(
+                    opacity: canRemove ? 1 : 0.6,
+                    child: ButtonWidget(
+                      text: 'Remove Car',
+                      height: 40,
+                      fontSize: 12,
+                      isLoading: liveController.isRemoveButtonLoading,
+                      onTap: () async {
+                        final reason = liveController.reasonText.value.trim();
+
+                        final ok = await Get.dialog<bool>(
+                              AlertDialog(
+                                title: const Text(
+                                  'Confirm removal',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                content: Text('Reason:\n$reason'),
+                                actions: [
+                                  ButtonWidget(
+                                    text: 'Cancel',
+                                    height: 35,
+                                    width: 80,
+                                    fontSize: 12,
+                                    backgroundColor: AppColors.grey,
+                                    isLoading: false.obs,
+                                    onTap: () => Get.back(result: false),
+                                  ),
+                                  ButtonWidget(
+                                    text: 'Remove',
+                                    height: 35,
+                                    width: 80,
+                                    fontSize: 12,
+                                    backgroundColor: AppColors.red,
+                                    isLoading: false.obs,
+                                    onTap: () => Get.back(result: true),
+                                  ),
+                                ],
+                              ),
+                            ) ??
+                            false;
+                        if (!ok) return;
+
+                        // 👇 call your API / controller method
+                        await liveController.removeCar(carId: car.id);
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  // Set Expected Price Button
+  Widget _buildSetExpectedPriceButton(CarsListModel car) {
+    return ButtonWidget(
+      text: 'Set Expected Price',
+      isLoading: false.obs,
+      width: 150,
+      backgroundColor: AppColors.green,
+      elevation: 5,
+      fontSize: 12,
+      onTap: () => showSetExpectedPriceDialog(
+        context: Get.context!,
+        title: 'Set Expected Price',
+        isSetPriceLoading: getxController.isSetExpectedPriceLoading,
+        initialValue: getxController.getInitialPriceForExpectedPriceButton(car),
+        canIncreasePriceUpto150Percent:
+            getxController.canIncreasePriceUpto150Percent(car),
+        onPriceSelected: (selectedPrice) {
+          getxController.setCustomerExpectedPrice(
+            carId: car.id,
+            customerExpectedPrice: selectedPrice,
+          );
+        },
+      ),
     );
   }
 }

@@ -223,6 +223,9 @@ class AppUrls {
   static String get getEntityNamesList =>
       "${baseUrl}entity-documents/get-entity-names-list";
 
+  static String get setCustomerExpectedPrice =>
+      "${baseUrl}customer/set-customer-expected-price";
+
   // Socket URL Extraction
   static final String socketBaseUrl = _extractSocketBaseUrl(
     baseUrl,

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:otobix_crm/admin/controller/admin_cars_list_controller.dart';
 import 'package:otobix_crm/models/cars_list_model.dart';
+import 'package:otobix_crm/services/car_margin_helpers.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_images.dart';
 import 'package:otobix_crm/utils/global_functions.dart';
@@ -436,7 +437,6 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
 
 // Set variable margin
   Widget _buildSetVariableMargin(CarsListModel car) {
-    debugPrint('Variable margin: ${car.variableMargin!.value.toString()}');
     return SingleChildScrollView(
       child: SetVariableMarginWidget(
         carId: car.id,
@@ -444,7 +444,7 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
         highestBid: car.highestBid.value,
         priceDiscovery: car.priceDiscovery,
         customerExpectedPrice: car.customerExpectedPrice.value,
-        variableMargin: car.variableMargin!.value,
+        variableMargin: car.variableMargin?.value,
       ),
     );
   }
