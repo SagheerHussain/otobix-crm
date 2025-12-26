@@ -1,45 +1,86 @@
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:otobix_crm/network/api_service.dart';
 import 'package:otobix_crm/services/car_margin_helpers.dart';
+import 'package:otobix_crm/utils/app_urls.dart';
+import 'package:otobix_crm/widgets/toast_widget.dart';
 
 class SetVariableMarginWidgetController extends GetxController {
-  RxDouble highestBid = 0.0.obs;
-  RxDouble customerExpectedPrice = 0.0.obs;
+  RxBool isSetVariableMarginLoading = false.obs;
+  RxDouble highestBid = 0.0.obs; // always remains same
+  RxDouble customerExpectedPrice = 0.0.obs; // always  remains same
   RxDouble variableMargin = 0.0.obs;
-  RxDouble priceDiscovery = 0.0.obs;
+  RxDouble priceDiscovery = 0.0.obs; // always  remains same
 
-  RxDouble adjustedHighestBidShownToCustomer = 0.0.obs;
+  RxDouble initialAdjustedHighestBidShownToCustomer =
+      0.0.obs; // always  remains same
 
-  RxDouble newBidPrice = 0.0.obs;
+  RxDouble newAdjustedHighestBidShownToCustomer = 0.0.obs;
 
-  RxDouble newBidPriceAfterAdjustmentShownToCustomer = 0.0.obs;
-
-  // ✅ store the ORIGINAL variable margin (baseline)
-  double _originalVariableMargin = 0.0;
-
-  // call this once when widget opens / data arrives
-  void setOriginalVariableMargin(double v) {
-    _originalVariableMargin = v;
-  }
-
-  void calculateNewBidPrice() {
-    final fixed = CarMarginHelpers.fixedMargin;
-
-    final initialTotal = fixed + _originalVariableMargin; // e.g. 4 + 10 = 14
-    final newTotal = fixed + variableMargin.value; // e.g. 4 + 8 = 12
-
-    final base =
-        highestBid.value * (1 + initialTotal / 100.0) / (1 + newTotal / 100.0);
-
-    // optional rounding to nearest 1000 (if you want bidding neat)
-    newBidPrice.value = CarMarginHelpers.roundUpToNearest1000(base).toDouble();
-
-    newBidPriceAfterAdjustmentShownToCustomer.value =
+// For initial show with margin adjusted
+  void calculateHighestBidShownToCustomerInitially() {
+    initialAdjustedHighestBidShownToCustomer.value =
         CarMarginHelpers.netAfterMarginsFlexible(
       originalPrice: highestBid.value,
       priceDiscovery: priceDiscovery.value,
       variableMargin: variableMargin.value,
       roundToPrevious1000: true,
     );
+  }
+
+  // For new changed margin
+  void calculateHighestBidShownToCustomerOnMarginChange() {
+    newAdjustedHighestBidShownToCustomer.value =
+        CarMarginHelpers.netAfterMarginsFlexible(
+      originalPrice: highestBid.value,
+      priceDiscovery: priceDiscovery.value,
+      variableMargin: variableMargin.value,
+      roundToPrevious1000: true,
+    );
+  }
+
+  // Set variable margin
+  Future<void> setVariableMargin(
+      {required String carId, required String userId}) async {
+    isSetVariableMarginLoading.value = true;
+
+    try {
+      final response = await ApiService.post(
+        endpoint: AppUrls.setVariableMargin,
+        body: {
+          'carId': carId,
+          'userId': userId,
+          'variableMargin': variableMargin.value,
+          'bidAmount': highestBid.value
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Get.back();
+        ToastWidget.show(
+            context: Get.context!,
+            title: 'Variable Margin Set',
+            subtitle: 'Variable margin has been updated successfully',
+            type: ToastType.success);
+      } else {
+        debugPrint('Failed to set variable margin ${response.body}');
+        ToastWidget.show(
+          context: Get.context!,
+          title: 'Failed',
+          subtitle: 'Failed to set variable margin',
+          type: ToastType.error,
+        );
+      }
+    } catch (error) {
+      debugPrint('Error setting variable margin: $error');
+      ToastWidget.show(
+        context: Get.context!,
+        title: 'Error',
+        subtitle: 'Error setting variable margin',
+        type: ToastType.error,
+      );
+    } finally {
+      isSetVariableMarginLoading.value = false;
+    }
   }
 }

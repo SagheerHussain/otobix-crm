@@ -628,11 +628,13 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
 // Add this conditional rendering
                       if (goLiveNowOrScheduleIndex == 2)
                         SetVariableMarginWidget(
+                          carId: car.id,
+                          userId: car.highestBidder,
                           highestBid: car.highestBid.value,
                           priceDiscovery: car.priceDiscovery,
                           customerExpectedPrice:
                               car.customerExpectedPrice.value,
-                          variableMargin: car.variableMargin.value,
+                          variableMargin: car.variableMargin!.value,
                         )
                       else ...[
                         const SizedBox(height: 16),
