@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/controller/admin_live_cars_list_controller.dart';
+import 'package:otobix_crm/admin/controller/admin_oto_buy_cars_list_controller.dart';
+import 'package:otobix_crm/admin/controller/admin_upcoming_cars_list_controller.dart';
 import 'package:otobix_crm/network/api_service.dart';
 import 'package:otobix_crm/services/car_margin_helpers.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
@@ -57,6 +60,10 @@ class SetVariableMarginWidgetController extends GetxController {
 
       if (response.statusCode == 200) {
         Get.back();
+        await Get.find<AdminUpcomingCarsListController>()
+            .fetchUpcomingCarsList();
+        await Get.find<AdminLiveCarsListController>().fetchLiveBidsCarsList();
+        await Get.find<AdminOtoBuyCarsListController>().fetchOtoBuyCarsList();
         ToastWidget.show(
             context: Get.context!,
             title: 'Variable Margin Set',
