@@ -557,6 +557,19 @@ class AdminLiveCarsListPage extends StatelessWidget {
                                   fontSize: 14,
                                 ),
                               ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                car.appointmentId,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.grey,
+                                  fontSize: 14,
+                                ),
+                              ),
                             ],
                           ),
                         ),

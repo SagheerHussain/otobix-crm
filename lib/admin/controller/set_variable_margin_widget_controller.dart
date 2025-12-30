@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:otobix_crm/admin/controller/admin_live_cars_list_controller.dart';
@@ -17,6 +19,8 @@ class SetVariableMarginWidgetController extends GetxController {
 
   RxDouble initialAdjustedHighestBidShownToCustomer =
       0.0.obs; // always  remains same
+
+  RxDouble customerExpectedPriceShownToDealer = 0.0.obs; // always  remains same
 
   RxDouble newAdjustedHighestBidShownToCustomer = 0.0.obs;
 
@@ -39,6 +43,18 @@ class SetVariableMarginWidgetController extends GetxController {
       priceDiscovery: priceDiscovery.value,
       variableMargin: variableMargin.value,
       roundToPrevious1000: true,
+    );
+  }
+
+// Customer Expected Price Shown To Dealer
+  void calculateCustomerExpectedPriceShownToDealer() {
+    customerExpectedPriceShownToDealer.value =
+        CarMarginHelpers.netAfterMarginsFlexible(
+      originalPrice: customerExpectedPrice.value,
+      priceDiscovery: priceDiscovery.value,
+      variableMargin: variableMargin.value,
+      roundToNext1000: true,
+      increaseMargin: true,
     );
   }
 
@@ -69,6 +85,15 @@ class SetVariableMarginWidgetController extends GetxController {
             title: 'Variable Margin Set',
             subtitle: 'Variable margin has been updated successfully',
             type: ToastType.success);
+      } else if (response.statusCode == 400) {
+        final message = jsonDecode(response.body)['message'];
+
+        ToastWidget.show(
+          context: Get.context!,
+          title: 'Failed',
+          subtitle: message ?? 'Failed to set variable margin',
+          type: ToastType.error,
+        );
       } else {
         debugPrint('Failed to set variable margin ${response.body}');
         ToastWidget.show(

@@ -31,6 +31,9 @@ class SetExpectedPriceDialogWidget extends StatefulWidget {
 class _SetExpectedPriceDialogWidgetState
     extends State<SetExpectedPriceDialogWidget> {
   final TextEditingController _priceController = TextEditingController();
+
+  final ScrollController _stepsController = ScrollController();
+
   final double _stepAmount = 1000;
   double _currentPrice = 0;
 
@@ -68,38 +71,18 @@ class _SetExpectedPriceDialogWidgetState
 
       _updatePrice(value);
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_stepsController.hasClients) {
+        _stepsController.jumpTo(_stepsController.position.maxScrollExtent / 2);
+      }
+    });
   }
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   _basePrice = (widget.initialValue ?? 0);
-
-  //   // show 80% on open
-  //   final start = _roundToNearest1000(_basePrice * 0.8);
-
-  //   // cap at 150%
-  //   _maxPrice = _basePrice > 0 ? (_basePrice * 1.5) : double.infinity;
-
-  //   _currentPrice = start;
-  //   _priceController.text = _currentPrice.toStringAsFixed(0);
-
-  //   _priceController.addListener(() {
-  //     if (_isProgrammaticChange) return;
-
-  //     final text = _priceController.text;
-  //     if (text.isEmpty) return;
-
-  //     final value = double.tryParse(text);
-  //     if (value == null) return;
-
-  //     _updatePrice(value);
-  //   });
-  // }
 
   @override
   void dispose() {
     _priceController.dispose();
+    _stepsController.dispose();
     super.dispose();
   }
 
@@ -135,28 +118,6 @@ class _SetExpectedPriceDialogWidgetState
     });
   }
 
-  // void _updatePrice(double newPrice) {
-  //   if (newPrice < 0) return;
-
-  //   final clamped = newPrice > _maxPrice ? _maxPrice : newPrice;
-  //   final rounded = _roundToNearest1000(clamped);
-  //   final newText = rounded.toStringAsFixed(0);
-
-  //   // ✅ avoid re-setting if already same
-  //   if (_currentPrice == rounded && _priceController.text == newText) return;
-
-  //   setState(() {
-  //     _currentPrice = rounded;
-
-  //     _isProgrammaticChange = true;
-  //     _priceController.value = TextEditingValue(
-  //       text: newText,
-  //       selection: TextSelection.collapsed(offset: newText.length),
-  //     );
-  //     _isProgrammaticChange = false;
-  //   });
-  // }
-
   double _roundToNearest1000(double v) => (v / 1000).round() * 1000.0;
 
   void _incrementPrice() {
@@ -176,6 +137,17 @@ class _SetExpectedPriceDialogWidgetState
 
   @override
   Widget build(BuildContext context) {
+    final steps = <double>[
+      -50000,
+      -25000,
+      -10000,
+      -5000,
+      5000,
+      10000,
+      25000,
+      50000,
+    ];
+
     return Dialog(
       constraints: BoxConstraints(maxWidth: 500, minWidth: 300),
       backgroundColor: AppColors.white,
@@ -269,16 +241,6 @@ class _SetExpectedPriceDialogWidgetState
                       hintStyle: TextStyle(color: AppColors.grey),
                       contentPadding: EdgeInsets.symmetric(horizontal: 10),
                     ),
-                    // onChanged: (value) {
-                    //   if (value.isNotEmpty) {
-                    //     final parsed = double.tryParse(value);
-                    //     if (parsed != null) {
-                    //       setState(() {
-                    //         _currentPrice = parsed;
-                    //       });
-                    //     }
-                    //   }
-                    // },
                   ),
                 ),
 
@@ -304,46 +266,23 @@ class _SetExpectedPriceDialogWidgetState
 
             const SizedBox(height: 15),
 
-            // // Current Price Display
-            // Text(
-            //   'Rs. ${_currentPrice.toStringAsFixed(0)}/-',
-            //   style: const TextStyle(
-            //     fontSize: 14,
-            //     fontWeight: FontWeight.w500,
-            //     color: Colors.grey,
-            //   ),
-            // ),
-
-            // const SizedBox(height: 20),
-
             // Quick Add Buttons (Horizontal Scroll)
+
             SizedBox(
               height: 40,
-              child: ListView(
+              child: ListView.separated(
+                controller: _stepsController,
                 scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                children: [
-                  const SizedBox(width: 5),
-                  _QuickAddButton(amount: 1000, onTap: () => _addAmount(1000)),
-                  const SizedBox(width: 8),
-                  _QuickAddButton(amount: 5000, onTap: () => _addAmount(5000)),
-                  const SizedBox(width: 8),
-                  _QuickAddButton(
-                    amount: 10000,
-                    onTap: () => _addAmount(10000),
-                  ),
-                  const SizedBox(width: 8),
-                  _QuickAddButton(
-                    amount: 25000,
-                    onTap: () => _addAmount(25000),
-                  ),
-                  const SizedBox(width: 8),
-                  _QuickAddButton(
-                    amount: 50000,
-                    onTap: () => _addAmount(50000),
-                  ),
-                  const SizedBox(width: 5),
-                ],
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                itemCount: steps.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, i) {
+                  final amount = steps[i];
+                  return _QuickStepButton(
+                    amount: amount,
+                    onTap: () => _addAmount(amount), // negative will decrement
+                  );
+                },
               ),
             ),
 
@@ -387,44 +326,6 @@ class _SetExpectedPriceDialogWidgetState
   }
 }
 
-class _QuickAddButton extends StatelessWidget {
-  final double amount;
-  final VoidCallback onTap;
-
-  const _QuickAddButton({required this.amount, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-        decoration: BoxDecoration(
-          color: AppColors.green.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.green),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.add, size: 18, color: AppColors.green),
-            const SizedBox(width: 4),
-            Text(
-              'Rs. ${NumberFormat.decimalPattern('en_IN').format(amount)}/-',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.green,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 // Example usage function
 void showSetExpectedPriceDialog({
   required BuildContext context,
@@ -446,4 +347,48 @@ void showSetExpectedPriceDialog({
       );
     },
   );
+}
+
+class _QuickStepButton extends StatelessWidget {
+  final double amount;
+  final VoidCallback onTap;
+
+  const _QuickStepButton({required this.amount, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDecrement = amount < 0;
+    final color = isDecrement ? AppColors.red : AppColors.green;
+    final icon = isDecrement ? Icons.remove : Icons.add;
+    final label =
+        'Rs. ${NumberFormat.decimalPattern('en_IN').format(amount.abs())}/-';
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
