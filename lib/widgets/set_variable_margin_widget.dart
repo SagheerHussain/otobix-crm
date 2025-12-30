@@ -40,6 +40,7 @@ class SetVariableMarginWidget extends StatelessWidget {
 
     controller.calculateHighestBidShownToCustomerInitially();
     controller.calculateHighestBidShownToCustomerOnMarginChange();
+    controller.calculateCustomerExpectedPriceShownToDealer();
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -77,22 +78,35 @@ class SetVariableMarginWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Current Data',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Current Data',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[700],
+                ),
+              ),
+              Text(
+                'Price Discovery: Rs. ${NumberFormat.decimalPattern('en_IN').format(controller.priceDiscovery.value)}/-',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[700],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: isMobile ? 1 : 3,
+            crossAxisCount: isMobile ? 1 : 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 12,
-            childAspectRatio: isMobile ? 4.7 : 3.35,
+            childAspectRatio: isMobile ? 4.7 : 4.9,
             children: [
               _buildInfoCard(
                 title: 'Highest Bid',
@@ -102,7 +116,7 @@ class SetVariableMarginWidget extends StatelessWidget {
                 borderColor: Colors.blue[100]!,
               ),
               _buildInfoCard(
-                title: 'Shown To Customer',
+                title: 'HB Shown To Customer',
                 value:
                     'Rs. ${_formatCurrency(controller.initialAdjustedHighestBidShownToCustomer.value)}',
                 icon: Icons.person,
@@ -117,6 +131,15 @@ class SetVariableMarginWidget extends StatelessWidget {
                 icon: Icons.price_check,
                 color: Colors.orange[50]!,
                 borderColor: Colors.orange[100]!,
+              ),
+              _buildInfoCard(
+                title: 'CEP Shown To Dealer',
+                value:
+                    'Rs. ${_formatCurrency(controller.customerExpectedPriceShownToDealer.value)}',
+                icon: Icons.sell,
+                color: Colors.green[50]!,
+                borderColor: Colors.green[100]!,
+                subtitle: 'After Margin Adjustment',
               ),
             ],
           ),

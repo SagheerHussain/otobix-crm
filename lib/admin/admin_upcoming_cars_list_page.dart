@@ -11,6 +11,7 @@ import 'package:otobix_crm/utils/app_urls.dart';
 import 'package:otobix_crm/utils/global_functions.dart';
 import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/empty_data_widget.dart';
+import 'package:otobix_crm/widgets/set_expected_price_dialog_widget.dart';
 import 'package:otobix_crm/widgets/set_variable_margin_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
 import 'package:otobix_crm/widgets/toast_widget.dart';
@@ -539,44 +540,66 @@ class AdminUpcomingCarsListPage extends StatelessWidget {
 
                       // Header
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: CachedNetworkImage(
-                              imageUrl: car.imageUrl,
-                              width: 64,
-                              height: 48,
-                              fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) =>
-                                  const Icon(Icons.directions_car),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
                               children: [
-                                Text(
-                                  '${car.make} ${car.model} ${car.variant}',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 14,
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: CachedNetworkImage(
+                                    imageUrl: car.imageUrl,
+                                    width: 64,
+                                    height: 48,
+                                    fit: BoxFit.cover,
+                                    errorWidget: (_, __, ___) =>
+                                        const Icon(Icons.directions_car),
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'FMV: Rs. ${NumberFormat.decimalPattern('en_IN').format(car.priceDiscovery)}/-',
-                                  style: const TextStyle(
-                                    color: AppColors.green,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${car.make} ${car.model} ${car.variant}',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'FMV: Rs. ${NumberFormat.decimalPattern('en_IN').format(car.priceDiscovery)}/-',
+                                        style: const TextStyle(
+                                          color: AppColors.green,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        car.appointmentId,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColors.grey,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
+                          _buildSetExpectedPriceButton(car),
                         ],
                       ),
 
@@ -839,6 +862,33 @@ class AdminUpcomingCarsListPage extends StatelessWidget {
         const SizedBox(width: 5),
         Text(text, style: const TextStyle(fontSize: 12)),
       ],
+    );
+  }
+
+  // Set Expected Price Button
+  Widget _buildSetExpectedPriceButton(CarsListModel car) {
+    return ButtonWidget(
+      text: 'Set Expected Price',
+      isLoading: false.obs,
+      width: 150,
+      backgroundColor: AppColors.green,
+      elevation: 5,
+      fontSize: 12,
+      onTap: () => showSetExpectedPriceDialog(
+        context: Get.context!,
+        title: 'Set Expected Price',
+        isSetPriceLoading: upcomingController.isSetExpectedPriceLoading,
+        initialValue:
+            upcomingController.getInitialPriceForExpectedPriceButton(car),
+        canIncreasePriceUpto150Percent:
+            upcomingController.canIncreasePriceUpto150Percent(car),
+        onPriceSelected: (selectedPrice) {
+          upcomingController.setCustomerExpectedPrice(
+            carId: car.id,
+            customerExpectedPrice: selectedPrice,
+          );
+        },
+      ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:otobix_crm/admin/controller/admin_upcoming_cars_list_controller.dart';
 import 'package:otobix_crm/models/cars_list_model.dart';
 import 'package:otobix_crm/network/socket_service.dart';
 import 'package:otobix_crm/network/api_service.dart';
@@ -449,6 +450,8 @@ class AdminLiveCarsListController extends GetxController {
       );
 
       if (response.statusCode == 200) {
+        Get.back();
+        await Get.find<AdminLiveCarsListController>().fetchLiveBidsCarsList();
         ToastWidget.show(
           context: Get.context!,
           title:
