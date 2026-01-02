@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:otobix_crm/admin/admin_app_updates_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_app_updates_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_cars_list_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_edit_profile_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_settings_page.dart';
@@ -112,6 +114,20 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                       Get.to(ResponsiveLayout(
                         mobile: AdminCarsListPage(),
                         desktop: AdminDesktopCarsListPage(),
+                      ));
+                    },
+                  ),
+
+                  // App Updates Card
+                  ProfileOption(
+                    icon: Icons.update,
+                    title: "App Updates",
+                    description: "View and manage app updates",
+                    color: AppColors.black,
+                    onTap: () {
+                      Get.to(ResponsiveLayout(
+                        mobile: AdminAppUpdatesPage(),
+                        desktop: AdminDesktopAppUpdatesPage(),
                       ));
                     },
                   ),
