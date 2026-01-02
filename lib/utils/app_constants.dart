@@ -7,6 +7,7 @@ class AppConstants {
   static final BannerStatus bannerStatus = BannerStatus();
   static final BannerTypes bannerTypes = BannerTypes();
   static final BannerViews bannerViews = BannerViews();
+  static final AppNames appNames = AppNames();
 }
 
 // User roles class
@@ -53,4 +54,11 @@ class BannerTypes {
 class BannerViews {
   final String home = 'Home';
   final String sellMyCar = 'Sell My Car';
+}
+
+// App names class
+class AppNames {
+  final String dealer = 'dealer';
+  final String customer = 'customer';
+  final String inspection = 'inspection';
 }

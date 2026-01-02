@@ -83,6 +83,12 @@ class AppUrls {
   static String get getInspectionRequestsList =>
       "${baseUrl}admin/inspection-requests/get-list";
 
+  static String get getAppUpdatesList =>
+      "${baseUrl}admin/app-versions/get-list";
+  static String get addAppUpdates => "${baseUrl}admin/app-versions/add";
+  static String get updateAppUpdates => "${baseUrl}admin/app-versions/update";
+  static String get deleteAppUpdates => "${baseUrl}admin/app-versions/delete";
+
   // New routes
   static String get sendOtp => "${baseUrl}otp/send-otp";
 
