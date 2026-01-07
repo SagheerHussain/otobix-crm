@@ -85,9 +85,18 @@ class AppUrls {
 
   static String get getAppUpdatesList =>
       "${baseUrl}admin/app-versions/get-list";
+
   static String get addAppUpdates => "${baseUrl}admin/app-versions/add";
+
   static String get updateAppUpdates => "${baseUrl}admin/app-versions/update";
+
   static String get deleteAppUpdates => "${baseUrl}admin/app-versions/delete";
+
+  static String get getCarMargins => "${baseUrl}admin/car-margins/get-list";
+
+  static String get updateCarMargins => "${baseUrl}admin/car-margins/update";
+
+  static String get deleteCarMargins => "${baseUrl}admin/car-margins/delete";
 
   // New routes
   static String get sendOtp => "${baseUrl}otp/send-otp";

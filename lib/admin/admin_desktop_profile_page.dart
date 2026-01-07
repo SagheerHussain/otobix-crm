@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:otobix_crm/admin/admin_app_updates_page.dart';
+import 'package:otobix_crm/admin/admin_car_margins_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_app_updates_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_car_margins_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_cars_list_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_edit_profile_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_settings_page.dart';
@@ -262,6 +264,22 @@ class _AdminDesktopProfilePageState extends State<AdminDesktopProfilePage> {
                         Get.to(ResponsiveLayout(
                           mobile: AdminAppUpdatesPage(),
                           desktop: AdminDesktopAppUpdatesPage(),
+                        ));
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Car Margins Card
+                    _buildProfileCard(
+                      icon: Icons.percent,
+                      title: "Car Margins",
+                      subtitle: "View and manage car margins",
+                      color: Colors.deepOrange,
+                      onTap: () {
+                        Get.to(ResponsiveLayout(
+                          mobile: AdminCarMarginsPage(),
+                          desktop: AdminDesktopCarMarginsPage(),
                         ));
                       },
                     ),
