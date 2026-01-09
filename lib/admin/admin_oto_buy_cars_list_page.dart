@@ -438,6 +438,7 @@ class AdminOtoBuyCarsListPage extends StatelessWidget {
         highestBid: car.highestBid.value,
         priceDiscovery: car.priceDiscovery,
         customerExpectedPrice: car.customerExpectedPrice.value,
+        fixedMargin: car.fixedMargin?.value,
         variableMargin: car.variableMargin?.value,
         isMobile: true,
       ),

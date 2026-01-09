@@ -83,6 +83,7 @@ class CarMarginHelpers {
   static double netAfterMarginsFlexible({
     required num originalPrice,
     required num? priceDiscovery,
+    double? fixedMargin,
     double? variableMargin,
     bool roundToNearest1000 = true,
     bool roundToPrevious1000 = false,
@@ -90,6 +91,7 @@ class CarMarginHelpers {
     bool increaseMargin = false, // If true, increase margin; otherwise decrease
   }) {
     final pdMargins = getMargins(priceDiscovery);
+    final usedFixed = fixedMargin ?? pdMargins.fixed;
     final usedVariable =
         // (variableMargin == null || variableMargin == 0 || variableMargin == 0.0)
         //     ? pdMargins.variable :
@@ -100,13 +102,13 @@ class CarMarginHelpers {
     if (increaseMargin) {
       netPrice = netAfterMarginsIncrease(
         amount: originalPrice,
-        fixedPercent: pdMargins.fixed,
+        fixedPercent: usedFixed,
         variablePercent: usedVariable,
       );
     } else {
       netPrice = netAfterMarginsDecrease(
         amount: originalPrice,
-        fixedPercent: pdMargins.fixed,
+        fixedPercent: usedFixed,
         variablePercent: usedVariable,
       );
     }
