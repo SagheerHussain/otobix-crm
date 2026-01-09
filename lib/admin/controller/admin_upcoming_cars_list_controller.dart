@@ -54,7 +54,8 @@ class AdminUpcomingCarsListController extends GetxController {
         // setupCountdowns(upcomingCarsList);
 
         filteredUpcomingCarsList.assignAll(upcomingCarsList);
-        setupCountdowns(filteredUpcomingCarsList);
+        // setupCountdowns(filteredUpcomingCarsList);
+        setupCountdowns(filteredUpcomingCarsList.toList());
       } else {
         filteredUpcomingCarsList.clear();
         debugPrint('Failed to fetch data ${response.body}');
@@ -71,24 +72,26 @@ class AdminUpcomingCarsListController extends GetxController {
   /// - Cancels timers for cars that disappeared
   /// - (Re)starts timers for provided cars
   /// - Formats "15h : 22m : 44s"
-  void setupCountdowns(List<CarsListModel> cars) {
+  void setupCountdowns(List<CarsListModel> carsInput) {
+    // ✅ snapshot so iteration is safe even if the RxList changes
+    final cars = List<CarsListModel>.from(carsInput);
+
     // 1) Cancel timers that are no longer needed
     final newIds = cars.map((c) => c.id).toSet();
     final toRemove = _timers.keys.where((id) => !newIds.contains(id)).toList();
+
     for (final id in toRemove) {
       _timers[id]?.cancel();
       _timers.remove(id);
       remainingTimes.remove(id);
     }
 
-    // Local helpers (kept inside this single function)
     String fmt(Duration d) {
       String two(int n) => n.toString().padLeft(2, '0');
       return '${two(d.inHours)}h : ${two(d.inMinutes % 60)}m : ${two(d.inSeconds % 60)}s';
     }
 
     void startFor(CarsListModel car) {
-      // Cancel previous timer for this car (if any)
       _timers[car.id]?.cancel();
 
       final until = car.upcomingUntil;
@@ -99,34 +102,93 @@ class AdminUpcomingCarsListController extends GetxController {
 
       void tick() {
         final diff = until.difference(DateTime.now());
-        if (diff.isNegative || diff.inSeconds <= 0) {
+
+        if (diff.inSeconds <= 0) {
           remainingTimes[car.id] = '00h : 00m : 00s';
+
           _timers[car.id]?.cancel();
           _timers.remove(car.id);
-
-          // Remove the car from the list when timer becomes less than zero
           remainingTimes.remove(car.id);
-          filteredUpcomingCarsList.removeWhere((c) => c.id == car.id);
-          upcomingCarsCount.value = filteredUpcomingCarsList.length;
+
+          // ✅ Defer list mutation so it never clashes with any current loop/build
+          Future.microtask(() {
+            filteredUpcomingCarsList.removeWhere((c) => c.id == car.id);
+            upcomingCarsCount.value = filteredUpcomingCarsList.length;
+          });
 
           return;
         }
+
         remainingTimes[car.id] = fmt(diff);
       }
 
-      // Prime immediately, then every second
-      tick();
-      _timers[car.id] = Timer.periodic(
-        const Duration(seconds: 1),
-        (_) => tick(),
-      );
+      tick(); // prime immediately
+      _timers[car.id] =
+          Timer.periodic(const Duration(seconds: 1), (_) => tick());
     }
 
-    // 2) Ensure every given car has an active timer
+    // 2) Start timers safely using the snapshot
     for (final car in cars) {
       startFor(car);
     }
   }
+
+  // void setupCountdowns1(List<CarsListModel> cars) {
+  //   // 1) Cancel timers that are no longer needed
+  //   final newIds = cars.map((c) => c.id).toSet();
+  //   final toRemove = _timers.keys.where((id) => !newIds.contains(id)).toList();
+  //   for (final id in toRemove) {
+  //     _timers[id]?.cancel();
+  //     _timers.remove(id);
+  //     remainingTimes.remove(id);
+  //   }
+
+  //   // Local helpers (kept inside this single function)
+  //   String fmt(Duration d) {
+  //     String two(int n) => n.toString().padLeft(2, '0');
+  //     return '${two(d.inHours)}h : ${two(d.inMinutes % 60)}m : ${two(d.inSeconds % 60)}s';
+  //   }
+
+  //   void startFor(CarsListModel car) {
+  //     // Cancel previous timer for this car (if any)
+  //     _timers[car.id]?.cancel();
+
+  //     final until = car.upcomingUntil;
+  //     if (until == null) {
+  //       remainingTimes[car.id] = 'N/A';
+  //       return;
+  //     }
+
+  //     void tick() {
+  //       final diff = until.difference(DateTime.now());
+  //       if (diff.isNegative || diff.inSeconds <= 0) {
+  //         remainingTimes[car.id] = '00h : 00m : 00s';
+  //         _timers[car.id]?.cancel();
+  //         _timers.remove(car.id);
+
+  //         // Remove the car from the list when timer becomes less than zero
+  //         remainingTimes.remove(car.id);
+  //         filteredUpcomingCarsList.removeWhere((c) => c.id == car.id);
+  //         upcomingCarsCount.value = filteredUpcomingCarsList.length;
+
+  //         return;
+  //       }
+  //       remainingTimes[car.id] = fmt(diff);
+  //     }
+
+  //     // Prime immediately, then every second
+  //     tick();
+  //     _timers[car.id] = Timer.periodic(
+  //       const Duration(seconds: 1),
+  //       (_) => tick(),
+  //     );
+  //   }
+
+  //   // 2) Ensure every given car has an active timer
+  //   for (final car in cars) {
+  //     startFor(car);
+  //   }
+  // }
 
   // Listen to upcoming cars section realtime
   void _listenUpcomingCarsSectionRealtime() {
@@ -170,7 +232,8 @@ class AdminUpcomingCarsListController extends GetxController {
         }
 
         // refresh all timers via the single entry-point
-        setupCountdowns(filteredUpcomingCarsList);
+        // setupCountdowns(filteredUpcomingCarsList);
+        setupCountdowns(filteredUpcomingCarsList.toList());
 
         // update count
         upcomingCarsCount.value = filteredUpcomingCarsList.length;

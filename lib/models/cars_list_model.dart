@@ -146,7 +146,6 @@ class CarsListModel {
       customerExpectedPrice: RxDouble(
           double.tryParse(data['customerExpectedPrice']?.toString() ?? '0') ??
               0.0),
-
       fixedMargin: (data['fixedMargin'] == null)
           ? null
           : (double.tryParse(data['fixedMargin'].toString()) ?? 0.0).obs,
