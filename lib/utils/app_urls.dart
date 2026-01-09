@@ -10,7 +10,7 @@ class AppUrls {
 //
   static const String baseUrl = String.fromEnvironment(
     'BASE_URL',
-    defaultValue: 'http://192.168.100.99:4000/api/',
+    defaultValue: 'http://192.168.100.92:4000/api/',
   );
 
   static String get login => "${baseUrl}user/login";
