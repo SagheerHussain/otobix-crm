@@ -14,6 +14,7 @@ class SetVariableMarginWidgetController extends GetxController {
   RxBool isSetVariableMarginLoading = false.obs;
   RxDouble highestBid = 0.0.obs; // always remains same
   RxDouble customerExpectedPrice = 0.0.obs; // always  remains same
+  RxDouble fixedMargin = 0.0.obs;
   RxDouble variableMargin = 0.0.obs;
   RxDouble priceDiscovery = 0.0.obs; // always  remains same
 
@@ -30,6 +31,7 @@ class SetVariableMarginWidgetController extends GetxController {
         CarMarginHelpers.netAfterMarginsFlexible(
       originalPrice: highestBid.value,
       priceDiscovery: priceDiscovery.value,
+      fixedMargin: fixedMargin.value,
       variableMargin: variableMargin.value,
       roundToPrevious1000: true,
     );
@@ -41,6 +43,7 @@ class SetVariableMarginWidgetController extends GetxController {
         CarMarginHelpers.netAfterMarginsFlexible(
       originalPrice: highestBid.value,
       priceDiscovery: priceDiscovery.value,
+      fixedMargin: fixedMargin.value,
       variableMargin: variableMargin.value,
       roundToPrevious1000: true,
     );
@@ -52,6 +55,7 @@ class SetVariableMarginWidgetController extends GetxController {
         CarMarginHelpers.netAfterMarginsFlexible(
       originalPrice: customerExpectedPrice.value,
       priceDiscovery: priceDiscovery.value,
+      fixedMargin: fixedMargin.value,
       variableMargin: variableMargin.value,
       roundToNext1000: true,
       increaseMargin: true,

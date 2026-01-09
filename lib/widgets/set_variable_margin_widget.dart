@@ -15,6 +15,7 @@ class SetVariableMarginWidget extends StatelessWidget {
   final double highestBid;
   final double priceDiscovery;
   final double customerExpectedPrice;
+  final double? fixedMargin;
   final double? variableMargin;
   final bool isMobile;
 
@@ -25,6 +26,7 @@ class SetVariableMarginWidget extends StatelessWidget {
     required this.highestBid,
     required this.priceDiscovery,
     required this.customerExpectedPrice,
+    required this.fixedMargin,
     required this.variableMargin,
     this.isMobile = false,
   });
@@ -34,6 +36,7 @@ class SetVariableMarginWidget extends StatelessWidget {
     // Initialize the controller with the provided values
     controller.highestBid.value = highestBid;
     controller.customerExpectedPrice.value = customerExpectedPrice;
+    controller.fixedMargin.value = fixedMargin ?? CarMarginHelpers.fixedMargin;
     controller.variableMargin.value =
         variableMargin ?? CarMarginHelpers.getVariableMargin(priceDiscovery);
     controller.priceDiscovery.value = priceDiscovery;

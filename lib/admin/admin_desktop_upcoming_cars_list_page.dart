@@ -657,6 +657,7 @@ class AdminDesktopUpcomingCarsListPage extends StatelessWidget {
                           priceDiscovery: car.priceDiscovery,
                           customerExpectedPrice:
                               car.customerExpectedPrice.value,
+                          fixedMargin: car.fixedMargin?.value,
                           variableMargin: car.variableMargin?.value,
                         )
                       else ...[
