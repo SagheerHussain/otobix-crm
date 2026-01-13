@@ -5,8 +5,10 @@ import 'package:otobix_crm/admin/admin_car_margins_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_app_updates_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_car_margins_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_cars_list_page.dart';
+import 'package:otobix_crm/admin/admin_desktop_dropdowns_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_edit_profile_page.dart';
 import 'package:otobix_crm/admin/admin_desktop_settings_page.dart';
+import 'package:otobix_crm/admin/admin_dropdowns_page.dart';
 import 'package:otobix_crm/admin/edit_account_page.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/admin/admin_cars_list_page.dart';
@@ -280,6 +282,22 @@ class _AdminDesktopProfilePageState extends State<AdminDesktopProfilePage> {
                         Get.to(ResponsiveLayout(
                           mobile: AdminCarMarginsPage(),
                           desktop: AdminDesktopCarMarginsPage(),
+                        ));
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Dropdowns Card
+                    _buildProfileCard(
+                      icon: Icons.list,
+                      title: "Dropdowns",
+                      subtitle: "View and manage dropdowns",
+                      color: AppColors.blue,
+                      onTap: () {
+                        Get.to(ResponsiveLayout(
+                          mobile: AdminDropdownsPage(),
+                          desktop: AdminDesktopDropdownsPage(),
                         ));
                       },
                     ),
