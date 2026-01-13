@@ -10,7 +10,7 @@ class AppUrls {
 //
   static const String baseUrl = String.fromEnvironment(
     'BASE_URL',
-    defaultValue: 'http://192.168.100.92:4000/api/',
+    defaultValue: 'http://192.168.2.35:4000/api/',
   );
 
   static String get login => "${baseUrl}user/login";
@@ -97,6 +97,14 @@ class AppUrls {
   static String get updateCarMargins => "${baseUrl}admin/car-margins/update";
 
   static String get deleteCarMargins => "${baseUrl}admin/car-margins/delete";
+
+  static String get getAllDropdownsList =>
+      "${baseUrl}admin/dropdowns/get-all-dropdowns-list";
+
+  static String get addOrUpdateDropdown =>
+      "${baseUrl}admin/dropdowns/add-or-update";
+
+  static String get deleteDropdown => "${baseUrl}admin/dropdowns/delete";
 
   // New routes
   static String get sendOtp => "${baseUrl}otp/send-otp";

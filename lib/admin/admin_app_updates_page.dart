@@ -4,6 +4,7 @@ import 'package:otobix_crm/admin/controller/admin_app_updates_controller.dart';
 import 'package:otobix_crm/models/app_updates_model.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_constants.dart';
+import 'package:otobix_crm/widgets/toast_widget.dart';
 
 class AdminAppUpdatesPage extends StatelessWidget {
   AdminAppUpdatesPage({super.key});
@@ -737,12 +738,12 @@ class AdminAppUpdatesPage extends StatelessWidget {
                                 iPackageC.text.trim().isEmpty ||
                                 iLatestC.text.trim().isEmpty ||
                                 iMinC.text.trim().isEmpty) {
-                              Get.snackbar(
-                                "Missing Fields",
-                                "Please fill all required fields",
-                                backgroundColor: Colors.orange.shade100,
-                                colorText: Colors.black87,
-                              );
+                              ToastWidget.show(
+                                  context: context,
+                                  title: 'Missing Fields',
+                                  subtitle: 'Please fill all required fields',
+                                  type: ToastType.error);
+
                               return;
                             }
 
