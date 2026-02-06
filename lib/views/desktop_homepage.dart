@@ -6,8 +6,10 @@ import 'package:otobix_crm/utils/app_images.dart';
 import 'package:otobix_crm/views/desktop_bid_history_page.dart';
 import 'package:otobix_crm/views/desktop_cars_page.dart';
 import 'package:otobix_crm/views/desktop_dashboard_page.dart';
-import 'package:otobix_crm/views/desktop_inspection_requests_page.dart';
+import 'package:otobix_crm/views/desktop_telecallings_page.dart';
 import 'package:otobix_crm/views/page_not_found_page.dart';
+import 'package:otobix_crm/views/retailer_desktop_cep_history_page.dart';
+import 'package:otobix_crm/widgets/role_switcher_widget.dart';
 import 'package:otobix_crm/widgets/sidebar_widget.dart';
 
 class DesktopHomepage extends StatelessWidget {
@@ -95,11 +97,36 @@ class DesktopHomepage extends StatelessWidget {
               children: [
                 Image(image: AssetImage(AppImages.logo), width: 40, height: 40),
                 const SizedBox(width: 10),
-                Text(
-                  "Otobix CRM",
-                  style: Theme.of(Get.context!).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Otobix CRM",
+                      style: Theme.of(Get.context!)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    RoleSwitcherWidget(builder: (isSalesManager) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.green.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        child: Text(
+                          isSalesManager ? "Sales Manager" : "Retailer",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.black,
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
                 ),
                 const SizedBox(width: 100),
                 buildSearchBar(),
@@ -235,23 +262,27 @@ class DesktopHomepage extends StatelessWidget {
   // Screens
   Widget _buildScreens(DesktopHomepageController controller) {
     return Expanded(
-      child: AnimatedBuilder(
-        animation: controller.sidebarController,
-        builder: (context, _) {
-          switch (controller.sidebarController.selectedIndex) {
-            case 0:
-              return DesktopDashboardPage();
-            case 1:
-              return DesktopBidHistoryPage();
-            case 2:
-              return DesktopCarsPage();
-            case 3:
-              return DesktopInspectionRequestsPage();
-            default:
-              return const Center(child: PageNotFoundPage());
-          }
-        },
-      ),
+      child: RoleSwitcherWidget(builder: (isSalesManager) {
+        return AnimatedBuilder(
+          animation: controller.sidebarController,
+          builder: (context, _) {
+            switch (controller.sidebarController.selectedIndex) {
+              case 0:
+                return DesktopDashboardPage();
+              case 1:
+                return isSalesManager
+                    ? DesktopBidHistoryPage()
+                    : RetailerDesktopCepHistoryPage();
+              case 2:
+                return DesktopCarsPage();
+              case 3:
+                return DesktopTelecallingsPage();
+              default:
+                return const Center(child: PageNotFoundPage());
+            }
+          },
+        );
+      }),
     );
   }
 }

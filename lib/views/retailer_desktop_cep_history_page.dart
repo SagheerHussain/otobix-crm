@@ -7,10 +7,11 @@ import 'package:otobix_crm/models/bid_summary_model.dart';
 import 'package:otobix_crm/services/car_margin_helpers.dart';
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
 import 'package:otobix_crm/widgets/refresh_page_widget.dart';
+import 'package:otobix_crm/widgets/set_expected_price_dialog_widget.dart';
 import 'package:otobix_crm/widgets/table_widget.dart';
 
-class DesktopBidHistoryPage extends StatelessWidget {
-  DesktopBidHistoryPage({super.key});
+class RetailerDesktopCepHistoryPage extends StatelessWidget {
+  RetailerDesktopCepHistoryPage({super.key});
 
   final DesktopBidHistoryController bidHistoryController =
       Get.put(DesktopBidHistoryController(), permanent: true);
@@ -59,7 +60,7 @@ class DesktopBidHistoryPage extends StatelessWidget {
     return Row(
       children: [
         Text(
-          "Bid History",
+          "Customer Expected Price History",
           style: TextStyle(
             color: AppColors.black,
             fontSize: 20,
@@ -184,14 +185,24 @@ class DesktopBidHistoryPage extends StatelessWidget {
           DesktopBidHistoryController.otobuyOffersFilter;
 
       final rows = bidsList.map((bid) {
-        final double customerExpectedPriceAfterMarginAdjustment =
+        final double highestBidAfterMarginAdjustment =
             CarMarginHelpers.netAfterMarginsFlexible(
-          originalPrice: bid.customerExpectedPrice,
+          originalPrice: bid.highestBid,
           priceDiscovery: bid.priceDiscovery,
           fixedMargin: bid.fixedMargin,
           variableMargin: bid.variableMargin,
-          roundToNext1000: true,
-          increaseMargin: true,
+          roundToPrevious1000: true,
+          increaseMargin: false,
+        );
+
+        final double bidAmountAfterMarginAdjustment =
+            CarMarginHelpers.netAfterMarginsFlexible(
+          originalPrice: bid.bidAmount,
+          priceDiscovery: bid.priceDiscovery,
+          fixedMargin: bid.bidFixedMargin,
+          variableMargin: bid.bidVariableMargin,
+          roundToPrevious1000: true,
+          increaseMargin: false,
         );
 
         final cells = <DataCell>[
@@ -202,17 +213,17 @@ class DesktopBidHistoryPage extends StatelessWidget {
           DataCell(Text(bid.appointmentId)),
           DataCell(
             Text(
-              "Rs. ${NumberFormat.decimalPattern().format(bid.bidAmount)}/-",
+              "Rs. ${NumberFormat.decimalPattern().format(bidAmountAfterMarginAdjustment)}/-",
             ),
           ),
           DataCell(
             Text(
-              "Rs. ${NumberFormat.decimalPattern().format(bid.highestBid)}/-",
+              "Rs. ${NumberFormat.decimalPattern().format(highestBidAfterMarginAdjustment)}/-",
             ),
           ),
           DataCell(
             Text(
-              "Rs. ${NumberFormat.decimalPattern().format(customerExpectedPriceAfterMarginAdjustment)}/-",
+              "Rs. ${NumberFormat.decimalPattern().format(bid.customerExpectedPrice)}/-",
             ),
           ),
           DataCell(Text(timeFormat.format(bid.time.toLocal()))),
@@ -262,7 +273,33 @@ class DesktopBidHistoryPage extends StatelessWidget {
           );
         }
 
-        return DataRow(cells: cells);
+        return DataRow(
+            onSelectChanged: (selected) {
+              if (selected ?? false) {
+                Get.dialog(
+                  SetExpectedPriceDialogWidget(
+                    title: 'Set Expected Price',
+                    isSetPriceLoading: false.obs,
+                    initialValue: bidHistoryController
+                        .getInitialPriceForExpectedPriceButton(
+                      expectedPrice: bid.customerExpectedPrice,
+                      priceDiscovery: bid.priceDiscovery,
+                    ),
+                    canIncreasePriceUpto150Percent:
+                        bidHistoryController.canIncreasePriceUpto150Percent(
+                      expectedPrice: bid.customerExpectedPrice,
+                    ),
+                    onPriceSelected: (selectedPrice) {
+                      bidHistoryController.setCustomerExpectedPrice(
+                        carId: bid.carId,
+                        customerExpectedPrice: selectedPrice.toDouble(),
+                      );
+                    },
+                  ),
+                );
+              }
+            },
+            cells: cells);
       }).toList();
 
       final columns = <DataColumn>[

@@ -16,13 +16,14 @@ class Roles {
   final String dealer = 'Dealer';
   final String customer = 'Customer';
   final String salesManager = 'Sales Manager';
+  final String retailer = 'Retailer';
   final String admin = 'Admin';
 
   final String userStatusPending = 'Pending';
   final String userStatusApproved = 'Approved';
   final String userStatusRejected = 'Rejected';
 
-  List<String> get all => [dealer, customer, salesManager, admin];
+  List<String> get all => [dealer, customer, salesManager, retailer, admin];
 }
 
 // Auction statuses class

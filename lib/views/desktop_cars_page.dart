@@ -5,9 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:otobix_crm/controllers/desktop_cars_controller.dart';
 import 'package:otobix_crm/models/car_summary_model.dart';
 import 'package:otobix_crm/models/cars_list_model_for_crm.dart';
+import 'package:otobix_crm/services/car_margin_helpers.dart';
 import 'package:otobix_crm/utils/app_colors.dart' show AppColors;
 import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/refresh_page_widget.dart';
+import 'package:otobix_crm/widgets/role_switcher_widget.dart';
+import 'package:otobix_crm/widgets/set_expected_price_dialog_widget.dart';
 import 'package:otobix_crm/widgets/table_widget.dart';
 import 'package:otobix_crm/widgets/pager_widget.dart';
 
@@ -203,6 +206,16 @@ class DesktopCarsPage extends StatelessWidget {
         final isSold = car.auctionStatus.toLowerCase() == 'sold' ||
             car.auctionStatus.toLowerCase() == 'otobuyended';
 
+        final double highestBidAfterMarginAdjustment =
+            CarMarginHelpers.netAfterMarginsFlexible(
+          originalPrice: car.highestBid,
+          priceDiscovery: car.priceDiscovery,
+          fixedMargin: car.fixedMargin,
+          variableMargin: car.variableMargin,
+          roundToPrevious1000: true,
+          increaseMargin: false,
+        );
+
         return DataRow(
           onSelectChanged: (selected) {
             if (selected ?? false) {
@@ -238,9 +251,16 @@ class DesktopCarsPage extends StatelessWidget {
             ),
             // Highest Bid
             DataCell(
-              Text(
-                'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-',
-              ),
+              RoleSwitcherWidget(builder: (isSalesManager) {
+                if (isSalesManager) {
+                  return Text(
+                    'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-',
+                  );
+                }
+                return Text(
+                  'Rs. ${NumberFormat.decimalPattern('en_IN').format(highestBidAfterMarginAdjustment)}/-',
+                );
+              }),
             ),
             // Status
             DataCell(
@@ -524,6 +544,17 @@ class DesktopCarsPage extends StatelessWidget {
 
   void _showCarDetails(BuildContext context, CarsListModelForCrm car) {
     final getxController = Get.find<DesktopCarsController>();
+
+    final double highestBidAfterMarginAdjustment =
+        CarMarginHelpers.netAfterMarginsFlexible(
+      originalPrice: car.highestBid,
+      priceDiscovery: car.priceDiscovery,
+      fixedMargin: car.fixedMargin,
+      variableMargin: car.variableMargin,
+      roundToPrevious1000: true,
+      increaseMargin: false,
+    );
+
     Get.dialog(
       Dialog(
         child: Container(
@@ -577,10 +608,18 @@ class DesktopCarsPage extends StatelessWidget {
                               'Odometer',
                               '${NumberFormat.decimalPattern('en_IN').format(car.odometerKm)} km',
                             ),
-                            _detailRow(
-                              'Highest Bid',
-                              'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-',
-                            ),
+                            RoleSwitcherWidget(builder: (isSalesManager) {
+                              if (isSalesManager) {
+                                return _detailRow(
+                                  'Highest Bid',
+                                  'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-',
+                                );
+                              }
+                              return _detailRow(
+                                'Highest Bid',
+                                'Rs. ${NumberFormat.decimalPattern('en_IN').format(highestBidAfterMarginAdjustment)}/-',
+                              );
+                            }),
                             _detailRow(
                               'Status',
                               DesktopCarsController.filterLabel(
@@ -666,6 +705,18 @@ class DesktopCarsPage extends StatelessWidget {
                                       } catch (_) {}
                                     }
 
+                                    final double
+                                        highestBidAfterMarginAdjustment =
+                                        CarMarginHelpers
+                                            .netAfterMarginsFlexible(
+                                      originalPrice: bid['highestBid'],
+                                      priceDiscovery: car.priceDiscovery,
+                                      fixedMargin: bid['fixedMargin'],
+                                      variableMargin: bid['variableMargin'],
+                                      roundToPrevious1000: true,
+                                      increaseMargin: false,
+                                    );
+
                                     return ListTile(
                                       dense: true,
                                       contentPadding: EdgeInsets.zero,
@@ -685,12 +736,23 @@ class DesktopCarsPage extends StatelessWidget {
                                             Text('Bid time: $formattedTime'),
                                         ],
                                       ),
-                                      trailing: Text(
-                                        'Rs. ${NumberFormat.decimalPattern('en_IN').format(bidAmount)}/-',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                                      trailing: RoleSwitcherWidget(
+                                          builder: (isSalesManager) {
+                                        if (isSalesManager) {
+                                          return Text(
+                                            'Rs. ${NumberFormat.decimalPattern('en_IN').format(bidAmount)}/-',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          );
+                                        }
+                                        return Text(
+                                          'Rs. ${NumberFormat.decimalPattern('en_IN').format(highestBidAfterMarginAdjustment)}/-',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        );
+                                      }),
                                     );
                                   },
                                 );
@@ -706,11 +768,50 @@ class DesktopCarsPage extends StatelessWidget {
 
               const SizedBox(height: 10),
 
-              Align(
-                alignment: Alignment.centerRight,
-                child: ButtonWidget(
-                    text: 'Close', isLoading: false.obs, onTap: Get.back),
-              ),
+              RoleSwitcherWidget(builder: (isSalesManager) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    if (!isSalesManager)
+                      ButtonWidget(
+                        text: 'Set CEP',
+                        isLoading: false.obs,
+                        onTap: () {
+                          Get.back();
+
+                          Get.dialog(
+                            SetExpectedPriceDialogWidget(
+                              title: 'Set Expected Price',
+                              isSetPriceLoading: false.obs,
+                              initialValue: carsController
+                                  .getInitialPriceForExpectedPriceButton(
+                                expectedPrice: car.customerExpectedPrice,
+                                priceDiscovery: car.priceDiscovery,
+                              ),
+                              canIncreasePriceUpto150Percent:
+                                  carsController.canIncreasePriceUpto150Percent(
+                                expectedPrice: car.customerExpectedPrice,
+                              ),
+                              onPriceSelected: (selectedPrice) {
+                                carsController.setCustomerExpectedPrice(
+                                  carId: car.id,
+                                  customerExpectedPrice:
+                                      selectedPrice.toDouble(),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    if (!isSalesManager) const SizedBox(width: 10),
+                    ButtonWidget(
+                        text: 'Close',
+                        isLoading: false.obs,
+                        backgroundColor: AppColors.red,
+                        onTap: Get.back),
+                  ],
+                );
+              }),
             ],
           ),
         ),

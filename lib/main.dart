@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:otobix_crm/admin/admin_dashboard.dart';
 import 'package:otobix_crm/admin/admin_desktop_dashboard.dart';
 import 'package:otobix_crm/network/socket_service.dart';
+import 'package:otobix_crm/services/check_user_role_service.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_constants.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
@@ -51,6 +54,11 @@ class MyApp extends StatelessWidget {
 // Load Initial Data
 Future<Widget> loadInitialData() async {
   await SharedPrefsHelper.init();
+
+  // Setup role service for checking user role
+  await Get.putAsync<CheckUserRoleService>(
+      () async => await CheckUserRoleService().init());
+
   SocketService.instance.initSocket(AppUrls.socketBaseUrl);
 
   final token = await SharedPrefsHelper.getString(SharedPrefsHelper.tokenKey);
@@ -72,9 +80,14 @@ Future<Widget> loadInitialData() async {
         mobile: DesktopHomepage(),
         desktop: DesktopHomepage(),
       );
-
-      // Login
+    } else if (userRole == AppConstants.roles.retailer) {
+      // Retailer
+      firstScreen = ResponsiveLayout(
+        mobile: DesktopHomepage(),
+        desktop: DesktopHomepage(),
+      );
     } else {
+      // Login
       firstScreen = LoginPage();
     }
   } else {

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:otobix_crm/controllers/desktop_bid_history_controller.dart';
 import 'package:otobix_crm/controllers/desktop_cars_controller.dart';
 import 'package:otobix_crm/controllers/login_controller.dart';
+import 'package:otobix_crm/services/check_user_role_service.dart';
 import 'package:otobix_crm/utils/shared_prefs_helper.dart';
 import 'package:otobix_crm/views/login_page.dart';
 import 'package:sidebarx/sidebarx.dart';
@@ -88,6 +89,10 @@ class DesktopHomepageController extends GetxController {
   Future<void> logout() async {
     await SharedPrefsHelper.clearAll();
     Get.delete<LoginController>();
+    // ✅ refresh the SAME registered service
+    if (Get.isRegistered<CheckUserRoleService>()) {
+      await Get.find<CheckUserRoleService>().refresh();
+    }
     Get.offAll(() => LoginPage());
   }
 }
