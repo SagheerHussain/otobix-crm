@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:otobix_crm/admin/controller/admin_cars_list_controller.dart';
 import 'package:otobix_crm/models/cars_list_model.dart';
-import 'package:otobix_crm/services/car_margin_helpers.dart';
 import 'package:otobix_crm/utils/app_colors.dart';
 import 'package:otobix_crm/utils/app_images.dart';
 import 'package:otobix_crm/utils/global_functions.dart';
@@ -12,6 +11,7 @@ import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/empty_data_widget.dart';
 import 'package:otobix_crm/widgets/set_variable_margin_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
+import 'package:otobix_crm/widgets/show_bid_and_cep_data_widget.dart';
 import 'package:otobix_crm/widgets/tab_bar_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_oto_buy_cars_list_controller.dart';
 import 'package:otobix_crm/widgets/toast_widget.dart';
@@ -84,7 +84,9 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
       // onTap: () => _showOtoBuyCarsBottomSheet(car),
       onTap: () {
         final isSold = otoBuyController.isSold(car.id, car.auctionStatus);
-        !isSold ? _showAuctionCompletedCarsBottomSheet(car) : null;
+        !isSold
+            ? _showAuctionOtobuyCarsBottomSheet(car)
+            : _showBidAndCepDataSheet(car);
       },
       child: Card(
         elevation: 4,
@@ -328,8 +330,8 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
     );
   }
 
-  // Bottom sheet
-  void _showAuctionCompletedCarsBottomSheet(final CarsListModel car) {
+  // Bottom sheet for OtoBuy cars
+  void _showAuctionOtobuyCarsBottomSheet(final CarsListModel car) {
     showModalBottomSheet(
       context: Get.context!,
       backgroundColor: Colors.white,
@@ -341,9 +343,9 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
       builder: (context) {
         return DraggableScrollableSheet(
           expand: false,
-          maxChildSize: 0.7,
+          maxChildSize: 0.9,
           minChildSize: 0.3,
-          initialChildSize: 0.6,
+          initialChildSize: 0.8,
           builder: (_, scrollController) {
             return StatefulBuilder(
               builder: (context, setState) {
@@ -427,6 +429,120 @@ class AdminDesktopOtoBuyCarsListPage extends StatelessWidget {
             screens: [
               _buildMarkSoldScreen(car),
               _buildSetVariableMargin(car),
+              _buildRemoveScreen(car)
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Bottom sheet for showing bid and cep data
+  void _showBidAndCepDataSheet(final CarsListModel car) {
+    showModalBottomSheet(
+      context: Get.context!,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      constraints: BoxConstraints(maxWidth: Get.width * 0.5),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          maxChildSize: 0.9,
+          minChildSize: 0.3,
+          initialChildSize: 0.8,
+          builder: (_, scrollController) {
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return _buildBidAndCepDataSheetContent(car);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildBidAndCepDataSheetContent(final CarsListModel car) {
+    return Column(
+      children: [
+        SizedBox(height: 20),
+        // Grab handle
+        Center(
+          child: Container(
+            width: 48,
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.black12,
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        // Header
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: CachedNetworkImage(
+                  imageUrl: car.imageUrl,
+                  width: 64,
+                  height: 48,
+                  fit: BoxFit.cover,
+                  errorWidget: (_, __, ___) => const Icon(Icons.directions_car),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${car.make} ${car.model} ${car.variant}',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'OCP: Rs. ${NumberFormat.decimalPattern('en_IN').format(car.oneClickPrice)}/-',
+                      style: const TextStyle(
+                        color: AppColors.green,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 20),
+        Expanded(
+          child: TabBarWidget(
+            titles: ['Bid & CEP Data', 'Remove Car'],
+            showCount: false,
+            tabsHeight: 30,
+            counts: [0, 0],
+            screens: [
+              ShowBidAndCepDataWidget(
+                carId: car.id,
+                highestBid: car.highestBid.toDouble(),
+                priceDiscovery: car.priceDiscovery.toDouble(),
+                customerExpectedPrice: car.customerExpectedPrice.toDouble(),
+                fixedMargin: car.fixedMargin?.toDouble(),
+                variableMargin: car.variableMargin?.toDouble(),
+                isMobile: false,
+              ),
               _buildRemoveScreen(car)
             ],
           ),

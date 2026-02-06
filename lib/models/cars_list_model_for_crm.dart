@@ -9,6 +9,10 @@ class CarsListModelForCrm {
   final double soldAt;
   final String soldToName;
   final String thumbnailUrl;
+  final double customerExpectedPrice;
+  final double priceDiscovery;
+  final double fixedMargin;
+  final double variableMargin;
 
   CarsListModelForCrm({
     required this.id,
@@ -21,6 +25,10 @@ class CarsListModelForCrm {
     required this.soldAt,
     required this.soldToName,
     required this.thumbnailUrl,
+    required this.customerExpectedPrice,
+    required this.priceDiscovery,
+    required this.fixedMargin,
+    required this.variableMargin,
   });
 
   factory CarsListModelForCrm.fromJson(Map<String, dynamic> json) {
@@ -37,6 +45,11 @@ class CarsListModelForCrm {
       soldAt: (json['soldAt'] as num?)?.toDouble() ?? 0,
       soldToName: json['soldToName'] as String? ?? '',
       thumbnailUrl: json['thumbnailUrl']?.toString() ?? '',
+      customerExpectedPrice:
+          (json['customerExpectedPrice'] as num?)?.toDouble() ?? 0,
+      priceDiscovery: (json['priceDiscovery'] as num?)?.toDouble() ?? 0,
+      fixedMargin: (json['fixedMargin'] as num?)?.toDouble() ?? 0,
+      variableMargin: (json['variableMargin'] as num?)?.toDouble() ?? 0,
     );
   }
 
@@ -52,6 +65,10 @@ class CarsListModelForCrm {
       'soldAt': soldAt,
       'soldToName': soldToName,
       'thumbnailUrl': thumbnailUrl,
+      'customerExpectedPrice': customerExpectedPrice,
+      'priceDiscovery': priceDiscovery,
+      'fixedMargin': fixedMargin,
+      'variableMargin': variableMargin,
     };
   }
 }

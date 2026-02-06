@@ -13,6 +13,7 @@ import 'package:otobix_crm/utils/global_functions.dart';
 import 'package:otobix_crm/widgets/button_widget.dart';
 import 'package:otobix_crm/widgets/empty_data_widget.dart';
 import 'package:otobix_crm/widgets/shimmer_widget.dart';
+import 'package:otobix_crm/widgets/show_bid_and_cep_data_widget.dart';
 import 'package:otobix_crm/widgets/tab_bar_widget.dart';
 import 'package:otobix_crm/widgets/toast_widget.dart';
 import 'package:otobix_crm/admin/controller/admin_auction_completed_cars_list_controller.dart';
@@ -365,12 +366,26 @@ class AdminDesktopAuctionCompletedCarsListPage extends StatelessWidget {
 
         Expanded(
           child: TabBarWidget(
-            titles: ['Move to Otobuy', 'Make Live Again', 'Remove Car'],
-            counts: [0, 0, 0],
+            titles: [
+              'Move to Otobuy',
+              'Make Live Again',
+              'Bid & CEP Data',
+              'Remove Car'
+            ],
+            counts: [0, 0, 0, 0],
             showCount: false,
             screens: [
               _buildMoveToOtobuyWidget(car),
               _buildMakeLiveWidget(car, Get.context!),
+              ShowBidAndCepDataWidget(
+                carId: car.id,
+                highestBid: car.highestBid.toDouble(),
+                priceDiscovery: car.priceDiscovery.toDouble(),
+                customerExpectedPrice: car.customerExpectedPrice.toDouble(),
+                fixedMargin: car.fixedMargin?.toDouble(),
+                variableMargin: car.variableMargin?.toDouble(),
+                isMobile: false,
+              ),
               _buildRemoveScreen(car),
             ],
             titleSize: 10,

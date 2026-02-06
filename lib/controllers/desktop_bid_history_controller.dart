@@ -1,16 +1,20 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:otobix_crm/models/bid_summary_model.dart';
 import 'package:otobix_crm/models/bids_list_model.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
 import 'package:otobix_crm/network/api_service.dart';
+import 'package:otobix_crm/widgets/toast_widget.dart';
 
 class DesktopBidHistoryController extends GetxController {
   // Loading & error
   final isPageLoading = false.obs;
   final isBidsLoading = false.obs;
   final error = RxnString();
+  final RxBool isSetExpectedPriceLoading = false.obs;
 
   // Data
   final summary = Rxn<BidsSummaryModel>();
@@ -199,4 +203,74 @@ class DesktopBidHistoryController extends GetxController {
 
 // Load
   Future<void> load() => reload();
+
+  // Get initial price for expected price button
+  double getInitialPriceForExpectedPriceButton({
+    required double expectedPrice,
+    required double priceDiscovery,
+  }) {
+    final double finalPrice =
+        expectedPrice != 0 ? expectedPrice : priceDiscovery;
+    return finalPrice;
+  }
+
+  // Check which (pd/expected) price is this for expected price button
+  bool canIncreasePriceUpto150Percent({
+    required double expectedPrice,
+  }) {
+    final bool type = expectedPrice != 0 ? false : true;
+    return type;
+  }
+
+  // Set customer expected price
+  Future<void> setCustomerExpectedPrice({
+    required String carId,
+    required double customerExpectedPrice,
+  }) async {
+    if (customerExpectedPrice <= 0) {
+      ToastWidget.show(
+        context: Get.context!,
+        title: 'Enter a valid amount',
+        type: ToastType.error,
+      );
+      return;
+    }
+
+    isSetExpectedPriceLoading.value = true;
+
+    try {
+      final response = await ApiService.put(
+        endpoint: AppUrls.setCustomerExpectedPrice,
+        body: {'carId': carId, 'customerExpectedPrice': customerExpectedPrice},
+      );
+
+      if (response.statusCode == 200) {
+        ToastWidget.show(
+          context: Get.context!,
+          title: 'Success',
+          subtitle:
+              'Successfully updated expected price to Rs. ${NumberFormat.decimalPattern('en_IN').format(customerExpectedPrice)}/-',
+          type: ToastType.success,
+        );
+      } else {
+        debugPrint('Failed to update expected price ${response.statusCode}');
+        ToastWidget.show(
+          context: Get.context!,
+          title: 'Failed',
+          subtitle: 'Failed to update expected price',
+          type: ToastType.error,
+        );
+      }
+    } catch (error) {
+      debugPrint('Error: $error');
+      ToastWidget.show(
+        context: Get.context!,
+        title: 'Error',
+        subtitle: 'Error updating expected price',
+        type: ToastType.error,
+      );
+    } finally {
+      isSetExpectedPriceLoading.value = false;
+    }
+  }
 }

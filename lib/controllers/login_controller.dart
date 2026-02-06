@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:otobix_crm/admin/admin_dashboard.dart';
 import 'package:otobix_crm/admin/admin_desktop_dashboard.dart';
 import 'package:otobix_crm/network/api_service.dart';
+import 'package:otobix_crm/services/check_user_role_service.dart';
 import 'package:otobix_crm/utils/app_constants.dart';
 import 'package:otobix_crm/utils/app_urls.dart';
 import 'package:otobix_crm/utils/responsive_layout.dart';
@@ -44,6 +45,9 @@ class LoginController extends GetxController {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
+        // Refresh the user role service to update the user role
+        await Get.find<CheckUserRoleService>().refresh();
+
         final token = data['token'];
         final user = data['user'];
         final userRole = user['userType'];
@@ -60,6 +64,10 @@ class LoginController extends GetxController {
         }
         if (approvalStatus == 'Approved' &&
             userRole == AppConstants.roles.salesManager) {
+          await SharedPrefsHelper.saveString(SharedPrefsHelper.tokenKey, token);
+        }
+        if (approvalStatus == 'Approved' &&
+            userRole == AppConstants.roles.retailer) {
           await SharedPrefsHelper.saveString(SharedPrefsHelper.tokenKey, token);
         }
 
@@ -103,6 +111,13 @@ class LoginController extends GetxController {
             ),
           );
         } else if (userRole == AppConstants.roles.salesManager) {
+          Get.offAll(
+            () => ResponsiveLayout(
+              mobile: DesktopHomepage(),
+              desktop: DesktopHomepage(),
+            ),
+          );
+        } else if (userRole == AppConstants.roles.retailer) {
           Get.offAll(
             () => ResponsiveLayout(
               mobile: DesktopHomepage(),

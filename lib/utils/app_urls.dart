@@ -80,8 +80,8 @@ class AppUrls {
   static String get getApprovedDealersList =>
       "${baseUrl}admin/dealers/get-approved-dealers-list";
 
-  static String get getInspectionRequestsList =>
-      "${baseUrl}admin/inspection-requests/get-list";
+  static String get getTelecallingsList =>
+      "${baseUrl}admin/telecallings/get-list";
 
   static String get getAppUpdatesList =>
       "${baseUrl}admin/app-versions/get-list";
