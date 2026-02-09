@@ -216,6 +216,18 @@ class DesktopCarsPage extends StatelessWidget {
           increaseMargin: false,
         );
 
+        
+
+        final double cepAfterMarginAdjustment =
+            CarMarginHelpers.netAfterMarginsFlexible(
+          originalPrice: car.customerExpectedPrice,
+          priceDiscovery: car.priceDiscovery,
+          fixedMargin: car.fixedMargin,
+          variableMargin: car.variableMargin,
+          roundToNext1000: true,
+          increaseMargin: true,
+        );
+
         return DataRow(
           onSelectChanged: (selected) {
             if (selected ?? false) {
@@ -259,6 +271,19 @@ class DesktopCarsPage extends StatelessWidget {
                 }
                 return Text(
                   'Rs. ${NumberFormat.decimalPattern('en_IN').format(highestBidAfterMarginAdjustment)}/-',
+                );
+              }),
+            ), 
+            // Customer Expected Price
+            DataCell(
+              RoleSwitcherWidget(builder: (isSalesManager) {
+                if (isSalesManager) {
+                  return Text(
+                    'Rs. ${NumberFormat.decimalPattern('en_IN').format(cepAfterMarginAdjustment)}/-',
+                  );
+                }
+                return Text(
+                  'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.customerExpectedPrice)}/-',
                 );
               }),
             ),
@@ -320,6 +345,16 @@ class DesktopCarsPage extends StatelessWidget {
           increaseMargin: false,
         );
 
+        final double cepAfterMarginAdjustment =
+            CarMarginHelpers.netAfterMarginsFlexible(
+          originalPrice: car.customerExpectedPrice,
+          priceDiscovery: car.priceDiscovery,
+          fixedMargin: car.fixedMargin,
+          variableMargin: car.variableMargin,
+          roundToNext1000: true,
+          increaseMargin: true,
+        );
+
         return DataRow(
           onSelectChanged: (selected) {
             if (selected ?? false) {
@@ -362,6 +397,19 @@ class DesktopCarsPage extends StatelessWidget {
                 );
               }
             )),
+             // Customer Expected Price
+            DataCell(
+              RoleSwitcherWidget(builder: (isSalesManager) {
+                if (isSalesManager) {
+                  return Text(
+                    'Rs. ${NumberFormat.decimalPattern('en_IN').format(cepAfterMarginAdjustment)}/-',
+                  );
+                }
+                return Text(
+                  'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.customerExpectedPrice)}/-',
+                );
+              }),
+            ),
             // Status chip
             DataCell(
               Container(
@@ -420,6 +468,9 @@ class DesktopCarsPage extends StatelessWidget {
                 label: Text("Highest Bid",
                     style: TextStyle(fontWeight: FontWeight.bold))),
             DataColumn(
+                label: Text("CEP",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
+            DataColumn(
                 label: Text("Status",
                     style: TextStyle(fontWeight: FontWeight.bold))),
           ],
@@ -427,6 +478,7 @@ class DesktopCarsPage extends StatelessWidget {
             50,
             250,
             160,
+            120,
             120,
             120,
             140,
@@ -471,6 +523,9 @@ class DesktopCarsPage extends StatelessWidget {
           DataColumn(
               label: Text("Highest Bid",
                   style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataColumn(
+                label: Text("CEP",
+                    style: TextStyle(fontWeight: FontWeight.bold))),
           DataColumn(
               label: Text("Status",
                   style: TextStyle(fontWeight: FontWeight.bold))),
@@ -488,6 +543,7 @@ class DesktopCarsPage extends StatelessWidget {
           120, // City
           120, // Odometer
           140, // Highest Bid
+          140, // CEP
           140, // Status
           140, // Sold At
           200, // Sold To
