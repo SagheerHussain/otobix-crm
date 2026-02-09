@@ -579,7 +579,7 @@ class DesktopCarsPage extends StatelessWidget {
         child: Container(
           constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 0.5,
-            maxHeight: MediaQuery.of(context).size.height * 0.5,
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
           ),
           padding: const EdgeInsets.all(16),
           child: Column(
