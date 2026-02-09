@@ -310,6 +310,16 @@ class DesktopCarsPage extends StatelessWidget {
           return value[0].toUpperCase() + value.substring(1);
         }
 
+          final double highestBidAfterMarginAdjustment =
+            CarMarginHelpers.netAfterMarginsFlexible(
+          originalPrice: car.highestBid,
+          priceDiscovery: car.priceDiscovery,
+          fixedMargin: car.fixedMargin,
+          variableMargin: car.variableMargin,
+          roundToPrevious1000: true,
+          increaseMargin: false,
+        );
+
         return DataRow(
           onSelectChanged: (selected) {
             if (selected ?? false) {
@@ -341,8 +351,17 @@ class DesktopCarsPage extends StatelessWidget {
             DataCell(Text(
                 '${NumberFormat.decimalPattern('en_IN').format(car.odometerKm)} km')),
             // Highest Bid
-            DataCell(Text(
-                'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-')),
+            DataCell(    RoleSwitcherWidget(builder: (isSalesManager) {
+                  if (isSalesManager) {
+                  return Text(
+                    'Rs. ${NumberFormat.decimalPattern('en_IN').format(car.highestBid)}/-',
+                  );
+                }
+                return Text(
+                  'Rs. ${NumberFormat.decimalPattern('en_IN').format(highestBidAfterMarginAdjustment)}/-',
+                );
+              }
+            )),
             // Status chip
             DataCell(
               Container(
