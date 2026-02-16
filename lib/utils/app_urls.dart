@@ -10,7 +10,7 @@ class AppUrls {
 //
   static const String baseUrl = String.fromEnvironment(
     'BASE_URL',
-    defaultValue: 'http://192.168.2.35:4000/api/', // For Local Host Testing
+    defaultValue: 'http://192.168.2.36:4000/api/', // For Local Host Testing
     // defaultValue: 'https://otobix-app-backend-development.onrender.com/api/', // For Development
     // defaultValue: 'https://ob-dealerapp-kong.onrender.com/api/', // For Production
   );
@@ -84,6 +84,9 @@ class AppUrls {
 
   static String get getTelecallingsList =>
       "${baseUrl}admin/telecallings/get-list";
+
+  static String get getInterestedBuyersList =>
+      "${baseUrl}admin/interested-buyers/get-list";
 
   static String get getAppUpdatesList =>
       "${baseUrl}admin/app-versions/get-list";
