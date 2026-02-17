@@ -67,6 +67,8 @@ class DesktopInterestedBuyersPage extends StatelessWidget {
             DataCell(Text(_safe(item.interestedBuyerId, fallback: _safe(item.id)))),
             DataCell(Text(_safe(item.dealerName))),
             DataCell(Text(_safe(item.dealerPhoneNumber))),
+            DataCell(Text(_safe(item.customerUserName))),
+            DataCell(Text(_safe(item.customerPhoneNumber))),
             DataCell(Text(_safe(item.dealerCity))),
             DataCell(Text(_carTitle(item))),
             DataCell(Text(_safe(item.carYear))),
@@ -97,6 +99,14 @@ class DesktopInterestedBuyersPage extends StatelessWidget {
           ),
           DataColumn(
             label: Text("Dealer Phone",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          DataColumn(
+            label: Text("Customer Name",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          DataColumn(
+            label: Text("Customer Phone",
                 style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           DataColumn(
@@ -136,6 +146,8 @@ class DesktopInterestedBuyersPage extends StatelessWidget {
           170, // InterestedBuyer ID
           170, // Dealer
           150, // Dealer Phone
+          150, // Customer Name
+          150, // Customer Phone
           140, // City
           260, // Car
           90,  // Year
@@ -205,6 +217,8 @@ class DesktopInterestedBuyersPage extends StatelessWidget {
                 const SizedBox(height: 6),
                 _detailRow('Interested Buyer ID', _safe(item.interestedBuyerId, fallback: _safe(item.id))),
                 _detailRow('Activity Type', _safe(item.activityType)),
+                _detailRow('Customer Name', _safe(item.customerUserName)),
+                _detailRow('Customer Phone', _safe(item.customerPhoneNumber)),
                 _detailRow('Is Deleted', item.isDeleted ? 'Yes' : 'No'),
 
                 const SizedBox(height: 14),

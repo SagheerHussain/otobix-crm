@@ -45,6 +45,10 @@ class InterestedBuyersModel {
   final String activityType; // "interested"
   final String interestedBuyerId;
 
+  // Extra fields not in mongo model or docs of interestedBuyers collection
+  final String? customerPhoneNumber;
+  final String? customerUserName;
+
   const InterestedBuyersModel({
     this.id,
     this.createdAt,
@@ -88,6 +92,10 @@ class InterestedBuyersModel {
     // Customer app related data
     this.activityType = "interested",
     this.interestedBuyerId = "",
+
+    // Extra fields not in mongo model or docs of interestedBuyers collection
+    this.customerPhoneNumber,
+    this.customerUserName,
   });
 
   factory InterestedBuyersModel.fromJson(Map<String, dynamic> json) {
@@ -138,6 +146,10 @@ class InterestedBuyersModel {
       // Customer app related data
       activityType: (json["activityType"] ?? "interested").toString(),
       interestedBuyerId: (json["interestedBuyerId"] ?? "").toString(),
+
+      // Extra fields not in mongo model or docs of interestedBuyers collection
+      customerPhoneNumber: (json["customerPhoneNumber"] ?? "").toString(),
+      customerUserName: (json["customerUserName"] ?? "").toString(),
     );
   }
 
