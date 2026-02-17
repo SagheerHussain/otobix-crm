@@ -54,6 +54,9 @@ class AdminUpcomingCarsListController extends GetxController {
         // setupCountdowns(upcomingCarsList);
 
         filteredUpcomingCarsList.assignAll(upcomingCarsList);
+        for (var element in filteredUpcomingCarsList) {
+          debugPrint('Upcoming Response: ${element.appointmentId}');
+        }
         // setupCountdowns(filteredUpcomingCarsList);
         setupCountdowns(filteredUpcomingCarsList.toList());
       } else {
@@ -99,28 +102,56 @@ class AdminUpcomingCarsListController extends GetxController {
         remainingTimes[car.id] = 'N/A';
         return;
       }
+      
+void tick() {
+  final nowUtc = DateTime.now().toUtc();
+  final untilUtc = until.toUtc();
+  final diff = untilUtc.difference(nowUtc);
 
-      void tick() {
-        final diff = until.difference(DateTime.now());
+  if (diff.inSeconds <= 0) {
+    remainingTimes[car.id] = '00h : 00m : 00s';
 
-        if (diff.inSeconds <= 0) {
-          remainingTimes[car.id] = '00h : 00m : 00s';
+    _timers[car.id]?.cancel();
+    _timers.remove(car.id);
 
-          _timers[car.id]?.cancel();
-          _timers.remove(car.id);
-          remainingTimes.remove(car.id);
+    // TEMP: don't remove yet (see next point)
+    // Future.microtask(() {
+    //   filteredUpcomingCarsList.removeWhere((c) => c.id == car.id);
+    //   upcomingCarsCount.value = filteredUpcomingCarsList.length;
+    // });
 
-          // ✅ Defer list mutation so it never clashes with any current loop/build
-          Future.microtask(() {
-            filteredUpcomingCarsList.removeWhere((c) => c.id == car.id);
-            upcomingCarsCount.value = filteredUpcomingCarsList.length;
-          });
+    return;
+  }
 
-          return;
-        }
+  remainingTimes[car.id] = fmt(diff);
+}
 
-        remainingTimes[car.id] = fmt(diff);
-      }
+//       void tick() {
+//         final diff = until.difference(DateTime.now());
+
+//         final now = DateTime.now();
+// debugPrint('CAR ${car.appointmentId} id=${car.id}');
+// debugPrint('until=${until.toIso8601String()} now=${now.toIso8601String()} diff=${diff.inSeconds}');
+
+
+//         if (diff.inSeconds <= 0) {
+//           remainingTimes[car.id] = '00h : 00m : 00s';
+
+//           _timers[car.id]?.cancel();
+//           _timers.remove(car.id);
+//           remainingTimes.remove(car.id);
+
+//           // ✅ Defer list mutation so it never clashes with any current loop/build
+//           Future.microtask(() {
+//             filteredUpcomingCarsList.removeWhere((c) => c.id == car.id);
+//             upcomingCarsCount.value = filteredUpcomingCarsList.length;
+//           });
+
+//           return;
+//         }
+
+//         remainingTimes[car.id] = fmt(diff);
+//       }
 
       tick(); // prime immediately
       _timers[car.id] =
